@@ -1,0 +1,35 @@
+# Godot-specific ignores
+.godot/
+.import/
+export_presets.cfg
+
+# Imported translations (automatically generated from CSV files)
+*.translation
+
+# Mono-specific ignores
+.mono/
+data_*/
+mono_crash.*
+
+# System/tool-specific ignores
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE-specific ignores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build outputs
+build/
+dist/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Logs
+*.log
