@@ -11,6 +11,7 @@ const MAX_ROTATION_DOWN = 45.0  # Max rotation when falling down (degrees)
 const ROTATION_SPEED = 3.0      # How fast the rotation changes
 const MIN_SPEED_FOR_ROTATION = 50.0  # Minimum speed to start rotating
 const MAX_SPEED_FOR_ROTATION = 1000.0  # Speed at which max rotation is reached
+const FLY_ANIMATION_THRESHOLD = 7.0  # Rotation threshold to trigger fly animation (degrees)
 
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 
@@ -35,6 +36,8 @@ func _physics_process(delta):
 
 	# Update rotation based on actual speed
 	update_rotation(delta)
+	
+	update_animation()
 
 	move_and_slide()
 
@@ -60,3 +63,17 @@ func update_rotation(delta):
 	var current_rotation_deg = rad_to_deg(rotation)
 	var new_rotation_deg = lerp(current_rotation_deg, target_rotation, ROTATION_SPEED * delta)
 	rotation = deg_to_rad(new_rotation_deg)
+
+
+func update_animation():
+	# Get current rotation in degrees
+	var current_rotation_deg = rad_to_deg(rotation)
+	
+	# Play fly animation when rotation is less than negative threshold (going up)
+	if current_rotation_deg < -FLY_ANIMATION_THRESHOLD:
+		if $AnimatedSprite2D.animation != "fly":
+			$AnimatedSprite2D.play("fly")
+	else:
+		# When rotation is at threshold or higher, play glide animation (going down or level)
+		if $AnimatedSprite2D.animation != "glide":
+			$AnimatedSprite2D.play("glide")
