@@ -1,7 +1,11 @@
 extends CharacterBody2D
 
+@onready var eagle = $"."
+@onready var label = $"../CanvasLayer/Label"
+
+
 # State machine enum
-enum EagleState {GLIDING, FLAPPING}
+enum EagleState {GLIDING, CHANGING_POSITION}
 
 # Physics constants
 const MAX_UP_VELOCITY = -600.0  # Max upward speed
@@ -14,6 +18,7 @@ const NEUTRAL_THRESHOLD = 5.0  # Speed threshold for neutral state
 
 # Animation constants
 const GLIDE_FLAP_INTERVAL = 3.0  # Seconds between glide flaps
+const GLIDE_FLAP_CYCLES = 2      # Number of flap cycles during glide flap
 
 # Rotation constants
 const MAX_ROTATION_UP = -45.0   # Max rotation when flying up (degrees)
@@ -29,10 +34,16 @@ var current_state: EagleState = EagleState.GLIDING
 var previous_velocity_y: float = 0.0
 var glide_flap_timer: float = 0.0
 var is_glide_flapping: bool = false
+var glide_flap_cycle_count: int = 0
 
 func _ready():
 	# Initialize with gliding state (default)
 	change_state(EagleState.GLIDING)
+
+
+func update_UI():
+	label.text = str(EagleState.keys()[current_state])
+
 
 func _physics_process(delta):
 	# Determine target state based on input and velocity
@@ -51,13 +62,15 @@ func _physics_process(delta):
 	# Apply movement
 	move_and_slide()
 	
+	update_UI()
+	
 	# Store previous velocity for state transitions
 	previous_velocity_y = velocity.y
 
 func determine_target_state() -> EagleState:
-	# Check for flapping state first (input should always override other states)
+	# Check for changing position state first (input should always override other states)
 	if Input.is_action_pressed("move_up") or Input.is_action_pressed("move_down"):
-		return EagleState.FLAPPING
+		return EagleState.CHANGING_POSITION
 	
 	# Default to gliding (no input or any motion)
 	return EagleState.GLIDING
@@ -70,7 +83,7 @@ func change_state(new_state: EagleState):
 	
 	# Set animation based on new state
 	match current_state:
-		EagleState.FLAPPING:
+		EagleState.CHANGING_POSITION:
 			if $AnimatedSprite2D.animation != "flap":
 				$AnimatedSprite2D.play("flap")
 		EagleState.GLIDING:
@@ -81,10 +94,11 @@ func change_state(new_state: EagleState):
 	if new_state == EagleState.GLIDING:
 		glide_flap_timer = 0.0
 		is_glide_flapping = false
+	
 
 func apply_state_physics(delta):
 	match current_state:
-		EagleState.FLAPPING:
+		EagleState.CHANGING_POSITION:
 			apply_flapping_physics(delta)
 		EagleState.GLIDING:
 			apply_gliding_physics(delta)
@@ -133,15 +147,22 @@ func apply_gliding_physics(delta):
 func start_glide_flap():
 	is_glide_flapping = true
 	glide_flap_timer = 0.0
+	glide_flap_cycle_count = 0
 	
-	# Play the flap animation once (make sure 'flap' is not set to loop in SpriteFrames)
+	# Play the flap animation for 2 cycles
 	if $AnimatedSprite2D.animation != "flap":
 		$AnimatedSprite2D.play("flap")
 	
-	# Wait for the animation to finish, then return to glide
-	await $AnimatedSprite2D.animation_finished
+	# Wait for 2 full animation cycles to complete
+	while glide_flap_cycle_count < GLIDE_FLAP_CYCLES:
+		await $AnimatedSprite2D.animation_finished
+		glide_flap_cycle_count += 1
+		
+		# If we haven't completed all cycles, restart the flap animation
+		if glide_flap_cycle_count < GLIDE_FLAP_CYCLES:
+			$AnimatedSprite2D.play("flap")
 	
-	# Return to glide animation
+	# Return to glide animation after completing all cycles
 	if current_state == EagleState.GLIDING:
 		$AnimatedSprite2D.play("glide")
 		is_glide_flapping = false
