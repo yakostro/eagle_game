@@ -6,10 +6,14 @@ enum EagleState {GLIDING, FLAPPING}
 # Physics constants
 const MAX_UP_VELOCITY = -600.0  # Max upward speed
 const MAX_DOWN_VELOCITY = 800.0  # Max downward speed
-const GRAVITY_SCALE = 0.1       # Slow gravity for gentle descent
 const LIFT_ACCELERATION = 11000.0  # Strong flap
 const DIVE_ACCELERATION = 12000.0  # Strong dive
 const DRAG = 500.0             # Counter-force to stop going up too far
+const NEUTRAL_DRAG = 800.0     # Force to return to neutral position
+const NEUTRAL_THRESHOLD = 5.0  # Speed threshold for neutral state
+
+# Animation constants
+const GLIDE_FLAP_INTERVAL = 3.0  # Seconds between glide flaps
 
 # Rotation constants
 const MAX_ROTATION_UP = -45.0   # Max rotation when flying up (degrees)
@@ -21,9 +25,10 @@ const MAX_SPEED_FOR_ROTATION = 1000.0  # Speed at which max rotation is reached
 # State transition constants
 const STATE_TRANSITION_HYSTERESIS = 10.0  # Prevents rapid state switching
 
-var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 var current_state: EagleState = EagleState.GLIDING
 var previous_velocity_y: float = 0.0
+var glide_flap_timer: float = 0.0
+var is_glide_flapping: bool = false
 
 func _ready():
 	# Initialize with gliding state (default)
@@ -54,11 +59,7 @@ func determine_target_state() -> EagleState:
 	if Input.is_action_pressed("move_up") or Input.is_action_pressed("move_down"):
 		return EagleState.FLAPPING
 	
-	# Check for flapping state based on upward motion
-	if velocity.y < -STATE_TRANSITION_HYSTERESIS:
-		return EagleState.FLAPPING
-	
-	# Default to gliding (downward motion or no input)
+	# Default to gliding (no input or any motion)
 	return EagleState.GLIDING
 
 func change_state(new_state: EagleState):
@@ -67,7 +68,7 @@ func change_state(new_state: EagleState):
 	
 	current_state = new_state
 	
-	# Update animation based on new state
+	# Set animation based on new state
 	match current_state:
 		EagleState.FLAPPING:
 			if $AnimatedSprite2D.animation != "flap":
@@ -75,6 +76,11 @@ func change_state(new_state: EagleState):
 		EagleState.GLIDING:
 			if $AnimatedSprite2D.animation != "glide":
 				$AnimatedSprite2D.play("glide")
+	
+	# Reset glide flap timer when entering gliding state
+	if new_state == EagleState.GLIDING:
+		glide_flap_timer = 0.0
+		is_glide_flapping = false
 
 func apply_state_physics(delta):
 	match current_state:
@@ -83,13 +89,8 @@ func apply_state_physics(delta):
 		EagleState.GLIDING:
 			apply_gliding_physics(delta)
 	
-	# Apply gravity to all states
-	velocity.y += gravity * GRAVITY_SCALE * delta
-	
 	# Clamp vertical velocity between max up/down
 	velocity.y = clamp(velocity.y, MAX_UP_VELOCITY, MAX_DOWN_VELOCITY)
-
-
 
 func apply_flapping_physics(delta):
 	# Apply upward force when input is pressed
@@ -99,11 +100,20 @@ func apply_flapping_physics(delta):
 	elif Input.is_action_pressed("move_down") and velocity.y < MAX_DOWN_VELOCITY:
 		velocity.y += DIVE_ACCELERATION * delta
 	else:
-		# No input: apply drag to upward motion to transition to gliding
+		# No input: apply drag to return to neutral
 		if velocity.y < 0.0:
 			velocity.y += DRAG * delta
+		elif velocity.y > 0.0:
+			velocity.y -= DRAG * delta
 
 func apply_gliding_physics(delta):
+	# Handle glide flap animation timer
+	glide_flap_timer += delta
+	
+	# Check if it's time for a glide flap
+	if glide_flap_timer >= GLIDE_FLAP_INTERVAL and not is_glide_flapping:
+		start_glide_flap()
+	
 	# In gliding state, allow dive input for faster descent
 	if Input.is_action_pressed("move_down") and velocity.y < MAX_DOWN_VELOCITY:
 		velocity.y += DIVE_ACCELERATION * 0.5 * delta
@@ -111,10 +121,30 @@ func apply_gliding_physics(delta):
 	elif Input.is_action_pressed("move_up") and velocity.y > MAX_UP_VELOCITY:
 		velocity.y -= LIFT_ACCELERATION * delta
 	else:
-		# Natural gliding: let gravity handle descent
-		# Apply minimal drag to prevent excessive speed
-		if velocity.y > 200.0:
-			velocity.y -= DRAG * 0.2 * delta
+		# No input: apply drag to gradually return to neutral
+		if velocity.y > NEUTRAL_THRESHOLD:
+			velocity.y -= NEUTRAL_DRAG * delta
+		elif velocity.y < -NEUTRAL_THRESHOLD:
+			velocity.y += NEUTRAL_DRAG * delta
+		else:
+			# Very close to neutral, stop movement
+			velocity.y = 0.0
+
+func start_glide_flap():
+	is_glide_flapping = true
+	glide_flap_timer = 0.0
+	
+	# Play the flap animation once (make sure 'flap' is not set to loop in SpriteFrames)
+	if $AnimatedSprite2D.animation != "flap":
+		$AnimatedSprite2D.play("flap")
+	
+	# Wait for the animation to finish, then return to glide
+	await $AnimatedSprite2D.animation_finished
+	
+	# Return to glide animation
+	if current_state == EagleState.GLIDING:
+		$AnimatedSprite2D.play("glide")
+		is_glide_flapping = false
 
 func update_rotation(delta):
 	# Calculate actual speed (magnitude of velocity)
