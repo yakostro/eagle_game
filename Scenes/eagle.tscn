@@ -65,7 +65,7 @@ animations = [{
 "texture": ExtResource("10_q8ain")
 }],
 "loop": true,
-"name": &"fly",
+"name": &"flap",
 "speed": 10.0
 }, {
 "frames": [{
@@ -141,8 +141,8 @@ animations = [{
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 position = Vector2(-327, -36)
 sprite_frames = SubResource("SpriteFrames_kheon")
-animation = &"fly"
-autoplay = "fly"
+animation = &"flap"
+autoplay = "flap"
 flip_h = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
