@@ -1,6 +1,7 @@
-[gd_scene load_steps=33 format=3 uid="uid://cd42djg346oqy"]
+[gd_scene load_steps=34 format=3 uid="uid://cd42djg346oqy"]
 
 [ext_resource type="Texture2D" uid="uid://bx2kqxbypi61f" path="res://sprites/bald_eagle/Flying/__eagle_flying_000.png" id="1_7vcbr"]
+[ext_resource type="Script" path="res://scripts/eagle.gd" id="1_pt68i"]
 [ext_resource type="Texture2D" uid="uid://74410xiobhg0" path="res://sprites/bald_eagle/Flying/__eagle_flying_001.png" id="2_hto6r"]
 [ext_resource type="Texture2D" uid="uid://cgqqn1ucgjtdw" path="res://sprites/bald_eagle/Flying/__eagle_flying_002.png" id="3_hrt4n"]
 [ext_resource type="Texture2D" uid="uid://cjg35so46w2rb" path="res://sprites/bald_eagle/Flying/__eagle_flying_003.png" id="4_lfcxg"]
@@ -64,7 +65,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("10_q8ain")
 }],
-"loop": true,
+"loop": false,
 "name": &"flap",
 "speed": 10.0
 }, {
@@ -137,12 +138,13 @@ animations = [{
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_yl77t"]
 
 [node name="Eagle" type="CharacterBody2D"]
+script = ExtResource("1_pt68i")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 position = Vector2(-327, -36)
 sprite_frames = SubResource("SpriteFrames_kheon")
 animation = &"flap"
-autoplay = "flap"
+autoplay = "glide"
 flip_h = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
@@ -150,3 +152,5 @@ position = Vector2(-243, 19)
 rotation = 1.5708
 scale = Vector2(4, 10)
 shape = SubResource("CapsuleShape2D_yl77t")
+
+[connection signal="animation_finished" from="AnimatedSprite2D" to="." method="_on_animated_sprite_2d_animation_finished"]

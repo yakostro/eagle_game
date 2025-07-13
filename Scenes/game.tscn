@@ -1,13 +1,11 @@
-[gd_scene load_steps=3 format=3 uid="uid://bvfc1tl8ttpuo"]
+[gd_scene load_steps=2 format=3 uid="uid://bvfc1tl8ttpuo"]
 
 [ext_resource type="PackedScene" uid="uid://cd42djg346oqy" path="res://Scenes/eagle.tscn" id="1_ek57t"]
-[ext_resource type="Script" path="res://Scenes/eagle.gd" id="2_g3vbx"]
 
 [node name="Game" type="Node"]
 
 [node name="Eagle" parent="." instance=ExtResource("1_ek57t")]
 position = Vector2(-147, -103)
-script = ExtResource("2_g3vbx")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 

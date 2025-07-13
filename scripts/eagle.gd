@@ -19,6 +19,10 @@ const NEUTRAL_THRESHOLD = 5.0  # Speed threshold for neutral state
 # Animation constants
 const GLIDE_FLAP_INTERVAL = 3.0  # Seconds between glide flaps
 const GLIDE_FLAP_CYCLES = 2      # Number of flap cycles during glide flap
+const GLIDE_FLAP_CYCLES_MIN = 1
+const GLIDE_FLAP_CYCLES_MAX = 3
+const GLIDE_FLAP_INTERVAL_MIN = 5.0
+const GLIDE_FLAP_INTERVAL_MAX = 10.0
 
 # Rotation constants
 const MAX_ROTATION_UP = -45.0   # Max rotation when flying up (degrees)
@@ -35,9 +39,12 @@ var previous_velocity_y: float = 0.0
 var glide_flap_timer: float = 0.0
 var is_glide_flapping: bool = false
 var glide_flap_cycle_count: int = 0
+var glide_flap_cycles_target: int = 2
+var glide_flap_interval: float = 0.0
 
 func _ready():
-	# Initialize with gliding state (default)
+	print("Eagle ready! Node name: ", name)
+	$AnimatedSprite2D.animation_finished.connect(_on_animated_sprite_2d_animation_finished)
 	change_state(EagleState.GLIDING)
 
 
@@ -81,20 +88,21 @@ func change_state(new_state: EagleState):
 	
 	current_state = new_state
 	
-	# Set animation based on new state
+	# Set animation based on new state, but don't interrupt glide flapping
 	match current_state:
 		EagleState.CHANGING_POSITION:
-			if $AnimatedSprite2D.animation != "flap":
-				$AnimatedSprite2D.play("flap")
+			# Always use flap animation for changing position
+			$AnimatedSprite2D.play("flap")
 		EagleState.GLIDING:
-			if $AnimatedSprite2D.animation != "glide":
+			# Only change to glide if we're not in the middle of a glide flap sequence
+			if not is_glide_flapping:
 				$AnimatedSprite2D.play("glide")
 	
-	# Reset glide flap timer when entering gliding state
-	if new_state == EagleState.GLIDING:
+	# Reset glide flap timer when entering gliding state (but preserve ongoing flap sequence)
+	if new_state == EagleState.GLIDING and not is_glide_flapping:
 		glide_flap_timer = 0.0
-		is_glide_flapping = false
-	
+		glide_flap_cycle_count = 0
+		glide_flap_interval = randf_range(GLIDE_FLAP_INTERVAL_MIN, GLIDE_FLAP_INTERVAL_MAX)
 
 func apply_state_physics(delta):
 	match current_state:
@@ -125,7 +133,7 @@ func apply_gliding_physics(delta):
 	glide_flap_timer += delta
 	
 	# Check if it's time for a glide flap
-	if glide_flap_timer >= GLIDE_FLAP_INTERVAL and not is_glide_flapping:
+	if glide_flap_timer >= glide_flap_interval and not is_glide_flapping:
 		start_glide_flap()
 	
 	# In gliding state, allow dive input for faster descent
@@ -145,27 +153,16 @@ func apply_gliding_physics(delta):
 			velocity.y = 0.0
 
 func start_glide_flap():
+	print("Starting glide flap sequence")
 	is_glide_flapping = true
 	glide_flap_timer = 0.0
 	glide_flap_cycle_count = 0
+	glide_flap_cycles_target = randi_range(GLIDE_FLAP_CYCLES_MIN, GLIDE_FLAP_CYCLES_MAX)
 	
-	# Play the flap animation for 2 cycles
-	if $AnimatedSprite2D.animation != "flap":
-		$AnimatedSprite2D.play("flap")
-	
-	# Wait for 2 full animation cycles to complete
-	while glide_flap_cycle_count < GLIDE_FLAP_CYCLES:
-		await $AnimatedSprite2D.animation_finished
-		glide_flap_cycle_count += 1
-		
-		# If we haven't completed all cycles, restart the flap animation
-		if glide_flap_cycle_count < GLIDE_FLAP_CYCLES:
-			$AnimatedSprite2D.play("flap")
-	
-	# Return to glide animation after completing all cycles
-	if current_state == EagleState.GLIDING:
-		$AnimatedSprite2D.play("glide")
-		is_glide_flapping = false
+	# Start the first flap animation cycle
+	$AnimatedSprite2D.play("flap")
+	# Set the next random interval for the next flap
+	glide_flap_interval = randf_range(GLIDE_FLAP_INTERVAL_MIN, GLIDE_FLAP_INTERVAL_MAX)
 
 func update_rotation(delta):
 	# Calculate actual speed (magnitude of velocity)
@@ -189,3 +186,23 @@ func update_rotation(delta):
 	var current_rotation_deg = rad_to_deg(rotation)
 	var new_rotation_deg = lerp(current_rotation_deg, target_rotation, ROTATION_SPEED * delta)
 	rotation = deg_to_rad(new_rotation_deg)
+
+
+func _on_animated_sprite_2d_animation_finished():
+	print("Animation finished: ", $AnimatedSprite2D.animation, " | is_glide_flapping: ", is_glide_flapping, " | current_state: ", EagleState.keys()[current_state])
+	
+	# Handle glide flap animation cycles
+	if is_glide_flapping and current_state == EagleState.GLIDING:
+		glide_flap_cycle_count += 1
+		print("Glide flap cycle: ", glide_flap_cycle_count, "/", glide_flap_cycles_target)
+		
+		# Check if we've completed all required flap cycles
+		if glide_flap_cycle_count >= glide_flap_cycles_target:
+			# Return to glide animation
+			print("Returning to glide animation")
+			$AnimatedSprite2D.play("glide")
+			is_glide_flapping = false
+		else:
+			# Continue with next flap cycle
+			print("Continuing with next flap cycle")
+			$AnimatedSprite2D.play("flap")
