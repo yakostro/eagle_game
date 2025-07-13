@@ -1,6 +1,5 @@
 extends CharacterBody2D
 
-@onready var eagle = $"."
 @onready var label = $"../CanvasLayer/Label"
 
 
@@ -17,12 +16,10 @@ const NEUTRAL_DRAG = 800.0     # Force to return to neutral position
 const NEUTRAL_THRESHOLD = 5.0  # Speed threshold for neutral state
 
 # Animation constants
-const GLIDE_FLAP_INTERVAL = 3.0  # Seconds between glide flaps
-const GLIDE_FLAP_CYCLES = 2      # Number of flap cycles during glide flap
 const GLIDE_FLAP_CYCLES_MIN = 1
 const GLIDE_FLAP_CYCLES_MAX = 3
-const GLIDE_FLAP_INTERVAL_MIN = 5.0
-const GLIDE_FLAP_INTERVAL_MAX = 10.0
+const GLIDE_FLAP_INTERVAL_MIN = 3.0
+const GLIDE_FLAP_INTERVAL_MAX = 7.0
 
 # Rotation constants
 const MAX_ROTATION_UP = -45.0   # Max rotation when flying up (degrees)
@@ -31,11 +28,8 @@ const ROTATION_SPEED = 3.0      # How fast the rotation changes
 const MIN_SPEED_FOR_ROTATION = 50.0  # Minimum speed to start rotating
 const MAX_SPEED_FOR_ROTATION = 1000.0  # Speed at which max rotation is reached
 
-# State transition constants
-const STATE_TRANSITION_HYSTERESIS = 10.0  # Prevents rapid state switching
-
+# State variables
 var current_state: EagleState = EagleState.GLIDING
-var previous_velocity_y: float = 0.0
 var glide_flap_timer: float = 0.0
 var is_glide_flapping: bool = false
 var glide_flap_cycle_count: int = 0
@@ -70,9 +64,6 @@ func _physics_process(delta):
 	move_and_slide()
 	
 	update_UI()
-	
-	# Store previous velocity for state transitions
-	previous_velocity_y = velocity.y
 
 func determine_target_state() -> EagleState:
 	# Check for changing position state first (input should always override other states)
