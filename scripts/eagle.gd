@@ -4,7 +4,7 @@ extends CharacterBody2D
 @onready var animated_sprite = $AnimatedSprite2D
 
 # Movement states - simple and focused
-enum MovementState { GLIDING, FLAPPING, DIVING }
+enum MovementState { GLIDING, LIFTING, DIVING }
 
 # Physics constants
 const MAX_UP_VELOCITY = -600.0
@@ -66,19 +66,19 @@ func update_movement_state():
 
 func determine_movement_state() -> MovementState:
 	if Input.is_action_pressed("move_up"):
-		return MovementState.FLAPPING
+		return MovementState.LIFTING
 	elif Input.is_action_pressed("move_down"):
 		if velocity.y > 200.0:  # Fast downward = diving
 			return MovementState.DIVING
 		else:
-			return MovementState.FLAPPING
+			return MovementState.LIFTING
 	else:
 		return MovementState.GLIDING
 
 func apply_movement_physics(delta):
 	match movement_state:
-		MovementState.FLAPPING:
-			apply_flapping_physics(delta)
+		MovementState.LIFTING:
+			apply_lifting_physics(delta)
 		MovementState.DIVING:
 			apply_diving_physics(delta)
 		MovementState.GLIDING:
@@ -87,7 +87,7 @@ func apply_movement_physics(delta):
 	# Clamp velocity
 	velocity.y = clamp(velocity.y, MAX_UP_VELOCITY, MAX_DOWN_VELOCITY)
 
-func apply_flapping_physics(delta):
+func apply_lifting_physics(delta):
 	if Input.is_action_pressed("move_up"):
 		velocity.y -= LIFT_ACCELERATION * delta
 	elif Input.is_action_pressed("move_down"):
