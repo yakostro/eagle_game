@@ -1,0 +1,156 @@
+[gd_scene load_steps=34 format=3 uid="uid://cd42djg346oqy"]
+
+[ext_resource type="Texture2D" uid="uid://bx2kqxbypi61f" path="res://sprites/bald_eagle/Flying/__eagle_flying_000.png" id="1_7vcbr"]
+[ext_resource type="Script" path="res://scripts/eagle.gd" id="1_pt68i"]
+[ext_resource type="Texture2D" uid="uid://74410xiobhg0" path="res://sprites/bald_eagle/Flying/__eagle_flying_001.png" id="2_hto6r"]
+[ext_resource type="Texture2D" uid="uid://cgqqn1ucgjtdw" path="res://sprites/bald_eagle/Flying/__eagle_flying_002.png" id="3_hrt4n"]
+[ext_resource type="Texture2D" uid="uid://cjg35so46w2rb" path="res://sprites/bald_eagle/Flying/__eagle_flying_003.png" id="4_lfcxg"]
+[ext_resource type="Texture2D" uid="uid://ceuwe1dmaoqea" path="res://sprites/bald_eagle/Flying/__eagle_flying_004.png" id="5_mu0ci"]
+[ext_resource type="Texture2D" uid="uid://c4bc1ftb17rrr" path="res://sprites/bald_eagle/Flying/__eagle_flying_005.png" id="6_7ejlq"]
+[ext_resource type="Texture2D" uid="uid://th46ahvgk0jm" path="res://sprites/bald_eagle/Flying/__eagle_flying_006.png" id="7_kyukb"]
+[ext_resource type="Texture2D" uid="uid://cgph8rak3om7d" path="res://sprites/bald_eagle/Flying/__eagle_flying_007.png" id="8_aewc6"]
+[ext_resource type="Texture2D" uid="uid://cpn2ip2xbgeto" path="res://sprites/bald_eagle/Flying/__eagle_flying_008.png" id="9_4vr4u"]
+[ext_resource type="Texture2D" uid="uid://detfq4sivhcby" path="res://sprites/bald_eagle/Flying/__eagle_flying_009.png" id="10_q8ain"]
+[ext_resource type="Texture2D" uid="uid://b4prdeycf6dcg" path="res://sprites/bald_eagle/Gliding/__eagle_gliding_000.png" id="11_i52cj"]
+[ext_resource type="Texture2D" uid="uid://bs8xix7gkut1t" path="res://sprites/bald_eagle/Gliding/__eagle_gliding_001.png" id="12_sirt7"]
+[ext_resource type="Texture2D" uid="uid://bli2wyg5mfoh7" path="res://sprites/bald_eagle/Gliding/__eagle_gliding_002.png" id="13_lh8ni"]
+[ext_resource type="Texture2D" uid="uid://ddlonxrrpg0br" path="res://sprites/bald_eagle/Gliding/__eagle_gliding_003.png" id="14_b7acw"]
+[ext_resource type="Texture2D" uid="uid://qfucf5qr8hyn" path="res://sprites/bald_eagle/Gliding/__eagle_gliding_004.png" id="15_1hbvu"]
+[ext_resource type="Texture2D" uid="uid://wcsd2jvi4lgq" path="res://sprites/bald_eagle/Gliding/__eagle_gliding_005.png" id="16_qjy2r"]
+[ext_resource type="Texture2D" uid="uid://dqdbo0igsaysq" path="res://sprites/bald_eagle/Gliding/__eagle_gliding_006.png" id="17_vsnd4"]
+[ext_resource type="Texture2D" uid="uid://beiokiocbnd0a" path="res://sprites/bald_eagle/Gliding/__eagle_gliding_007.png" id="18_fftug"]
+[ext_resource type="Texture2D" uid="uid://bxr78x1gqj1m0" path="res://sprites/bald_eagle/Gliding/__eagle_gliding_008.png" id="19_u61oo"]
+[ext_resource type="Texture2D" uid="uid://chffgctg8xcmb" path="res://sprites/bald_eagle/Gliding/__eagle_gliding_009.png" id="20_ihpfa"]
+[ext_resource type="Texture2D" uid="uid://b3hl73khpreiu" path="res://sprites/bald_eagle/Gliding/__eagle_gliding_010.png" id="21_6mr2m"]
+[ext_resource type="Texture2D" uid="uid://qtcldhby7dq" path="res://sprites/bald_eagle/Gliding/__eagle_gliding_011.png" id="22_0t8mg"]
+[ext_resource type="Texture2D" uid="uid://dpvx7takllhmb" path="res://sprites/bald_eagle/Gliding/__eagle_gliding_012.png" id="23_dq5j5"]
+[ext_resource type="Texture2D" uid="uid://dtm634xva13tj" path="res://sprites/bald_eagle/Gliding/__eagle_gliding_013.png" id="24_aca8u"]
+[ext_resource type="Texture2D" uid="uid://c3jyaouftda2f" path="res://sprites/bald_eagle/Gliding/__eagle_gliding_014.png" id="25_otig0"]
+[ext_resource type="Texture2D" uid="uid://dfxlvjn8ltm5b" path="res://sprites/bald_eagle/Gliding/__eagle_gliding_015.png" id="26_tpyd0"]
+[ext_resource type="Texture2D" uid="uid://t8g3vsbiweui" path="res://sprites/bald_eagle/Gliding/__eagle_gliding_016.png" id="27_ymrll"]
+[ext_resource type="Texture2D" uid="uid://catn8miuln8kd" path="res://sprites/bald_eagle/Gliding/__eagle_gliding_017.png" id="28_hn755"]
+[ext_resource type="Texture2D" uid="uid://b56moo3b8hr77" path="res://sprites/bald_eagle/Gliding/__eagle_gliding_018.png" id="29_terl0"]
+[ext_resource type="Texture2D" uid="uid://k112ei10rga6" path="res://sprites/bald_eagle/Gliding/__eagle_gliding_019.png" id="30_1g45s"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_kheon"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_7vcbr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_hto6r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_hrt4n")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_lfcxg")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_mu0ci")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_7ejlq")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_kyukb")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_aewc6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_4vr4u")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_q8ain")
+}],
+"loop": false,
+"name": &"flap",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("11_i52cj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_sirt7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_lh8ni")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_b7acw")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_1hbvu")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_qjy2r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("17_vsnd4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("18_fftug")
+}, {
+"duration": 1.0,
+"texture": ExtResource("19_u61oo")
+}, {
+"duration": 1.0,
+"texture": ExtResource("20_ihpfa")
+}, {
+"duration": 1.0,
+"texture": ExtResource("21_6mr2m")
+}, {
+"duration": 1.0,
+"texture": ExtResource("22_0t8mg")
+}, {
+"duration": 1.0,
+"texture": ExtResource("23_dq5j5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("24_aca8u")
+}, {
+"duration": 1.0,
+"texture": ExtResource("25_otig0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("26_tpyd0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("27_ymrll")
+}, {
+"duration": 1.0,
+"texture": ExtResource("28_hn755")
+}, {
+"duration": 1.0,
+"texture": ExtResource("29_terl0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("30_1g45s")
+}],
+"loop": true,
+"name": &"glide",
+"speed": 10.0
+}]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_yl77t"]
+
+[node name="Eagle" type="CharacterBody2D"]
+script = ExtResource("1_pt68i")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(-327, -36)
+sprite_frames = SubResource("SpriteFrames_kheon")
+animation = &"flap"
+autoplay = "glide"
+flip_h = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-243, 19)
+rotation = 1.5708
+scale = Vector2(4, 10)
+shape = SubResource("CapsuleShape2D_yl77t")
+
+[connection signal="animation_finished" from="AnimatedSprite2D" to="." method="_on_animated_sprite_2d_animation_finished"]
