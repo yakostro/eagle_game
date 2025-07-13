@@ -7,8 +7,9 @@ extends Node
 # Animation states - separate from movement states
 enum AnimationState {
 	GLIDE,
-	FLAP,
-	GLIDE_FLAP  # Special idle flapping during glide
+	FLAP_CONTINUOUS,  # Looping flap for active input
+	FLAP_FINISHING,   # Finishing current flap before returning to glide
+	GLIDE_FLAP        # Non-looping flap for idle sequences
 }
 
 # Animation constants
@@ -41,10 +42,21 @@ func handle_movement_state_change(old_state_name: String, new_state_name: String
 	# React to movement state changes using string names
 	match new_state_name:
 		"GLIDING":
-			if animation_state != AnimationState.GLIDE_FLAP:
+			# Check if we need to finish the current flap animation first
+			if animation_state == AnimationState.FLAP_CONTINUOUS:
+				# Don't interrupt mid-flap - let it finish first
+				animation_state = AnimationState.FLAP_FINISHING
+				print("Finishing current flap before returning to glide")
+			elif animation_state != AnimationState.GLIDE_FLAP:
+				# Safe to switch immediately (not mid-flap)
 				play_animation(AnimationState.GLIDE)
 		"FLAPPING", "DIVING":
-			play_animation(AnimationState.FLAP)
+			# If we were finishing a flap, go back to continuous flapping
+			if animation_state == AnimationState.FLAP_FINISHING:
+				animation_state = AnimationState.FLAP_CONTINUOUS
+				print("Resuming continuous flapping")
+			else:
+				play_animation(AnimationState.FLAP_CONTINUOUS)
 
 func update_glide_flap_timer(delta):
 	# Only update timer during normal gliding
@@ -69,8 +81,11 @@ func play_animation(new_animation_state: AnimationState):
 	match animation_state:
 		AnimationState.GLIDE:
 			animated_sprite.play("glide")
-		AnimationState.FLAP:
+		AnimationState.FLAP_CONTINUOUS:
 			animated_sprite.play("flap")
+		AnimationState.FLAP_FINISHING:
+			# Don't change animation - let current flap finish
+			pass
 		AnimationState.GLIDE_FLAP:
 			animated_sprite.play("flap")
 
@@ -81,6 +96,13 @@ func reset_glide_flap_timer():
 func _on_animation_finished():
 	# Handle animation sequence completion
 	match animation_state:
+		AnimationState.FLAP_CONTINUOUS:
+			# Keep looping the flap animation for continuous input
+			animated_sprite.play("flap")
+		AnimationState.FLAP_FINISHING:
+			# Flap finished, now transition to glide
+			print("Flap finished, transitioning to glide")
+			play_animation(AnimationState.GLIDE)
 		AnimationState.GLIDE_FLAP:
 			glide_flap_cycles_remaining -= 1
 			if glide_flap_cycles_remaining <= 0:
