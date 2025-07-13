@@ -9,7 +9,8 @@ enum AnimationState {
 	GLIDE,
 	FLAP_CONTINUOUS,  # Looping flap for active input
 	FLAP_FINISHING,   # Finishing current flap before returning to glide
-	GLIDE_FLAP        # Non-looping flap for idle sequences
+	GLIDE_FLAP,       # Non-looping flap for idle sequences
+	SCREECH           # Screech animation
 }
 
 # Animation constants
@@ -27,6 +28,9 @@ var glide_flap_timer: float = 0.0
 var glide_flap_interval: float = 5.0
 var glide_flap_cycles_remaining: int = 0
 
+# Screech system
+var previous_state_before_screech: AnimationState = AnimationState.GLIDE
+
 func _init(sprite: AnimatedSprite2D):
 	animated_sprite = sprite
 	animated_sprite.animation_finished.connect(_on_animation_finished)
@@ -38,10 +42,10 @@ func _ready():
 func _physics_process(delta):
 	update_glide_flap_timer(delta)
 
-func handle_movement_state_change(old_state_name: String, new_state_name: String):
-	# React to movement state changes using string names
-	match new_state_name:
-		"GLIDING":
+func handle_movement_state_change(old_state: Eagle.MovementState, new_state: Eagle.MovementState):
+	# React to movement state changes using enum values
+	match new_state:
+		Eagle.MovementState.GLIDING:
 			# Check if we need to finish the current flap animation first
 			if animation_state == AnimationState.FLAP_CONTINUOUS:
 				# Don't interrupt mid-flap - let it finish first
@@ -50,7 +54,7 @@ func handle_movement_state_change(old_state_name: String, new_state_name: String
 			elif animation_state != AnimationState.GLIDE_FLAP:
 				# Safe to switch immediately (not mid-flap)
 				play_animation(AnimationState.GLIDE)
-		"FLAPPING", "DIVING":
+		Eagle.MovementState.LIFTING, Eagle.MovementState.DIVING:
 			# If we were finishing a flap, go back to continuous flapping
 			if animation_state == AnimationState.FLAP_FINISHING:
 				animation_state = AnimationState.FLAP_CONTINUOUS
@@ -58,8 +62,17 @@ func handle_movement_state_change(old_state_name: String, new_state_name: String
 			else:
 				play_animation(AnimationState.FLAP_CONTINUOUS)
 
+func handle_screech_request():
+	# Save current state to return to after screech
+	if animation_state != AnimationState.SCREECH:
+		previous_state_before_screech = animation_state
+	
+	# Play screech animation
+	play_animation(AnimationState.SCREECH)
+	print("Playing screech animation")
+
 func update_glide_flap_timer(delta):
-	# Only update timer during normal gliding
+	# Only update timer during normal gliding (not during screech)
 	if animation_state == AnimationState.GLIDE:
 		glide_flap_timer += delta
 		
@@ -88,6 +101,8 @@ func play_animation(new_animation_state: AnimationState):
 			pass
 		AnimationState.GLIDE_FLAP:
 			animated_sprite.play("flap")
+		AnimationState.SCREECH:
+			animated_sprite.play("screech")
 
 func reset_glide_flap_timer():
 	glide_flap_timer = 0.0
@@ -111,3 +126,7 @@ func _on_animation_finished():
 			else:
 				# Continue flapping
 				animated_sprite.play("flap")
+		AnimationState.SCREECH:
+			# Screech finished, return to previous state
+			print("Screech finished, returning to previous state")
+			play_animation(previous_state_before_screech)

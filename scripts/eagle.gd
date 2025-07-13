@@ -1,3 +1,4 @@
+class_name Eagle
 extends CharacterBody2D
 
 @onready var label = $"../CanvasLayer/Label"
@@ -27,7 +28,8 @@ var movement_state: MovementState = MovementState.GLIDING
 var animation_controller: EagleAnimationController
 
 # Signals
-signal movement_state_changed(old_state_name: String, new_state_name: String)
+signal movement_state_changed(old_state: MovementState, new_state: MovementState)
+signal screech_requested()
 
 func _ready():
 	print("Eagle ready! Node name: ", name)
@@ -38,12 +40,16 @@ func _ready():
 	
 	# Connect signals
 	movement_state_changed.connect(animation_controller.handle_movement_state_change)
+	screech_requested.connect(animation_controller.handle_screech_request)
 
 func _physics_process(delta):
-	# 1. Update movement state
+	# 1. Handle special input actions
+	handle_special_inputs()
+	
+	# 2. Update movement state
 	update_movement_state()
 	
-	# 2. Apply physics based on current state
+	# 3. Apply physics based on current state
 	apply_movement_physics(delta)
 	
 	# 3. Update rotation
@@ -55,14 +61,18 @@ func _physics_process(delta):
 	# 5. Update UI
 	update_UI()
 
+func handle_special_inputs():
+	# Handle screech input (H button)
+	if Input.is_action_just_pressed("screech"):
+		screech_requested.emit()
+
 func update_movement_state():
 	var new_state = determine_movement_state()
 	
 	if new_state != movement_state:
-		var old_state_name = MovementState.keys()[movement_state]
+		var old_state = movement_state
 		movement_state = new_state
-		var new_state_name = MovementState.keys()[new_state]
-		movement_state_changed.emit(old_state_name, new_state_name)
+		movement_state_changed.emit(old_state, new_state)
 
 func determine_movement_state() -> MovementState:
 	if Input.is_action_pressed("move_up"):
