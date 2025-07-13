@@ -3,6 +3,7 @@ extends CharacterBody2D
 
 @onready var label = $"../CanvasLayer/Label"
 @onready var animated_sprite = $AnimatedSprite2D
+@onready var screech_audio = $Screech
 
 # Movement states - simple and focused
 enum MovementState { GLIDING, LIFTING, DIVING }
@@ -64,6 +65,9 @@ func _physics_process(delta):
 func handle_special_inputs():
 	# Handle screech input (H button)
 	if Input.is_action_just_pressed("screech"):
+		# Play screech sound
+		screech_audio.play()
+		# Trigger screech animation
 		screech_requested.emit()
 
 func update_movement_state():
