@@ -1,9 +1,10 @@
 class_name Eagle
 extends CharacterBody2D
 
-@onready var label = $"../CanvasLayer/Label"
 @onready var animated_sprite = $AnimatedSprite2D
 @onready var screech_audio = $Screech
+@onready var state_label = $"../CanvasLayer/StateLabel"
+
 
 # Movement states - simple and focused
 enum MovementState { GLIDING, LIFTING, DIVING }
@@ -28,9 +29,18 @@ const MAX_SPEED_FOR_ROTATION = 1000.0
 var movement_state: MovementState = MovementState.GLIDING
 var animation_controller: EagleAnimationController
 
+# Fishing
+var caught_fish: int = 0
+var has_fish: bool = false
+
 # Signals
 signal movement_state_changed(old_state: MovementState, new_state: MovementState)
 signal screech_requested()
+
+
+
+
+
 
 func _ready():
 	print("Eagle ready! Node name: ", name)
@@ -61,6 +71,37 @@ func _physics_process(delta):
 	
 	# 5. Update UI
 	update_UI()
+
+
+# Add this method to your Eagle class
+func catch_fish():
+	"""Called when the eagle catches a fish"""
+	caught_fish += 1
+	has_fish = true
+	print("Eagle caught a fish! Total fish: ", caught_fish)
+	
+	# You can add visual/audio feedback here later
+	# For example: play a catch sound, show a fish icon, etc.
+
+# Add this method to your Eagle class  
+func eat_fish():
+	"""Called when the eagle eats a caught fish to restore energy"""
+	if has_fish:
+		has_fish = false
+		print("Eagle ate a fish!")
+		# TODO: Restore energy when energy system is implemented
+		return true
+	return false
+
+func drop_fish():
+	"""Called when the eagle drops a fish to feed chicks"""
+	if has_fish:
+		has_fish = false
+		print("Eagle dropped a fish!")
+		# TODO: Feed chicks when nest system is implemented
+		return true
+	return false
+
 
 func handle_special_inputs():
 	# Handle screech input (H button)
@@ -137,4 +178,4 @@ func update_rotation(delta):
 	rotation = deg_to_rad(new_rotation_deg)
 
 func update_UI():
-	label.text = str(MovementState.keys()[movement_state])
+	state_label.text = str(MovementState.keys()[movement_state])

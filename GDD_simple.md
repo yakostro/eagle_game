@@ -25,6 +25,7 @@ Score: count how many chicks survive
 
 ### Catching fish
 - Eagle catches a fish that is jumping from the bottom of the screen
+- Fish spawns on the right from the eagle and jumps to the left towards eagle
 - The eagle can eat this fish to get energy or keep fish to feed the chicks so they can survive
 - To catch fish eagle has to:
 - v1: be near the fish and catch it automatically
