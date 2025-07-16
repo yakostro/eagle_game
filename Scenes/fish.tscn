@@ -6,6 +6,7 @@
 [sub_resource type="CircleShape2D" id="CircleShape2D_gytsw"]
 
 [node name="Fish" type="RigidBody2D"]
+z_index = -1
 collision_layer = 0
 mass = 0.1
 script = ExtResource("1_svwb7")
@@ -13,6 +14,7 @@ spawn_x_offset = 1500.0
 jump_force = 1100.0
 jump_force_variation = 200.0
 horizontal_speed = 1300.0
+fish_offset_from_eagle = Vector2(-130, 120)
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 position = Vector2(9, -1)

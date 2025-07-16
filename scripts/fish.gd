@@ -9,6 +9,10 @@ class_name Fish
 @export var lifetime: float = 5.0
 @export var spawn_x_variance: float = 100.0  # Random spawn position variance
 
+# Fish attachment variables
+@export var fish_scale_when_caught: float = 0.8  # Make fish smaller when caught
+@export var fish_offset_from_eagle: Vector2 = Vector2(0, 20)  # Position relative to eagle claws
+
 var is_caught: bool = false
 var eagle_reference: Eagle
 var target_x: float
@@ -72,11 +76,27 @@ func calculate_target_and_jump():
 	print("Fish jumping from X:", global_position.x, " to target X:", target_x)
 
 func _physics_process(delta):
-	# Optional: Debug visualization (remove in final game)
-	if is_caught:
+	# If fish is caught, follow the eagle
+	if is_caught and eagle_reference:
+		# Disable physics and follow eagle
+		freeze = true
+		
+		# Get eagle's rotation and position
+		var eagle_rotation = eagle_reference.rotation
+		var eagle_position = eagle_reference.global_position
+		
+		# Rotate the offset vector by eagle's rotation
+		var rotated_offset = fish_offset_from_eagle.rotated(eagle_rotation)
+		
+		# Set fish position using rotated offset
+		global_position = eagle_position + rotated_offset
+		
+		# Set fish rotation to match eagle's rotation
+		rotation = eagle_rotation
+		
 		return
 		
-	# Check if fish has passed the target X coordinate
+	# Optional: Debug visualization (remove in final game)
 	if global_position.x >= target_x:
 		print("Fish passed target X coordinate at Y:", global_position.y)
 
@@ -88,14 +108,40 @@ func _on_catch_area_entered(body):
 func catch_fish(eagle):
 	is_caught = true
 	
+	# Make fish smaller and attach to eagle
+	scale = Vector2(fish_scale_when_caught, fish_scale_when_caught)
+	
+	# Disable physics
+	freeze = true
+	
+	# Disable collision detection for caught fish
+	var catch_area = $CatchArea
+	catch_area.set_deferred("monitoring", false)
+	
 	# Notify the eagle that it caught a fish
 	if eagle.has_method("catch_fish"):
-		eagle.catch_fish()
+		eagle.catch_fish(self)  # Pass the fish reference to eagle
 	else:
 		print("Eagle caught a fish!")
 	
-	# Remove the fish from the scene
-	queue_free()
+	print("Fish caught and attached to eagle!")
+
+func release_fish():
+	"""Called when eagle releases/drops the fish"""
+	is_caught = false
+	freeze = false
+	
+	# Re-enable collision detection
+	var catch_area = $CatchArea
+	catch_area.set_deferred("monitoring", true)
+	
+	# Reset scale
+	scale = Vector2(1.0, 1.0)
+	
+	# Apply some physics to make fish fall
+	linear_velocity = Vector2(0, 100)  # Small downward velocity
+	
+	print("Fish released from eagle!")
 
 func _on_lifetime_ended():
 	# Remove fish if not caught within lifetime

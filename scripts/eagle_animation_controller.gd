@@ -10,7 +10,8 @@ enum AnimationState {
 	FLAP_CONTINUOUS,  # Looping flap for active input
 	FLAP_FINISHING,   # Finishing current flap before returning to glide
 	GLIDE_FLAP,       # Non-looping flap for idle sequences
-	SCREECH           # Screech animation
+	SCREECH,          # Screech animation
+	FLAP_TALONS_OUT   # Flapping while carrying fish (talons extended)
 }
 
 # Animation constants
@@ -22,6 +23,9 @@ const GLIDE_FLAP_INTERVAL_MAX = 7.0
 # Animation state
 var animation_state: AnimationState = AnimationState.GLIDE
 var animated_sprite: AnimatedSprite2D
+
+# Fish carrying state
+var is_carrying_fish: bool = false
 
 # Glide flap system
 var glide_flap_timer: float = 0.0
@@ -42,7 +46,30 @@ func _ready():
 func _physics_process(delta):
 	update_glide_flap_timer(delta)
 
+func handle_fish_carrying_change(has_fish: bool):
+	"""Handle when eagle starts or stops carrying fish"""
+	is_carrying_fish = has_fish
+	print("Eagle fish carrying state changed: ", has_fish)
+	
+	# Force animation update based on current movement state
+	if has_fish:
+		# Switch to talons out animation immediately
+		if animation_state in [AnimationState.GLIDE, AnimationState.FLAP_CONTINUOUS, AnimationState.FLAP_FINISHING]:
+			play_animation(AnimationState.FLAP_TALONS_OUT)
+	else:
+		# Return to normal animations
+		# Determine appropriate animation based on current movement
+		var eagle = get_parent() as Eagle
+		if eagle:
+			handle_movement_state_change(eagle.movement_state, eagle.movement_state)
+
 func handle_movement_state_change(old_state: Eagle.MovementState, new_state: Eagle.MovementState):
+	# If carrying fish, prioritize talons out animation
+	if is_carrying_fish and animation_state != AnimationState.SCREECH:
+		if animation_state != AnimationState.FLAP_TALONS_OUT:
+			play_animation(AnimationState.FLAP_TALONS_OUT)
+		return
+	
 	# React to movement state changes using enum values
 	match new_state:
 		Eagle.MovementState.GLIDING:
@@ -72,8 +99,8 @@ func handle_screech_request():
 	print("Playing screech animation")
 
 func update_glide_flap_timer(delta):
-	# Only update timer during normal gliding (not during screech)
-	if animation_state == AnimationState.GLIDE:
+	# Only update timer during normal gliding (not during screech or carrying fish)
+	if animation_state == AnimationState.GLIDE and not is_carrying_fish:
 		glide_flap_timer += delta
 		
 		if glide_flap_timer >= glide_flap_interval:
@@ -103,6 +130,8 @@ func play_animation(new_animation_state: AnimationState):
 			animated_sprite.play("flap")
 		AnimationState.SCREECH:
 			animated_sprite.play("screech")
+		AnimationState.FLAP_TALONS_OUT:
+			animated_sprite.play("talons_out")
 
 func reset_glide_flap_timer():
 	glide_flap_timer = 0.0
@@ -114,19 +143,40 @@ func _on_animation_finished():
 		AnimationState.FLAP_CONTINUOUS:
 			# Keep looping the flap animation for continuous input
 			animated_sprite.play("flap")
+		AnimationState.FLAP_TALONS_OUT:
+			# Keep looping the talons out animation while carrying fish
+			if is_carrying_fish:
+				animated_sprite.play("talons_out")
+			else:
+				# Fish was dropped/eaten during animation, return to normal
+				var eagle = get_parent() as Eagle
+				if eagle:
+					handle_movement_state_change(eagle.movement_state, eagle.movement_state)
 		AnimationState.FLAP_FINISHING:
-			# Flap finished, now transition to glide
-			print("Flap finished, transitioning to glide")
-			play_animation(AnimationState.GLIDE)
+			# Flap finished, now transition to glide or talons out
+			print("Flap finished, transitioning to appropriate state")
+			if is_carrying_fish:
+				play_animation(AnimationState.FLAP_TALONS_OUT)
+			else:
+				play_animation(AnimationState.GLIDE)
 		AnimationState.GLIDE_FLAP:
 			glide_flap_cycles_remaining -= 1
 			if glide_flap_cycles_remaining <= 0:
-				# Return to normal glide
-				play_animation(AnimationState.GLIDE)
+				# Return to appropriate state
+				if is_carrying_fish:
+					play_animation(AnimationState.FLAP_TALONS_OUT)
+				else:
+					play_animation(AnimationState.GLIDE)
 			else:
 				# Continue flapping
-				animated_sprite.play("flap")
+				if is_carrying_fish:
+					animated_sprite.play("talons_out")
+				else:
+					animated_sprite.play("flap")
 		AnimationState.SCREECH:
 			# Screech finished, return to previous state
 			print("Screech finished, returning to previous state")
-			play_animation(previous_state_before_screech)
+			if is_carrying_fish:
+				play_animation(AnimationState.FLAP_TALONS_OUT)
+			else:
+				play_animation(previous_state_before_screech)

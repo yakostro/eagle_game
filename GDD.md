@@ -31,13 +31,6 @@ Score: count how many chicks survive
 - after catching the fish the fish should stay in the claws.
 - all the time when eagle carries fish we have to play flap_talons_out' animation.
 
-
-Handling animation:
-- when spacebar is pressed by user, switch animation to 'swoop_attack'
-- if fish is catched and eagle is carrying fish, switch animation to 'flap_talons_out'. it is already in the 'eagle.tscn/Animation'. 
-
-
-
 ### Eating fish
 - The eagle can eat cought fish to get energy
 

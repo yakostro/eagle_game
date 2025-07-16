@@ -27,22 +27,23 @@ const ROTATION_SPEED = 3.0
 const MIN_SPEED_FOR_ROTATION = 50.0
 const MAX_SPEED_FOR_ROTATION = 1000.0
 
+# Game mechanics variables
+@export var max_energy: float = 100.0
+@export var energy_per_fish: float = 25.0  # Energy gained from eating fish
+@export var energy_loss_per_second: float = 5.0  # Base energy loss over time
+
 # Components
 var movement_state: MovementState = MovementState.GLIDING
 var animation_controller: EagleAnimationController
 
-# Fishing
-var caught_fish: int = 0
-var has_fish: bool = false
+# Energy and fish tracking
+var current_energy: float = 100.0
+var carried_fish: Fish = null  # Reference to the carried fish object
 
 # Signals
 signal movement_state_changed(old_state: MovementState, new_state: MovementState)
 signal screech_requested()
-
-
-
-
-
+signal fish_caught_changed(has_fish: bool)  # Signal when fish carrying state changes
 
 func _ready():
 	print("Eagle ready! Node name: ", name)
@@ -54,56 +55,81 @@ func _ready():
 	# Connect signals
 	movement_state_changed.connect(animation_controller.handle_movement_state_change)
 	screech_requested.connect(animation_controller.handle_screech_request)
+	fish_caught_changed.connect(animation_controller.handle_fish_carrying_change)
 
 func _physics_process(delta):
 	# 1. Handle special input actions
 	handle_special_inputs()
 	
-	# 2. Update movement state
+	# 2. Handle fish actions
+	handle_fish_actions()
+	
+	# 3. Update energy
+	update_energy(delta)
+	
+	# 4. Update movement state
 	update_movement_state()
 	
-	# 3. Apply physics based on current state
+	# 5. Apply physics based on current state
 	apply_movement_physics(delta)
 	
-	# 3. Update rotation
+	# 6. Update rotation
 	update_rotation(delta)
 	
-	# 4. Apply movement
+	# 7. Apply movement
 	move_and_slide()
 	
-	# 5. Update UI
+	# 8. Update UI
 	update_UI()
 
-
-# Add this method to your Eagle class
-func catch_fish():
+# Fish management methods
+func catch_fish(fish: Fish):
 	"""Called when the eagle catches a fish"""
-	caught_fish += 1
-	has_fish = true
-	print("Eagle caught a fish! Total fish: ", caught_fish)
-	
-	# You can add visual/audio feedback here later
-	# For example: play a catch sound, show a fish icon, etc.
+	if carried_fish == null:  # Only catch if not already carrying
+		carried_fish = fish
+		print("Eagle caught a fish!")
+		fish_caught_changed.emit(true)
 
-# Add this method to your Eagle class  
 func eat_fish():
 	"""Called when the eagle eats a caught fish to restore energy"""
-	if has_fish:
-		has_fish = false
+	if carried_fish != null:
 		print("Eagle ate a fish!")
-		# TODO: Restore energy when energy system is implemented
+		current_energy = min(current_energy + energy_per_fish, max_energy)
+		carried_fish.queue_free()  # Remove the fish from scene
+		carried_fish = null
+		fish_caught_changed.emit(false)
 		return true
 	return false
 
 func drop_fish():
 	"""Called when the eagle drops a fish to feed chicks"""
-	if has_fish:
-		has_fish = false
+	if carried_fish != null:
 		print("Eagle dropped a fish!")
-		# TODO: Feed chicks when nest system is implemented
+		carried_fish.release_fish()  # Release the fish back to the world
+		carried_fish = null
+		fish_caught_changed.emit(false)
 		return true
 	return false
 
+func has_fish() -> bool:
+	"""Returns true if eagle is carrying a fish"""
+	return carried_fish != null
+
+func handle_fish_actions():
+	"""Handle input for eating or dropping fish"""
+	if carried_fish != null:
+		if Input.is_action_just_pressed("eat_fish"):
+			eat_fish()
+		elif Input.is_action_just_pressed("drop_fish"):
+			drop_fish()
+
+func update_energy(delta):
+	"""Update eagle's energy over time"""
+	# Lose energy over time (faster if low morale in future)
+	current_energy -= energy_loss_per_second * delta
+	current_energy = max(current_energy, 0.0)
+	
+	# TODO: Add death condition when energy reaches 0
 
 func handle_special_inputs():
 	# Handle screech input (H button)
@@ -181,3 +207,9 @@ func update_rotation(delta):
 
 func update_UI():
 	state_label.text = str(MovementState.keys()[movement_state])
+	
+	# Add fish carrying status and energy to UI
+	if has_fish():
+		state_label.text += " [FISH]"
+	
+	state_label.text += " Energy: " + str(int(current_energy))

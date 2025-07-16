@@ -1,4 +1,4 @@
-[gd_scene load_steps=65 format=3 uid="uid://cd42djg346oqy"]
+[gd_scene load_steps=73 format=3 uid="uid://cd42djg346oqy"]
 
 [ext_resource type="Texture2D" uid="uid://bx2kqxbypi61f" path="res://sprites/bald_eagle/Flying/__eagle_flying_000.png" id="1_7vcbr"]
 [ext_resource type="Script" path="res://scripts/eagle.gd" id="1_pt68i"]
@@ -12,13 +12,21 @@
 [ext_resource type="Texture2D" uid="uid://cpn2ip2xbgeto" path="res://sprites/bald_eagle/Flying/__eagle_flying_008.png" id="9_4vr4u"]
 [ext_resource type="Texture2D" uid="uid://detfq4sivhcby" path="res://sprites/bald_eagle/Flying/__eagle_flying_009.png" id="10_q8ain"]
 [ext_resource type="Texture2D" uid="uid://b4prdeycf6dcg" path="res://sprites/bald_eagle/Gliding/__eagle_gliding_000.png" id="11_i52cj"]
+[ext_resource type="Texture2D" uid="uid://dbb03qjc7lt0e" path="res://sprites/bald_eagle/Transition to swoop attack/__eagle_transition_to_swoop_attack_000.png" id="12_c4bug"]
 [ext_resource type="Texture2D" uid="uid://bs8xix7gkut1t" path="res://sprites/bald_eagle/Gliding/__eagle_gliding_001.png" id="12_sirt7"]
+[ext_resource type="Texture2D" uid="uid://dgocgigpee4dj" path="res://sprites/bald_eagle/Transition to swoop attack/__eagle_transition_to_swoop_attack_001.png" id="13_kv02c"]
 [ext_resource type="Texture2D" uid="uid://bli2wyg5mfoh7" path="res://sprites/bald_eagle/Gliding/__eagle_gliding_002.png" id="13_lh8ni"]
+[ext_resource type="Texture2D" uid="uid://cgdkp43btu0s3" path="res://sprites/bald_eagle/Transition to swoop attack/__eagle_transition_to_swoop_attack_002.png" id="14_afl03"]
 [ext_resource type="Texture2D" uid="uid://ddlonxrrpg0br" path="res://sprites/bald_eagle/Gliding/__eagle_gliding_003.png" id="14_b7acw"]
 [ext_resource type="Texture2D" uid="uid://qfucf5qr8hyn" path="res://sprites/bald_eagle/Gliding/__eagle_gliding_004.png" id="15_1hbvu"]
+[ext_resource type="Texture2D" uid="uid://c1jgjxp4s4usl" path="res://sprites/bald_eagle/Transition to swoop attack/__eagle_transition_to_swoop_attack_003.png" id="15_krom8"]
+[ext_resource type="Texture2D" uid="uid://b1a3wdkkdycrj" path="res://sprites/bald_eagle/Transition to swoop attack/__eagle_transition_to_swoop_attack_004.png" id="16_1ltjn"]
 [ext_resource type="Texture2D" uid="uid://wcsd2jvi4lgq" path="res://sprites/bald_eagle/Gliding/__eagle_gliding_005.png" id="16_qjy2r"]
+[ext_resource type="Texture2D" uid="uid://dyiv8shm7awlu" path="res://sprites/bald_eagle/Transition to swoop attack/__eagle_transition_to_swoop_attack_005.png" id="17_blqoh"]
 [ext_resource type="Texture2D" uid="uid://dqdbo0igsaysq" path="res://sprites/bald_eagle/Gliding/__eagle_gliding_006.png" id="17_vsnd4"]
 [ext_resource type="Texture2D" uid="uid://beiokiocbnd0a" path="res://sprites/bald_eagle/Gliding/__eagle_gliding_007.png" id="18_fftug"]
+[ext_resource type="Texture2D" uid="uid://blgjnbmthvu5m" path="res://sprites/bald_eagle/Transition to swoop attack/__eagle_transition_to_swoop_attack_006.png" id="18_hika1"]
+[ext_resource type="Texture2D" uid="uid://6fqqddhkrb2" path="res://sprites/bald_eagle/Transition to swoop attack/__eagle_transition_to_swoop_attack_007.png" id="19_6bkll"]
 [ext_resource type="Texture2D" uid="uid://bxr78x1gqj1m0" path="res://sprites/bald_eagle/Gliding/__eagle_gliding_008.png" id="19_u61oo"]
 [ext_resource type="Texture2D" uid="uid://chffgctg8xcmb" path="res://sprites/bald_eagle/Gliding/__eagle_gliding_009.png" id="20_ihpfa"]
 [ext_resource type="Texture2D" uid="uid://b3hl73khpreiu" path="res://sprites/bald_eagle/Gliding/__eagle_gliding_010.png" id="21_6mr2m"]
@@ -98,6 +106,35 @@ animations = [{
 }],
 "loop": false,
 "name": &"flap",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("12_c4bug")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_kv02c")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_afl03")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_krom8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_1ltjn")
+}, {
+"duration": 1.0,
+"texture": ExtResource("17_blqoh")
+}, {
+"duration": 1.0,
+"texture": ExtResource("18_hika1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("19_6bkll")
+}],
+"loop": false,
+"name": &"from_swoop_attack",
 "speed": 10.0
 }, {
 "frames": [{
@@ -233,7 +270,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"swoop_attack",
-"speed": 5.0
+"speed": 10.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -266,12 +303,19 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("61_yfpvs")
 }],
-"loop": true,
+"loop": false,
 "name": &"talons_out",
-"speed": 5.0
+"speed": 10.0
+}, {
+"frames": [],
+"loop": false,
+"name": &"transition_to_swoop_attack",
+"speed": 10.0
 }]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_yl77t"]
+radius = 30.5
+height = 76.8
 
 [node name="Eagle" type="CharacterBody2D" node_paths=PackedStringArray("animated_sprite")]
 script = ExtResource("1_pt68i")
@@ -280,17 +324,20 @@ animated_sprite = NodePath("Animation")
 [node name="Animation" type="AnimatedSprite2D" parent="."]
 position = Vector2(-327, -36)
 sprite_frames = SubResource("SpriteFrames_kheon")
-animation = &"swoop_attack"
+animation = &"talons_out"
 autoplay = "glide"
 flip_h = true
 
 [node name="CollisionShape" type="CollisionShape2D" parent="."]
-position = Vector2(-243, 19)
+position = Vector2(-243, 102)
 rotation = 1.5708
 scale = Vector2(4, 10)
 shape = SubResource("CapsuleShape2D_yl77t")
 
 [node name="Screech" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("42_g63mg")
+
+[node name="CarriedFishHolder" type="Node2D" parent="."]
+position = Vector2(-243, 50)
 
 [connection signal="animation_finished" from="Animation" to="." method="_on_animated_sprite_2d_animation_finished"]
