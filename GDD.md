@@ -1,7 +1,7 @@
 
-# Game concept. The Last Eagle.
+# Game concept. The Last Eagle
 
-Aim: You play as the last eagle whose mission is to feed eagle chicks so the spieces can survive
+*Aim*: You play as the last eagle whose mission is to feed eagle chicks so the spieces can survive
 Core gameplay: fly, evade obstacles, catch fish, feed chicks or eat, keep balance between morale and energy. The difficulty (obstacles, quantity of fish) raises through time
 Lose: if morale or energy drops to 0
 Score: count how many chicks survive
@@ -27,8 +27,15 @@ Score: count how many chicks survive
 - Eagle catches a fish that is jumping from the bottom of the screen
 - Fish spawns on the right from the eagle and jumps to the left towards eagle
 - The eagle can eat this fish to get energy or keep fish to feed the chicks so they can survive
-- To catch fish eagle has to:
-- v1: be near the fish and catch it automatically
+- To catch fish eagle has to collide with the fish.
+- after catching the fish the fish should stay in the claws.
+- all the time when eagle carries fish we have to play flap_talons_out' animation.
+
+
+Handling animation:
+- when spacebar is pressed by user, switch animation to 'swoop_attack'
+- if fish is catched and eagle is carrying fish, switch animation to 'flap_talons_out'. it is already in the 'eagle.tscn/Animation'. 
+
 
 
 ### Eating fish

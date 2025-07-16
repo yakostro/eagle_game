@@ -1,4 +1,4 @@
-[gd_scene load_steps=45 format=3 uid="uid://cd42djg346oqy"]
+[gd_scene load_steps=65 format=3 uid="uid://cd42djg346oqy"]
 
 [ext_resource type="Texture2D" uid="uid://bx2kqxbypi61f" path="res://sprites/bald_eagle/Flying/__eagle_flying_000.png" id="1_7vcbr"]
 [ext_resource type="Script" path="res://scripts/eagle.gd" id="1_pt68i"]
@@ -42,6 +42,26 @@
 [ext_resource type="Texture2D" uid="uid://difupqbo8hin6" path="res://sprites/bald_eagle/Flying swark/__eagle_flying_swark_008.png" id="40_mq70w"]
 [ext_resource type="Texture2D" uid="uid://cyod03ycgnbgh" path="res://sprites/bald_eagle/Flying swark/__eagle_flying_swark_009.png" id="41_flc4h"]
 [ext_resource type="AudioStream" uid="uid://c0prxo4y0h3cc" path="res://sounds/screech.mp3" id="42_g63mg"]
+[ext_resource type="Texture2D" uid="uid://dvl0sgq3r62bj" path="res://sprites/bald_eagle/Swoop attack/__eagle_swoop_attack_pose_000.png" id="42_uv7xr"]
+[ext_resource type="Texture2D" uid="uid://dndamuebbcdgl" path="res://sprites/bald_eagle/Swoop attack/__eagle_swoop_attack_pose_001.png" id="43_d6557"]
+[ext_resource type="Texture2D" uid="uid://6juairqphllv" path="res://sprites/bald_eagle/Swoop attack/__eagle_swoop_attack_pose_002.png" id="44_7wes3"]
+[ext_resource type="Texture2D" uid="uid://k02cl6tr7uyb" path="res://sprites/bald_eagle/Swoop attack/__eagle_swoop_attack_pose_003.png" id="45_vvgde"]
+[ext_resource type="Texture2D" uid="uid://dy166ymae4efo" path="res://sprites/bald_eagle/Swoop attack/__eagle_swoop_attack_pose_004.png" id="46_rry3l"]
+[ext_resource type="Texture2D" uid="uid://b8ecr5brixsju" path="res://sprites/bald_eagle/Swoop attack/__eagle_swoop_attack_pose_005.png" id="47_6jxwq"]
+[ext_resource type="Texture2D" uid="uid://db355m7mx6q2f" path="res://sprites/bald_eagle/Swoop attack/__eagle_swoop_attack_pose_006.png" id="48_1jvcw"]
+[ext_resource type="Texture2D" uid="uid://hqu4qont46wb" path="res://sprites/bald_eagle/Swoop attack/__eagle_swoop_attack_pose_007.png" id="49_457pt"]
+[ext_resource type="Texture2D" uid="uid://ceisai1o0s8w6" path="res://sprites/bald_eagle/Swoop attack/__eagle_swoop_attack_pose_008.png" id="50_tqdqq"]
+[ext_resource type="Texture2D" uid="uid://ce40gs0aqiyv3" path="res://sprites/bald_eagle/Swoop attack/__eagle_swoop_attack_pose_009.png" id="51_cuuti"]
+[ext_resource type="Texture2D" uid="uid://nrwh178hbxam" path="res://sprites/bald_eagle/Flying talons out/__eagle_flying_talons_out_000.png" id="52_r5svj"]
+[ext_resource type="Texture2D" uid="uid://bd8u32msskq0k" path="res://sprites/bald_eagle/Flying talons out/__eagle_flying_talons_out_001.png" id="53_l1agb"]
+[ext_resource type="Texture2D" uid="uid://d38tgv83iv0qy" path="res://sprites/bald_eagle/Flying talons out/__eagle_flying_talons_out_002.png" id="54_pb6vi"]
+[ext_resource type="Texture2D" uid="uid://dckc7r42ko1pi" path="res://sprites/bald_eagle/Flying talons out/__eagle_flying_talons_out_003.png" id="55_bo01w"]
+[ext_resource type="Texture2D" uid="uid://dtm556vowtbkl" path="res://sprites/bald_eagle/Flying talons out/__eagle_flying_talons_out_004.png" id="56_76c7l"]
+[ext_resource type="Texture2D" uid="uid://ep3ybcxntgtd" path="res://sprites/bald_eagle/Flying talons out/__eagle_flying_talons_out_005.png" id="57_5ykdj"]
+[ext_resource type="Texture2D" uid="uid://1kegv4ls4fdg" path="res://sprites/bald_eagle/Flying talons out/__eagle_flying_talons_out_006.png" id="58_wjxnu"]
+[ext_resource type="Texture2D" uid="uid://ckfwvta6o66r7" path="res://sprites/bald_eagle/Flying talons out/__eagle_flying_talons_out_007.png" id="59_81p4b"]
+[ext_resource type="Texture2D" uid="uid://bmwdos6ajrk26" path="res://sprites/bald_eagle/Flying talons out/__eagle_flying_talons_out_008.png" id="60_ure4v"]
+[ext_resource type="Texture2D" uid="uid://dsdd1ra0msex" path="res://sprites/bald_eagle/Flying talons out/__eagle_flying_talons_out_009.png" id="61_yfpvs"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_kheon"]
 animations = [{
@@ -179,21 +199,92 @@ animations = [{
 "loop": false,
 "name": &"screech",
 "speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("42_uv7xr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("43_d6557")
+}, {
+"duration": 1.0,
+"texture": ExtResource("44_7wes3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("45_vvgde")
+}, {
+"duration": 1.0,
+"texture": ExtResource("46_rry3l")
+}, {
+"duration": 1.0,
+"texture": ExtResource("47_6jxwq")
+}, {
+"duration": 1.0,
+"texture": ExtResource("48_1jvcw")
+}, {
+"duration": 1.0,
+"texture": ExtResource("49_457pt")
+}, {
+"duration": 1.0,
+"texture": ExtResource("50_tqdqq")
+}, {
+"duration": 1.0,
+"texture": ExtResource("51_cuuti")
+}],
+"loop": true,
+"name": &"swoop_attack",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("52_r5svj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("53_l1agb")
+}, {
+"duration": 1.0,
+"texture": ExtResource("54_pb6vi")
+}, {
+"duration": 1.0,
+"texture": ExtResource("55_bo01w")
+}, {
+"duration": 1.0,
+"texture": ExtResource("56_76c7l")
+}, {
+"duration": 1.0,
+"texture": ExtResource("57_5ykdj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("58_wjxnu")
+}, {
+"duration": 1.0,
+"texture": ExtResource("59_81p4b")
+}, {
+"duration": 1.0,
+"texture": ExtResource("60_ure4v")
+}, {
+"duration": 1.0,
+"texture": ExtResource("61_yfpvs")
+}],
+"loop": true,
+"name": &"talons_out",
+"speed": 5.0
 }]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_yl77t"]
 
-[node name="Eagle" type="CharacterBody2D"]
+[node name="Eagle" type="CharacterBody2D" node_paths=PackedStringArray("animated_sprite")]
 script = ExtResource("1_pt68i")
+animated_sprite = NodePath("Animation")
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+[node name="Animation" type="AnimatedSprite2D" parent="."]
 position = Vector2(-327, -36)
 sprite_frames = SubResource("SpriteFrames_kheon")
-animation = &"screech"
+animation = &"swoop_attack"
 autoplay = "glide"
 flip_h = true
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape" type="CollisionShape2D" parent="."]
 position = Vector2(-243, 19)
 rotation = 1.5708
 scale = Vector2(4, 10)
@@ -202,4 +293,4 @@ shape = SubResource("CapsuleShape2D_yl77t")
 [node name="Screech" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("42_g63mg")
 
-[connection signal="animation_finished" from="AnimatedSprite2D" to="." method="_on_animated_sprite_2d_animation_finished"]
+[connection signal="animation_finished" from="Animation" to="." method="_on_animated_sprite_2d_animation_finished"]

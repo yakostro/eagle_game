@@ -1,10 +1,12 @@
 class_name Eagle
 extends CharacterBody2D
 
-@onready var animated_sprite = $AnimatedSprite2D
+#@onready var animated_sprite = $Animation
+#@onready var animated_sprite = $AnimatedSprite2D
 @onready var screech_audio = $Screech
 @onready var state_label = $"../CanvasLayer/StateLabel"
 
+@export var animated_sprite: AnimatedSprite2D
 
 # Movement states - simple and focused
 enum MovementState { GLIDING, LIFTING, DIVING }
