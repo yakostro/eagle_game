@@ -8,30 +8,31 @@
 
 [node name="Game" type="Node"]
 
-[node name="FishSpawner" type="Node" parent="." node_paths=PackedStringArray("eagle_reference", "UI_fish_counter")]
+[node name="Spawners" type="Node" parent="."]
+
+[node name="FishSpawner" type="Node" parent="Spawners" node_paths=PackedStringArray("eagle_reference", "UI_fish_counter")]
 script = ExtResource("6_xt0y2")
 fish_scene = ExtResource("4_bafjl")
-eagle_reference = NodePath("../Eagle")
-UI_fish_counter = NodePath("../CanvasLayer/FishCounterLabel")
+eagle_reference = NodePath("../../Eagle")
+UI_fish_counter = NodePath("../../CanvasLayer/FishCounterLabel")
 
 [node name="Eagle" parent="." instance=ExtResource("1_ek57t")]
-position = Vector2(-560, -103)
-scale = Vector2(0.5, 0.5)
+position = Vector2(755, 395)
 
 [node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(960, 540)
 
 [node name="WindParticles" parent="." instance=ExtResource("2_wind")]
 z_index = -1
-position = Vector2(1760, -92)
+position = Vector2(2101, 552)
 amount = 30
-speed_scale = 5.0
+speed_scale = 4.0
 lifetime_randomness = 0.0
 draw_order = 1
 texture = ExtResource("3_yd0cu")
-emission_rect_extents = Vector2(1, 800)
 spread = 0.0
-initial_velocity_min = 160.0
-initial_velocity_max = 180.0
+initial_velocity_min = 140.0
+initial_velocity_max = 160.0
 angular_velocity_min = 0.0
 angular_velocity_max = 0.0
 linear_accel_min = 0.0
@@ -41,7 +42,6 @@ damping_min = 0.0
 damping_max = 5.0
 angle_max = 0.0
 scale_amount_min = 1.0
-scale_amount_max = 5.0
 color = Color(1, 0.996078, 0.996078, 0.290196)
 hue_variation_min = -0.72
 hue_variation_max = 0.11

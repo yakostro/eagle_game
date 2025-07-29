@@ -3,11 +3,12 @@ extends RigidBody2D
 class_name Fish
 
 @export var spawn_x_offset: float = 200.0  # How far to the right of eagle to spawn
+@export var spawn_x_variance: float = 100.0  # Random spawn position variance
 @export var jump_force: float = 500.0
 @export var jump_force_variation: float = 100.0  # Random variation in jump force
 @export var horizontal_speed: float = 150.0  # Horizontal speed towards target
 @export var lifetime: float = 5.0
-@export var spawn_x_variance: float = 100.0  # Random spawn position variance
+
 
 # Fish attachment variables
 @export var fish_scale_when_caught: float = 0.8  # Make fish smaller when caught

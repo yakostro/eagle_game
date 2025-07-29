@@ -4,31 +4,31 @@
 [ext_resource type="Script" path="res://scripts/fish.gd" id="1_svwb7"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_gytsw"]
+radius = 4.20584
 
 [node name="Fish" type="RigidBody2D"]
 z_index = -1
 collision_layer = 0
 mass = 0.1
 script = ExtResource("1_svwb7")
-spawn_x_offset = 1500.0
-jump_force = 1100.0
-jump_force_variation = 200.0
-horizontal_speed = 1300.0
+spawn_x_offset = 1000.0
+jump_force = 600.0
+horizontal_speed = 600.0
 fish_offset_from_eagle = Vector2(-130, 120)
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 position = Vector2(9, -1)
-scale = Vector2(0.5, 0.5)
+scale = Vector2(0.2, 0.2)
 texture = ExtResource("1_njgtp")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(-4, 0)
+position = Vector2(3, 0)
 scale = Vector2(7.05341, -2.8789)
 shape = SubResource("CircleShape2D_gytsw")
 
 [node name="CatchArea" type="Area2D" parent="."]
 
 [node name="CollisionShapeCatchArea" type="CollisionShape2D" parent="CatchArea"]
-position = Vector2(-4, 0)
+position = Vector2(3, 0)
 scale = Vector2(7.05341, -3.5989)
 shape = SubResource("CircleShape2D_gytsw")
