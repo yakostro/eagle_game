@@ -1,20 +1,29 @@
-[gd_scene load_steps=6 format=3 uid="uid://bvfc1tl8ttpuo"]
+[gd_scene load_steps=8 format=3 uid="uid://bvfc1tl8ttpuo"]
 
 [ext_resource type="PackedScene" uid="uid://cd42djg346oqy" path="res://scenes/eagle.tscn" id="1_ek57t"]
 [ext_resource type="PackedScene" uid="uid://cet764a7faoqm" path="res://scenes/wind_particles.tscn" id="2_wind"]
+[ext_resource type="Script" path="res://scripts/obstacle_spawner.gd" id="3_6m21n"]
 [ext_resource type="Texture2D" uid="uid://bq584cyumqstu" path="res://particles/wind_particle_3.png" id="3_yd0cu"]
 [ext_resource type="PackedScene" uid="uid://bnbjiu5ct08nt" path="res://scenes/fish.tscn" id="4_bafjl"]
+[ext_resource type="PackedScene" uid="uid://bwhm8l7k51rw0" path="res://scenes/mountain.tscn" id="4_yvdbw"]
 [ext_resource type="Script" path="res://scripts/fish_spawner.gd" id="6_xt0y2"]
 
 [node name="Game" type="Node"]
 
 [node name="Spawners" type="Node" parent="."]
 
-[node name="FishSpawner" type="Node" parent="Spawners" node_paths=PackedStringArray("eagle_reference", "UI_fish_counter")]
+[node name="FishSpawner" type="Node2D" parent="Spawners" node_paths=PackedStringArray("eagle_reference", "UI_fish_counter")]
 script = ExtResource("6_xt0y2")
 fish_scene = ExtResource("4_bafjl")
 eagle_reference = NodePath("../../Eagle")
 UI_fish_counter = NodePath("../../CanvasLayer/FishCounterLabel")
+
+[node name="ObstacleSpawner" type="Node2D" parent="Spawners"]
+z_index = -2
+position = Vector2(1920, 1080)
+script = ExtResource("3_6m21n")
+mountain_scene = ExtResource("4_yvdbw")
+spawn_interval = 6.0
 
 [node name="Eagle" parent="." instance=ExtResource("1_ek57t")]
 position = Vector2(755, 395)

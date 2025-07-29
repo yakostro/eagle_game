@@ -173,11 +173,8 @@ static func spawn_fish_at_bottom(scene_tree: SceneTree, fish_scene: PackedScene,
 	# Make sure fish doesn't spawn off-screen
 	spawn_x = min(spawn_x, screen_width - 50)
 	
-	var spawn_y = min(screen_height - 100, 500)  # Don't spawn too far down
-	
-	# If screen height seems too large, use a fixed position
-	if screen_height > 1000:
-		spawn_y = 400  # Fixed position for very large screens
+	# Spawn fish BELOW the bottom of the screen
+	var spawn_y = screen_height + randf_range(50, 150)  # 50-150 pixels below screen bottom
 	
 	# DEBUG: Print spawn position
 	print("Eagle at X: ", eagle.global_position.x)
