@@ -32,18 +32,28 @@ const MAX_SPEED_FOR_ROTATION = 1000.0
 @export var energy_per_fish: float = 25.0  # Energy gained from eating fish
 @export var energy_loss_per_second: float = 5.0  # Base energy loss over time
 
+# Morale system variables
+@export var max_morale: float = 100.0
+@export var morale_loss_per_nest: float = 15.0  # Morale lost when nest goes off screen
+@export var morale_gain_per_fed_nest: float = 20.0  # Morale gained when nest is fed
+@export var min_energy_loss_multiplier: float = 1.0  # Energy loss multiplier at max morale
+@export var max_energy_loss_multiplier: float = 3.0  # Energy loss multiplier at 0 morale
+
 # Components
 var movement_state: MovementState = MovementState.GLIDING
 var animation_controller: EagleAnimationController
 
 # Energy and fish tracking
 var current_energy: float = 100.0
+var current_morale: float = 100.0  # Start with max morale
 var carried_fish: Fish = null  # Reference to the carried fish object
 
 # Signals
 signal movement_state_changed(old_state: MovementState, new_state: MovementState)
 signal screech_requested()
 signal fish_caught_changed(has_fish: bool)  # Signal when fish carrying state changes
+signal morale_changed(new_morale: float)  # Signal when morale changes
+signal eagle_died()  # Signal when eagle dies from energy depletion
 
 func _ready():
 	print("Eagle ready! Node name: ", name)
@@ -115,6 +125,42 @@ func has_fish() -> bool:
 	"""Returns true if eagle is carrying a fish"""
 	return carried_fish != null
 
+# Morale management methods
+func lose_morale(amount: float):
+	"""Called when the eagle loses morale (e.g., nest goes off screen)"""
+	var old_morale = current_morale
+	current_morale = max(current_morale - amount, 0.0)  # Can't go below 0
+	if old_morale != current_morale:
+		print("Eagle lost morale: ", amount, " (Current: ", current_morale, ")")
+		morale_changed.emit(current_morale)
+
+func gain_morale(amount: float):
+	"""Called when the eagle gains morale (e.g., feeds a nest)"""
+	var old_morale = current_morale
+	current_morale = min(current_morale + amount, max_morale)
+	if old_morale != current_morale:
+		print("Eagle gained morale: ", amount, " (Current: ", current_morale, ")")
+		morale_changed.emit(current_morale)
+
+func get_current_morale() -> float:
+	"""Returns current morale value"""
+	return current_morale
+
+func get_morale_percentage() -> float:
+	"""Returns morale as a percentage (0.0 to 1.0)"""
+	return current_morale / max_morale
+
+# Nest interaction methods
+func on_nest_fed():
+	"""Called when a nest is successfully fed with a fish"""
+	gain_morale(morale_gain_per_fed_nest)
+	print("Nest fed! Eagle gained morale.")
+
+func on_nest_missed():
+	"""Called when a nest goes off screen without being fed"""
+	lose_morale(morale_loss_per_nest)
+	print("Nest missed! Eagle lost morale.")
+
 func handle_fish_actions():
 	"""Handle input for eating or dropping fish"""
 	if carried_fish != null:
@@ -125,11 +171,24 @@ func handle_fish_actions():
 
 func update_energy(delta):
 	"""Update eagle's energy over time"""
-	# Lose energy over time (faster if low morale in future)
-	current_energy -= energy_loss_per_second * delta
+	# Calculate energy loss multiplier based on morale (lower morale = faster energy loss)
+	var morale_percentage = get_morale_percentage()
+	var energy_loss_multiplier = lerp(max_energy_loss_multiplier, min_energy_loss_multiplier, morale_percentage)
+	
+	# Lose energy over time (faster if low morale)
+	var actual_energy_loss = energy_loss_per_second * energy_loss_multiplier * delta
+	current_energy -= actual_energy_loss
 	current_energy = max(current_energy, 0.0)
 	
-	# TODO: Add death condition when energy reaches 0
+	# Check for death condition
+	if current_energy <= 0.0:
+		die()
+
+func die():
+	"""Called when the eagle dies from energy depletion"""
+	print("Eagle died! Energy depleted.")
+	eagle_died.emit()
+	# TODO: Handle death state - disable controls, play death animation, etc.
 
 func handle_special_inputs():
 	# Handle screech input (H button)
@@ -208,8 +267,10 @@ func update_rotation(delta):
 func update_UI():
 	state_label.text = str(MovementState.keys()[movement_state])
 	
-	# Add fish carrying status and energy to UI
+	# Add fish carrying status
 	if has_fish():
 		state_label.text += " [FISH]"
 	
+	# Add energy and morale to UI
 	state_label.text += " Energy: " + str(int(current_energy))
+	state_label.text += " | Morale: " + str(int(current_morale))
