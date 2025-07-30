@@ -11,7 +11,8 @@ enum AnimationState {
 	FLAP_FINISHING,   # Finishing current flap before returning to glide
 	GLIDE_FLAP,       # Non-looping flap for idle sequences
 	SCREECH,          # Screech animation
-	FLAP_TALONS_OUT   # Flapping while carrying fish (talons extended)
+	FLAP_TALONS_OUT,  # Flapping while carrying fish (talons extended)
+	HIT               # Hit animation when eagle collides with obstacle
 }
 
 # Animation constants
@@ -34,6 +35,9 @@ var glide_flap_cycles_remaining: int = 0
 
 # Screech system
 var previous_state_before_screech: AnimationState = AnimationState.GLIDE
+
+# Hit system
+var previous_state_before_hit: AnimationState = AnimationState.GLIDE
 
 func _init(sprite: AnimatedSprite2D):
 	animated_sprite = sprite
@@ -63,9 +67,9 @@ func handle_fish_carrying_change(has_fish: bool):
 		if eagle:
 			handle_movement_state_change(eagle.movement_state, eagle.movement_state)
 
-func handle_movement_state_change(old_state: Eagle.MovementState, new_state: Eagle.MovementState):
-	# If carrying fish, prioritize talons out animation
-	if is_carrying_fish and animation_state != AnimationState.SCREECH:
+func handle_movement_state_change(_old_state: Eagle.MovementState, new_state: Eagle.MovementState):
+	# If carrying fish, prioritize talons out animation (except for SCREECH and HIT)
+	if is_carrying_fish and animation_state != AnimationState.SCREECH and new_state != Eagle.MovementState.HIT:
 		if animation_state != AnimationState.FLAP_TALONS_OUT:
 			play_animation(AnimationState.FLAP_TALONS_OUT)
 		return
@@ -88,6 +92,12 @@ func handle_movement_state_change(old_state: Eagle.MovementState, new_state: Eag
 				print("Resuming continuous flapping")
 			else:
 				play_animation(AnimationState.FLAP_CONTINUOUS)
+		Eagle.MovementState.HIT:
+			# Save current state and play hit animation
+			if animation_state != AnimationState.HIT:
+				previous_state_before_hit = animation_state
+			play_animation(AnimationState.HIT)
+			print("Playing hit animation")
 
 func handle_screech_request():
 	# Save current state to return to after screech
@@ -132,6 +142,9 @@ func play_animation(new_animation_state: AnimationState):
 			animated_sprite.play("screech")
 		AnimationState.FLAP_TALONS_OUT:
 			animated_sprite.play("talons_out")
+		AnimationState.HIT:
+			print("Starting hit animation...")
+			animated_sprite.play("hit")
 
 func reset_glide_flap_timer():
 	glide_flap_timer = 0.0
@@ -139,6 +152,7 @@ func reset_glide_flap_timer():
 
 func _on_animation_finished():
 	# Handle animation sequence completion
+	print("Animation finished: ", animation_state)
 	match animation_state:
 		AnimationState.FLAP_CONTINUOUS:
 			# Keep looping the flap animation for continuous input
@@ -180,3 +194,10 @@ func _on_animation_finished():
 				play_animation(AnimationState.FLAP_TALONS_OUT)
 			else:
 				play_animation(previous_state_before_screech)
+		AnimationState.HIT:
+			# Hit animation finished, tell eagle to end hit state and return to appropriate animation
+			print("Hit animation finished")
+			var eagle = get_parent() as Eagle
+			if eagle:
+				eagle.end_hit_state()  # This will trigger movement state change
+			# The animation will be set by the subsequent movement state change

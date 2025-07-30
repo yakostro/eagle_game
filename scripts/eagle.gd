@@ -9,7 +9,7 @@ extends CharacterBody2D
 @export var animated_sprite: AnimatedSprite2D
 
 # Movement states - simple and focused
-enum MovementState { GLIDING, LIFTING, DIVING }
+enum MovementState { GLIDING, LIFTING, DIVING, HIT }
 
 # Physics constants
 const MAX_UP_VELOCITY = -500.0
@@ -38,6 +38,12 @@ const MAX_SPEED_FOR_ROTATION = 1000.0
 @export var min_energy_loss_multiplier: float = 1.0  # Energy loss multiplier at max morale
 @export var max_energy_loss_multiplier: float = 3.0  # Energy loss multiplier at 0 morale
 
+# Hit system variables
+@export var hit_energy_loss: float = 20.0  # Energy lost when hitting an obstacle
+@export var hit_immunity_duration: float = 2.0  # Seconds of immunity after being hit
+@export var hit_blink_duration: float = 3.0  # Seconds of blinking effect (can be longer than immunity)
+@export var hit_blink_interval: float = 0.1  # How fast the blinking occurs
+
 # Components
 var movement_state: MovementState = MovementState.GLIDING
 var animation_controller: EagleAnimationController
@@ -47,12 +53,24 @@ var current_energy: float = 100.0
 var current_morale: float = 100.0  # Start with max morale
 var carried_fish: Fish = null  # Reference to the carried fish object
 
+# Hit system state tracking
+var is_immune: bool = false  # Whether eagle is immune to hits
+var immunity_timer: float = 0.0  # Time remaining for immunity
+var is_blinking: bool = false  # Whether eagle is currently blinking
+var blink_timer: float = 0.0  # Time remaining for blinking effect
+var blink_visible: bool = true  # Current visibility state during blinking
+var blink_interval_timer: float = 0.0  # Timer for blink intervals
+var previous_movement_state: MovementState = MovementState.GLIDING  # State to return to after hit
+var hit_state_timer: float = 0.0  # Timer to force exit from hit state if animation doesn't finish
+var max_hit_state_duration: float = 1.0  # Maximum time allowed in hit state
+
 # Signals
 signal movement_state_changed(old_state: MovementState, new_state: MovementState)
 signal screech_requested()
 signal fish_caught_changed(has_fish: bool)  # Signal when fish carrying state changes
 signal morale_changed(new_morale: float)  # Signal when morale changes
 signal eagle_died()  # Signal when eagle dies from energy depletion
+signal eagle_hit()  # Signal when eagle gets hit by an obstacle
 
 func _ready():
 	print("Eagle ready! Node name: ", name)
@@ -76,19 +94,22 @@ func _physics_process(delta):
 	# 3. Update energy
 	update_energy(delta)
 	
-	# 4. Update movement state
+	# 4. Update hit system (immunity and blinking)
+	update_hit_system(delta)
+	
+	# 5. Update movement state
 	update_movement_state()
 	
-	# 5. Apply physics based on current state
+	# 6. Apply physics based on current state
 	apply_movement_physics(delta)
 	
-	# 6. Update rotation
+	# 7. Update rotation
 	update_rotation(delta)
 	
-	# 7. Apply movement
+	# 8. Apply movement
 	move_and_slide()
 	
-	# 8. Update UI
+	# 9. Update UI
 	update_UI()
 
 # Fish management methods
@@ -167,6 +188,102 @@ func on_nest_missed():
 	lose_morale(morale_loss_per_nest)
 	print("Nest missed! Eagle lost morale.")
 
+# Hit system methods
+func hit_by_obstacle():
+	"""Called when eagle collides with an obstacle"""
+	# Only take damage if not immune
+	if not is_immune:
+		print("Eagle hit by obstacle!")
+		
+		# Lose energy
+		current_energy -= hit_energy_loss
+		current_energy = max(current_energy, 0.0)
+		print("Lost ", hit_energy_loss, " energy. Current energy: ", current_energy)
+		
+		# Save current state and switch to HIT state
+		if movement_state != MovementState.HIT:
+			previous_movement_state = movement_state
+		movement_state = MovementState.HIT
+		
+		# Start immunity and blinking
+		is_immune = true
+		immunity_timer = hit_immunity_duration
+		is_blinking = true
+		blink_timer = hit_blink_duration
+		blink_visible = true
+		blink_interval_timer = 0.0
+		hit_state_timer = 0.0  # Reset hit state timer
+		
+		# Emit hit signal
+		eagle_hit.emit()
+		
+		# Check for death
+		if current_energy <= 0.0:
+			die()
+
+func update_hit_system(delta):
+	"""Update immunity and blinking timers"""
+	# Update hit state timeout (safety mechanism)
+	if movement_state == MovementState.HIT:
+		hit_state_timer += delta
+		if hit_state_timer >= max_hit_state_duration:
+			print("Hit state timeout reached - forcing exit from hit state")
+			end_hit_state()
+	
+	# Update immunity timer
+	if is_immune:
+		immunity_timer -= delta
+		if immunity_timer <= 0.0:
+			is_immune = false
+			print("Eagle immunity ended")
+	
+	# Update blinking effect
+	if is_blinking:
+		blink_timer -= delta
+		blink_interval_timer += delta
+		
+		# Toggle visibility based on blink interval
+		if blink_interval_timer >= hit_blink_interval:
+			blink_visible = !blink_visible
+			animated_sprite.visible = blink_visible
+			blink_interval_timer = 0.0
+		
+		# End blinking when timer expires
+		if blink_timer <= 0.0:
+			is_blinking = false
+			animated_sprite.visible = true  # Make sure eagle is visible
+			blink_visible = true
+			print("Eagle blinking ended")
+
+func is_eagle_immune() -> bool:
+	"""Returns true if eagle is currently immune to hits"""
+	return is_immune
+
+func end_hit_state():
+	"""Called by animation controller when hit animation finishes"""
+	if movement_state == MovementState.HIT:
+		print("Ending hit state, returning to: ", MovementState.keys()[previous_movement_state])
+		var old_state = movement_state
+		movement_state = previous_movement_state
+		hit_state_timer = 0.0  # Reset hit state timer
+		movement_state_changed.emit(old_state, movement_state)
+		print("Eagle control restored! Current state: ", MovementState.keys()[movement_state])
+
+func _on_hit_detection_area_body_entered(body):
+	"""Called when the HitDetectionArea overlaps with a body (obstacle)"""
+	print("Hit detection area triggered by: ", body.name, " | Is obstacle: ", body.is_in_group("obstacles"), " | Is immune: ", is_immune, " | Current state: ", MovementState.keys()[movement_state])
+	
+	# Only process hits if not immune, not already in hit state, and the body is an obstacle
+	if not is_immune and movement_state != MovementState.HIT and body.is_in_group("obstacles"):
+		print("Eagle hit confirmed! Processing hit with obstacle: ", body.name)
+		hit_by_obstacle()
+	elif is_immune:
+		print("Eagle is immune - hit ignored")
+	elif movement_state == MovementState.HIT:
+		print("Eagle already in hit state - hit ignored")
+	else:
+		print("Body is not an obstacle - hit ignored")
+
 func handle_fish_actions():
 	"""Handle input for eating or dropping fish"""
 	if carried_fish != null:
@@ -203,8 +320,17 @@ func handle_special_inputs():
 		screech_audio.play()
 		# Trigger screech animation
 		screech_requested.emit()
+	
+	# DEBUG: Test hit system with T key
+	if Input.is_action_just_pressed("ui_select"):  # Spacebar/Enter for testing
+		print("DEBUG: Manual hit triggered!")
+		hit_by_obstacle()
 
 func update_movement_state():
+	# Don't update movement state during HIT - let animation controller handle it
+	if movement_state == MovementState.HIT:
+		return
+		
 	var new_state = determine_movement_state()
 	
 	if new_state != movement_state:
@@ -231,6 +357,8 @@ func apply_movement_physics(delta):
 			apply_diving_physics(delta)
 		MovementState.GLIDING:
 			apply_gliding_physics(delta)
+		MovementState.HIT:
+			apply_hit_physics(delta)
 	
 	# Clamp velocity
 	velocity.y = clamp(velocity.y, MAX_UP_VELOCITY, MAX_DOWN_VELOCITY)
@@ -254,6 +382,14 @@ func apply_gliding_physics(delta):
 	else:
 		velocity.y = 0.0
 
+func apply_hit_physics(delta):
+	# During hit, eagle maintains momentum but doesn't respond to input
+	# Apply gentle drag to slow down over time
+	if velocity.y > NEUTRAL_THRESHOLD:
+		velocity.y -= DRAG * delta
+	elif velocity.y < -NEUTRAL_THRESHOLD:
+		velocity.y += DRAG * delta
+
 func update_rotation(delta):
 	var speed = velocity.length()
 	var target_rotation = 0.0
@@ -273,9 +409,17 @@ func update_rotation(delta):
 func update_UI():
 	state_label.text = str(MovementState.keys()[movement_state])
 	
+	# Add hit state timer if in hit state
+	if movement_state == MovementState.HIT:
+		state_label.text += " (T:" + str("%.1f" % hit_state_timer) + ")"
+	
 	# Add fish carrying status
 	if has_fish():
 		state_label.text += " [FISH]"
+	
+	# Add immunity status
+	if is_immune:
+		state_label.text += " [IMMUNE]"
 	
 	# Add energy and morale to UI
 	state_label.text += " Energy: " + str(int(current_energy))
