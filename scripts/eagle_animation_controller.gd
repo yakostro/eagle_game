@@ -40,8 +40,15 @@ var previous_state_before_screech: AnimationState = AnimationState.GLIDE
 var previous_state_before_hit: AnimationState = AnimationState.GLIDE
 
 func _init(sprite: AnimatedSprite2D):
+	print("Animation controller _init called with sprite: ", sprite)
 	animated_sprite = sprite
+	if animated_sprite == null:
+		print("ERROR: animated_sprite is null!")
+	else:
+		print("animated_sprite set successfully")
+		print("Available animations: ", animated_sprite.sprite_frames.get_animation_names())
 	animated_sprite.animation_finished.connect(_on_animation_finished)
+	print("animation_finished signal connected")
 	reset_glide_flap_timer()
 
 func _ready():
@@ -68,8 +75,11 @@ func handle_fish_carrying_change(has_fish: bool):
 			handle_movement_state_change(eagle.movement_state, eagle.movement_state)
 
 func handle_movement_state_change(_old_state: Eagle.MovementState, new_state: Eagle.MovementState):
+	print("Animation Controller received state change: ", Eagle.MovementState.keys()[_old_state], " -> ", Eagle.MovementState.keys()[new_state])
+	
 	# If carrying fish, prioritize talons out animation (except for SCREECH and HIT)
 	if is_carrying_fish and animation_state != AnimationState.SCREECH and new_state != Eagle.MovementState.HIT:
+		print("Fish carrying logic: switching to talons out")
 		if animation_state != AnimationState.FLAP_TALONS_OUT:
 			play_animation(AnimationState.FLAP_TALONS_OUT)
 		return
@@ -94,10 +104,13 @@ func handle_movement_state_change(_old_state: Eagle.MovementState, new_state: Ea
 				play_animation(AnimationState.FLAP_CONTINUOUS)
 		Eagle.MovementState.HIT:
 			# Save current state and play hit animation
+			print("HIT case reached in animation controller!")
 			if animation_state != AnimationState.HIT:
 				previous_state_before_hit = animation_state
+				print("Saved previous animation state: ", animation_state)
+			print("About to call play_animation(AnimationState.HIT)")
 			play_animation(AnimationState.HIT)
-			print("Playing hit animation")
+			print("Called play_animation(AnimationState.HIT) - hit animation should be playing")
 
 func handle_screech_request():
 	# Save current state to return to after screech
@@ -123,9 +136,12 @@ func start_glide_flap_sequence():
 	reset_glide_flap_timer()
 
 func play_animation(new_animation_state: AnimationState):
+	print("play_animation called with: ", new_animation_state)
 	if new_animation_state == animation_state:
+		print("Animation state unchanged, returning")
 		return
 		
+	print("Changing animation state from ", animation_state, " to ", new_animation_state)
 	animation_state = new_animation_state
 	
 	match animation_state:
@@ -143,8 +159,15 @@ func play_animation(new_animation_state: AnimationState):
 		AnimationState.FLAP_TALONS_OUT:
 			animated_sprite.play("talons_out")
 		AnimationState.HIT:
-			print("Starting hit animation...")
+			print("AnimationState.HIT case reached in play_animation!")
+			print("animated_sprite reference: ", animated_sprite)
+			print("Current animation: ", animated_sprite.animation)
+			print("Available animations: ", animated_sprite.sprite_frames.get_animation_names())
+			print("About to call animated_sprite.play('hit')")
 			animated_sprite.play("hit")
+			print("Called animated_sprite.play('hit')")
+			print("Current animation after play: ", animated_sprite.animation)
+			print("Animation should be playing now")
 
 func reset_glide_flap_timer():
 	glide_flap_timer = 0.0

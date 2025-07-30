@@ -74,15 +74,18 @@ signal eagle_hit()  # Signal when eagle gets hit by an obstacle
 
 func _ready():
 	print("Eagle ready! Node name: ", name)
+	print("animated_sprite reference: ", animated_sprite)
 	
 	# Initialize animation controller
 	animation_controller = EagleAnimationController.new(animated_sprite)
 	add_child(animation_controller)
+	print("Animation controller created and added as child")
 	
 	# Connect signals
 	movement_state_changed.connect(animation_controller.handle_movement_state_change)
 	screech_requested.connect(animation_controller.handle_screech_request)
 	fish_caught_changed.connect(animation_controller.handle_fish_carrying_change)
+	print("Signals connected to animation controller")
 
 func _physics_process(delta):
 	# 1. Handle special input actions
@@ -191,18 +194,26 @@ func on_nest_missed():
 # Hit system methods
 func hit_by_obstacle():
 	"""Called when eagle collides with an obstacle"""
+	print("hit_by_obstacle() called! is_immune:", is_immune)
 	# Only take damage if not immune
 	if not is_immune:
-		print("Eagle hit by obstacle!")
+		print("Eagle hit by obstacle! Processing hit...")
 		
 		# Lose energy
 		current_energy -= hit_energy_loss
 		current_energy = max(current_energy, 0.0)
 		print("Lost ", hit_energy_loss, " energy. Current energy: ", current_energy)
 		
+		# Drop fish if carrying one (as per GDD requirement)
+		if has_fish():
+			print("Eagle hit while carrying fish - dropping fish!")
+			drop_fish()
+		
 		# Save current state and switch to HIT state
 		if movement_state != MovementState.HIT:
 			previous_movement_state = movement_state
+		print("Setting movement state to HIT. Previous state was: ", MovementState.keys()[previous_movement_state])
+		var old_state = movement_state
 		movement_state = MovementState.HIT
 		
 		# Start immunity and blinking
@@ -213,6 +224,10 @@ func hit_by_obstacle():
 		blink_visible = true
 		blink_interval_timer = 0.0
 		hit_state_timer = 0.0  # Reset hit state timer
+		
+		# Emit movement state change signal to trigger hit animation
+		movement_state_changed.emit(old_state, MovementState.HIT)
+		print("Emitted movement_state_changed signal: ", MovementState.keys()[old_state], " -> ", MovementState.keys()[MovementState.HIT])
 		
 		# Emit hit signal
 		eagle_hit.emit()
@@ -329,12 +344,14 @@ func handle_special_inputs():
 func update_movement_state():
 	# Don't update movement state during HIT - let animation controller handle it
 	if movement_state == MovementState.HIT:
+		# print("Skipping movement state update - currently in HIT state")
 		return
 		
 	var new_state = determine_movement_state()
 	
 	if new_state != movement_state:
 		var old_state = movement_state
+		print("Normal movement state change: ", MovementState.keys()[old_state], " -> ", MovementState.keys()[new_state])
 		movement_state = new_state
 		movement_state_changed.emit(old_state, new_state)
 

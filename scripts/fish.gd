@@ -121,10 +121,7 @@ func _physics_process(delta):
 		print("Dropped fish cleaned up below screen at Y:", global_position.y)
 		queue_free()
 		return
-		
-	# Optional: Debug visualization (remove in final game)
-	if global_position.x >= target_x:
-		print("Fish passed target X coordinate at Y:", global_position.y)
+
 
 func _on_catch_area_entered(body):
 	# Check if the eagle entered the catch area and fish can be caught

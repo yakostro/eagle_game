@@ -218,9 +218,6 @@ animations = [{
 }, {
 "duration": 1.0,
 "texture": ExtResource("40_631kk")
-}, {
-"duration": 1.0,
-"texture": ExtResource("40_631kk")
 }],
 "loop": false,
 "name": &"hit",
@@ -355,7 +352,7 @@ animated_sprite = NodePath("Animation")
 [node name="Animation" type="AnimatedSprite2D" parent="."]
 position = Vector2(-331, 1)
 sprite_frames = SubResource("SpriteFrames_kheon")
-animation = &"flap"
+animation = &"hit"
 autoplay = "glide"
 offset = Vector2(4, -37)
 flip_h = true
