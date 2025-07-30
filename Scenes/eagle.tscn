@@ -1,4 +1,4 @@
-[gd_scene load_steps=73 format=3 uid="uid://cd42djg346oqy"]
+[gd_scene load_steps=75 format=3 uid="uid://cd42djg346oqy"]
 
 [ext_resource type="Texture2D" uid="uid://bx2kqxbypi61f" path="res://sprites/bald_eagle/Flying/__eagle_flying_000.png" id="1_7vcbr"]
 [ext_resource type="Script" path="res://scripts/eagle.gd" id="1_pt68i"]
@@ -47,6 +47,7 @@
 [ext_resource type="Texture2D" uid="uid://dxwwdvau6fvps" path="res://sprites/bald_eagle/Flying swark/__eagle_flying_swark_005.png" id="37_gfweq"]
 [ext_resource type="Texture2D" uid="uid://b58vqt56njhbv" path="res://sprites/bald_eagle/Flying swark/__eagle_flying_swark_006.png" id="38_sa6vp"]
 [ext_resource type="Texture2D" uid="uid://bbkpp274jxyis" path="res://sprites/bald_eagle/Flying swark/__eagle_flying_swark_007.png" id="39_ps1o8"]
+[ext_resource type="Texture2D" uid="uid://p83njlgyof1m" path="res://sprites/bald_eagle/__eagle_dead_000.png" id="40_631kk"]
 [ext_resource type="Texture2D" uid="uid://difupqbo8hin6" path="res://sprites/bald_eagle/Flying swark/__eagle_flying_swark_008.png" id="40_mq70w"]
 [ext_resource type="Texture2D" uid="uid://cyod03ycgnbgh" path="res://sprites/bald_eagle/Flying swark/__eagle_flying_swark_009.png" id="41_flc4h"]
 [ext_resource type="AudioStream" uid="uid://c0prxo4y0h3cc" path="res://sounds/screech.mp3" id="42_g63mg"]
@@ -204,6 +205,26 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
+"texture": ExtResource("40_631kk")
+}, {
+"duration": 1.0,
+"texture": ExtResource("40_631kk")
+}, {
+"duration": 1.0,
+"texture": ExtResource("40_631kk")
+}, {
+"duration": 1.0,
+"texture": ExtResource("40_631kk")
+}, {
+"duration": 1.0,
+"texture": ExtResource("40_631kk")
+}],
+"loop": false,
+"name": &"hit",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
 "texture": ExtResource("32_4bo2g")
 }, {
 "duration": 1.0,
@@ -314,11 +335,16 @@ animations = [{
 }]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_yl77t"]
-radius = 10.6667
-height = 29.3333
+radius = 15.8486
+height = 31.6973
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_hitbox"]
+radius = 8.69121
+height = 43.573
 
 [node name="Eagle" type="CharacterBody2D" node_paths=PackedStringArray("animated_sprite")]
 scale = Vector2(0.3, 0.3)
+collision_mask = 0
 motion_mode = 1
 script = ExtResource("1_pt68i")
 animated_sprite = NodePath("Animation")
@@ -326,13 +352,13 @@ animated_sprite = NodePath("Animation")
 [node name="Animation" type="AnimatedSprite2D" parent="."]
 position = Vector2(-331, 1)
 sprite_frames = SubResource("SpriteFrames_kheon")
-animation = &"talons_out"
+animation = &"hit"
 autoplay = "glide"
 offset = Vector2(4, -37)
 flip_h = true
 
 [node name="CollisionShape" type="CollisionShape2D" parent="."]
-position = Vector2(-313.333, 143.333)
+position = Vector2(-310, 103.333)
 rotation = 1.5708
 scale = Vector2(6.52, 9.18)
 shape = SubResource("CapsuleShape2D_yl77t")
@@ -343,4 +369,15 @@ stream = ExtResource("42_g63mg")
 [node name="CarriedFishHolder" type="Node2D" parent="."]
 position = Vector2(-243, 50)
 
+[node name="HitDetectionArea" type="Area2D" parent="."]
+collision_layer = 4
+collision_mask = 2
+
+[node name="HitDetectionShape" type="CollisionShape2D" parent="HitDetectionArea"]
+position = Vector2(-243.333, 13.3333)
+rotation = 1.5708
+scale = Vector2(6.52, 9.18)
+shape = SubResource("CapsuleShape2D_hitbox")
+
 [connection signal="animation_finished" from="Animation" to="." method="_on_animated_sprite_2d_animation_finished"]
+[connection signal="body_entered" from="HitDetectionArea" to="." method="_on_hit_detection_area_body_entered"]

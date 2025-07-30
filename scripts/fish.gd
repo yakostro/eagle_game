@@ -114,7 +114,6 @@ func _physics_process(delta):
 
 		queue_free()
 		return
-		
 
 
 func _on_catch_area_entered(body):
