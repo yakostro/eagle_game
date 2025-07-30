@@ -15,14 +15,25 @@ class_name Fish
 @export var fish_scale_when_caught: float = 0.8  # Make fish smaller when caught
 @export var fish_offset_from_eagle: Vector2 = Vector2(0, 20)  # Position relative to eagle claws
 
+# Fish drop variables
+@export var drop_vertical_velocity: float = 150.0  # Initial downward velocity when dropped
+@export var drop_backward_acceleration: float = -280.0  # Leftward acceleration to simulate falling behind eagle
+@export var max_backward_velocity: float = -200.0  # Maximum leftward velocity
+@export var screen_cleanup_margin: float = 100.0  # How far below screen to delete fish
+@export var drop_cooldown_time: float = 1.0  # Time in seconds before fish can be caught again after being dropped
+
 var is_caught: bool = false
+var is_dropped: bool = false  # Track if fish was dropped by eagle
+var can_be_caught: bool = true  # Whether fish can currently be caught
 var eagle_reference: Eagle
 var target_x: float
 var start_position: Vector2
+var screen_height: float  # Store screen height for cleanup
 
-func setup_fish(eagle: Eagle):
-	"""Call this after spawning the fish to set the eagle reference"""
+func setup_fish(eagle: Eagle, screen_height_value: float = 1080.0):
+	"""Call this after spawning the fish to set the eagle reference and screen height"""
 	eagle_reference = eagle
+	screen_height = screen_height_value
 	calculate_target_and_jump()
 
 func _ready():
@@ -97,14 +108,27 @@ func _physics_process(delta):
 		rotation = eagle_rotation
 		
 		return
+	
+	# Apply gradual leftward acceleration for dropped fish
+	if is_dropped and not freeze:
+		# Gradually increase leftward velocity to simulate falling behind eagle
+		linear_velocity.x += drop_backward_acceleration * delta
+		# Clamp to maximum backward velocity
+		linear_velocity.x = max(linear_velocity.x, max_backward_velocity)
+	
+	# Check if dropped fish should be cleaned up when it goes below screen
+	if is_dropped and global_position.y > screen_height + screen_cleanup_margin:
+		print("Dropped fish cleaned up below screen at Y:", global_position.y)
+		queue_free()
+		return
 		
 	# Optional: Debug visualization (remove in final game)
 	if global_position.x >= target_x:
 		print("Fish passed target X coordinate at Y:", global_position.y)
 
 func _on_catch_area_entered(body):
-	# Check if the eagle entered the catch area
-	if body is Eagle and not is_caught:
+	# Check if the eagle entered the catch area and fish can be caught
+	if body is Eagle and not is_caught and can_be_caught:
 		catch_fish(body)
 
 func catch_fish(eagle):
@@ -134,19 +158,41 @@ func catch_fish(eagle):
 func release_fish():
 	"""Called when eagle releases/drops the fish"""
 	is_caught = false
+	is_dropped = true  # Mark as dropped for cleanup tracking
 	freeze = false
 	
-	# Re-enable collision detection
+	# Temporarily disable catching to prevent immediate re-catch
+	can_be_caught = false
+	
+	# Re-enable collision detection but fish won't be catchable until cooldown ends
 	var catch_area = $CatchArea
 	catch_area.set_deferred("monitoring", true)
+	
+	# Start cooldown timer to re-enable catching
+	var cooldown_timer = Timer.new()
+	add_child(cooldown_timer)
+	cooldown_timer.wait_time = drop_cooldown_time
+	cooldown_timer.one_shot = true
+	cooldown_timer.timeout.connect(_on_drop_cooldown_ended)
+	cooldown_timer.start()
 	
 	# Reset scale
 	scale = Vector2(1.0, 1.0)
 	
-	# Apply some physics to make fish fall
-	linear_velocity = Vector2(0, 100)  # Small downward velocity
+	# Apply initial drop physics - starts falling mostly straight down
+	# Minimal initial horizontal velocity, leftward acceleration will be applied over time
+	var initial_horizontal_velocity = randf_range(-20.0, 10.0)  # Small random variation
+	linear_velocity = Vector2(initial_horizontal_velocity, drop_vertical_velocity)
 	
-	print("Fish released from eagle!")
+	# Add some rotation for visual effect
+	angular_velocity = randf_range(-5.0, 5.0)
+	
+	print("Fish released from eagle with initial velocity:", linear_velocity, " (will accelerate leftward as it falls)")
+
+func _on_drop_cooldown_ended():
+	"""Called when the drop cooldown timer expires - re-enable catching"""
+	can_be_caught = true
+	print("Fish can be caught again after drop cooldown")
 
 func _on_lifetime_ended():
 	# Remove fish if not caught within lifetime
@@ -189,7 +235,7 @@ static func spawn_fish_at_bottom(scene_tree: SceneTree, fish_scene: PackedScene,
 	# Add to scene
 	scene_tree.current_scene.add_child(fish)
 	
-	# Setup the fish with eagle reference
-	fish.setup_fish(eagle)
+	# Setup the fish with eagle reference and screen height
+	fish.setup_fish(eagle, screen_height)
 	
 	return fish

@@ -314,8 +314,8 @@ animations = [{
 }]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_yl77t"]
-radius = 22.2
-height = 44.4
+radius = 10.6667
+height = 29.3333
 
 [node name="Eagle" type="CharacterBody2D" node_paths=PackedStringArray("animated_sprite")]
 scale = Vector2(0.3, 0.3)
@@ -332,9 +332,9 @@ offset = Vector2(4, -37)
 flip_h = true
 
 [node name="CollisionShape" type="CollisionShape2D" parent="."]
-position = Vector2(-278, 109)
+position = Vector2(-313.333, 143.333)
 rotation = 1.5708
-scale = Vector2(4, 10)
+scale = Vector2(6.52, 9.18)
 shape = SubResource("CapsuleShape2D_yl77t")
 
 [node name="Screech" type="AudioStreamPlayer2D" parent="."]

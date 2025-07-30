@@ -35,8 +35,13 @@ func _process(delta):
 	# Move left automatically
 	global_position.x -= movement_speed * delta
 	
-	# Self-cleanup when off-screen
-	if global_position.x < -200:
+	# Self-cleanup when off-screen (based on sprite width)
+	var sprite = get_node("Sprite2D")
+	var texture = sprite.texture
+	var sprite_width = texture.get_width() * scale.x
+	
+	# Remove when the rightmost edge is off the left side of the screen
+	if global_position.x + sprite_width < 0:
 		print("Mountain ", name, " removed (off-screen)")
 		queue_free()
 
@@ -45,4 +50,7 @@ func move_left(speed: float, delta: float):
 	global_position.x -= speed * delta
 	
 	# Return true if mountain is off-screen (for cleanup)
-	return global_position.x < -200
+	var sprite = get_node("Sprite2D")
+	var texture = sprite.texture
+	var sprite_width = texture.get_width() * scale.x
+	return global_position.x + sprite_width < 0

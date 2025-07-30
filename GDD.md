@@ -50,7 +50,7 @@ Morale
 
 ## Release fish
 - If eagle has fish in his claws he can release it
-- Player presses SPACE to release a fish
+- Player presses F to release a fish
 
 ## Eat fish
 - When player press E button on the keyboard AND an eagle has a fish, an eagle eats a fish
