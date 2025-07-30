@@ -8,6 +8,7 @@ class_name Fish
 @export var jump_force_variation: float = 100.0  # Random variation in jump force
 @export var horizontal_speed: float = 150.0  # Horizontal speed towards target
 @export var lifetime: float = 5.0
+@export var energy_value: float = 25.0  # Energy this fish provides when eaten
 
 
 # Fish attachment variables
@@ -107,25 +108,28 @@ func _on_catch_area_entered(body):
 		catch_fish(body)
 
 func catch_fish(eagle):
-	is_caught = true
-	
-	# Make fish smaller and attach to eagle
-	scale = Vector2(fish_scale_when_caught, fish_scale_when_caught)
-	
-	# Disable physics
-	freeze = true
-	
-	# Disable collision detection for caught fish
-	var catch_area = $CatchArea
-	catch_area.set_deferred("monitoring", false)
-	
-	# Notify the eagle that it caught a fish
+	# First check if eagle can catch this fish
+	var successfully_caught = false
 	if eagle.has_method("catch_fish"):
-		eagle.catch_fish(self)  # Pass the fish reference to eagle
-	else:
-		print("Eagle caught a fish!")
+		successfully_caught = eagle.catch_fish(self)  # Eagle returns true if it can catch
 	
-	print("Fish caught and attached to eagle!")
+	# Only proceed if eagle successfully caught the fish
+	if successfully_caught:
+		is_caught = true
+		
+		# Make fish smaller and attach to eagle
+		scale = Vector2(fish_scale_when_caught, fish_scale_when_caught)
+		
+		# Disable physics
+		freeze = true
+		
+		# Disable collision detection for caught fish
+		var catch_area = $CatchArea
+		catch_area.set_deferred("monitoring", false)
+		
+		print("Fish caught and attached to eagle!")
+	else:
+		print("Fish could not be caught - eagle already has a fish!")
 
 func release_fish():
 	"""Called when eagle releases/drops the fish"""

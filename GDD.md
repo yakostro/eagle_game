@@ -46,6 +46,7 @@ Morale
 - When eagle collides with fish and has no fish in claws, he catches it
 - If caught, fish sit in the claws of the eagle. It rotates with the eagle rotation
 - Eagle can carry only one fish at a time
+- if eagle already has a fish and fish collides with the eagle, then fish is just continue moving 
 
 ## Release fish
 - If eagle has fish in his claws he can release it

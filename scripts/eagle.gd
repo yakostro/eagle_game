@@ -12,10 +12,10 @@ extends CharacterBody2D
 enum MovementState { GLIDING, LIFTING, DIVING }
 
 # Physics constants
-const MAX_UP_VELOCITY = -600.0
-const MAX_DOWN_VELOCITY = 800.0
-const LIFT_ACCELERATION = 11000.0
-const DIVE_ACCELERATION = 12000.0
+const MAX_UP_VELOCITY = -500.0
+const MAX_DOWN_VELOCITY = 700.0
+const LIFT_ACCELERATION = 3000.0
+const DIVE_ACCELERATION = 4000.0
 const DRAG = 500.0
 const NEUTRAL_DRAG = 800.0
 const NEUTRAL_THRESHOLD = 5.0
@@ -29,8 +29,7 @@ const MAX_SPEED_FOR_ROTATION = 1000.0
 
 # Game mechanics variables
 @export var max_energy: float = 100.0
-@export var energy_per_fish: float = 25.0  # Energy gained from eating fish
-@export var energy_loss_per_second: float = 5.0  # Base energy loss over time
+@export var energy_loss_per_second: float = 1.0  # Base energy loss over time
 
 # Morale system variables
 @export var max_morale: float = 100.0
@@ -93,18 +92,25 @@ func _physics_process(delta):
 	update_UI()
 
 # Fish management methods
-func catch_fish(fish: Fish):
-	"""Called when the eagle catches a fish"""
+func catch_fish(fish: Fish) -> bool:
+	"""Called when the eagle catches a fish. Returns true if successful."""
 	if carried_fish == null:  # Only catch if not already carrying
 		carried_fish = fish
 		print("Eagle caught a fish!")
 		fish_caught_changed.emit(true)
+		return true
+	else:
+		print("Eagle already carrying a fish - cannot catch another!")
+		return false
 
 func eat_fish():
 	"""Called when the eagle eats a caught fish to restore energy"""
 	if carried_fish != null:
 		print("Eagle ate a fish!")
-		current_energy = min(current_energy + energy_per_fish, max_energy)
+		# Use the fish's energy value instead of fixed amount
+		var energy_gained = carried_fish.energy_value
+		current_energy = min(current_energy + energy_gained, max_energy)
+		print("Energy gained from fish: ", energy_gained, " (Total energy: ", current_energy, ")")
 		carried_fish.queue_free()  # Remove the fish from scene
 		carried_fish = null
 		fish_caught_changed.emit(false)
