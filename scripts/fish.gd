@@ -63,10 +63,7 @@ func calculate_target_and_jump():
 	# Fish should jump TOWARDS the eagle, not away from it
 	target_x = eagle_reference.global_position.x
 	
-	# DEBUG: Print eagle and target positions
-	print("Eagle position: ", eagle_reference.global_position)
-	print("Fish start position: ", global_position)
-	print("Target X (eagle): ", target_x)
+
 	
 	# Calculate direction to target (should be LEFT since fish spawns to the right)
 	var direction = 1 if target_x > global_position.x else -1
@@ -82,11 +79,7 @@ func calculate_target_and_jump():
 	# Apply the jump with calculated horizontal speed and varied jump force
 	linear_velocity = Vector2(horizontal_velocity, -actual_jump_force)
 	
-	# DEBUG: Print velocity and variation
-	print("Direction: ", direction, " (", "right" if direction > 0 else "left", ")")
-	print("Jump force variation: ", variation, " (base: ", jump_force, " final: ", actual_jump_force, ")")
-	print("Fish velocity: ", linear_velocity)
-	print("Fish jumping from X:", global_position.x, " to target X:", target_x)
+
 
 func _physics_process(delta):
 	# If fish is caught, follow the eagle
@@ -118,13 +111,11 @@ func _physics_process(delta):
 	
 	# Check if dropped fish should be cleaned up when it goes below screen
 	if is_dropped and global_position.y > screen_height + screen_cleanup_margin:
-		print("Dropped fish cleaned up below screen at Y:", global_position.y)
+
 		queue_free()
 		return
 		
-	# Optional: Debug visualization (remove in final game)
-	if global_position.x >= target_x:
-		print("Fish passed target X coordinate at Y:", global_position.y)
+
 
 func _on_catch_area_entered(body):
 	# Check if the eagle entered the catch area and fish can be caught
@@ -151,9 +142,7 @@ func catch_fish(eagle):
 		var catch_area = $CatchArea
 		catch_area.set_deferred("monitoring", false)
 		
-		print("Fish caught and attached to eagle!")
-	else:
-		print("Fish could not be caught - eagle already has a fish!")
+
 
 func release_fish():
 	"""Called when eagle releases/drops the fish"""
@@ -187,17 +176,17 @@ func release_fish():
 	# Add some rotation for visual effect
 	angular_velocity = randf_range(-5.0, 5.0)
 	
-	print("Fish released from eagle with initial velocity:", linear_velocity, " (will accelerate leftward as it falls)")
+
 
 func _on_drop_cooldown_ended():
 	"""Called when the drop cooldown timer expires - re-enable catching"""
 	can_be_caught = true
-	print("Fish can be caught again after drop cooldown")
+
 
 func _on_lifetime_ended():
 	# Remove fish if not caught within lifetime
 	if not is_caught:
-		print("Fish expired at position:", global_position)
+
 		queue_free()
 
 # Static method to spawn fish at bottom of screen
@@ -206,12 +195,11 @@ static func spawn_fish_at_bottom(scene_tree: SceneTree, fish_scene: PackedScene,
 	
 	# Check if the fish is actually a Fish instance
 	if not fish is Fish:
-		print("Error: Fish scene doesn't have Fish script attached!")
+
 		fish.queue_free()
 		return null
 	
-	# DEBUG: Print screen size
-	print("Screen size: ", screen_width, "x", screen_height)
+
 	
 	# Spawn fish to the RIGHT of the eagle
 	# Use spawn_x_offset to determine how far to the right of eagle to spawn
@@ -226,9 +214,7 @@ static func spawn_fish_at_bottom(scene_tree: SceneTree, fish_scene: PackedScene,
 	# Spawn fish BELOW the bottom of the screen
 	var spawn_y = screen_height + randf_range(50, 150)  # 50-150 pixels below screen bottom
 	
-	# DEBUG: Print spawn position
-	print("Eagle at X: ", eagle.global_position.x)
-	print("Spawning fish at: ", spawn_x, ", ", spawn_y, " (", spawn_x - eagle.global_position.x, " pixels to the right of eagle)")
+
 	
 	fish.global_position = Vector2(spawn_x, spawn_y)
 	

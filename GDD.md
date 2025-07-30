@@ -57,6 +57,12 @@ Morale
 - Make a signal for this event so fish could disappear and UI animation about adding energy could be played
 - Add energy (from fish’s parameter) to the eagle
 
+## Hit
+- When eagle collides with the obstacle, it lose part of his energy
+- Eagle is not interacting with the obstacles like a physical body
+- Eagle blinks for a while and become immune to colisions for amount of time like in old-style games
+- play animation 'hit' and then get back to the animation state that corespond to eagle movement state. The blinking could last longer than 'hit' animation
+
 # Fish
 ## Instantiation
 - Fish spawns on the right from the eagle below the bottom of the screen
