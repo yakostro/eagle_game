@@ -24,3 +24,6 @@ centered = false
 position = Vector2(214, 5)
 shape = SubResource("SegmentShape2D_cwc11")
 debug_color = Color(0.337255, 0.188235, 0.721569, 0.8)
+
+[node name="NestPlaceholder" type="Marker2D" parent="."]
+position = Vector2(170, 7)

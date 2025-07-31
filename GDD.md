@@ -84,7 +84,6 @@ Morale
 ## Fed
 - If fish collides with a NEST it disappears
 - Add signal for UI to play positive feedback animation
-- Add Morale points to the eagle
 
 ## Eaten
 - Fish disappears from the claws 
@@ -111,15 +110,24 @@ Obstacles:
 ## Instantiation
 - Nest spawns once on every N (make a export var) obstacle
 - nest placed on the top of the obstacle sprite with 20 px offset down
+- create nest spawner in the same file where all obstacles are being spawned
 
-## Nest scene configuration
-- Nest scene is consist of two main parts: NEST and a BASIS. Basis is a MOUNTAIN. 
-- A nest and a mountain are separate sprites
-- when spawned, mountain sprite should be scaled from 0.5 to 1.5 (make export vars)
-- the nest sprite should always be on top
+## States
+- Hungry
+- Fed
 
-## Behavior
-- If a nest collides with the fish, it emits signal for eagle to increase moral points
+## Hungry state
+- plays hungry animation
+- If a nest collides with the fish:
+	- It emits signal for eagle to increase moral points
+	- Nest switched to Fed state
+	- the sprite that is used in the fish is placed into the FishPlaceholder in the nest scene. preserve position, scale and rotation
+
+## Fed state
+- plays fed animation
+
+
+## Behavior (for any state)
 - If nest goes off the left side of the screen, it emits a signal for the eagle to decrease moral points. Also the instance of the nest is deleted
 - the world should be bigger than camera view and eagle shoul be able to move bot and top quite actively
 

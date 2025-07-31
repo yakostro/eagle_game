@@ -37,14 +37,21 @@ func setup_fish(eagle: Eagle, screen_height_value: float = 1080.0):
 	calculate_target_and_jump()
 
 func _ready():
-	# Disable physical collisions but keep gravity
-	collision_layer = 0
-	collision_mask = 0
+	# Set collision layers for proper detection
+	collision_layer = 1  # Fish are on layer 1 for nest detection
+	collision_mask = 0   # Fish don't need to detect other objects
 	gravity_scale = 1.0
 	
 	# Get the detection area and connect signal
 	var catch_area = $CatchArea
 	catch_area.body_entered.connect(_on_catch_area_entered)
+	
+	# Set up catch area for nest detection
+	catch_area.collision_layer = 1  # Same layer as fish body for consistent detection
+	catch_area.collision_mask = 1   # CatchArea doesn't need to detect anything
+	
+	# Add to fish group for easy detection
+	add_to_group("fish")
 	
 	# Set up lifetime timer
 	var timer = Timer.new()
@@ -189,7 +196,7 @@ func _on_lifetime_ended():
 		queue_free()
 
 # Static method to spawn fish at bottom of screen
-static func spawn_fish_at_bottom(scene_tree: SceneTree, fish_scene: PackedScene, eagle: Eagle, screen_width: float, screen_height: float):
+static func spawn_fish_at_bottom(scene_tree: SceneTree, fish_scene: PackedScene, eagle: Eagle, screen_width: float, viewport_height: float):
 	var fish = fish_scene.instantiate()
 	
 	# Check if the fish is actually a Fish instance
@@ -211,7 +218,7 @@ static func spawn_fish_at_bottom(scene_tree: SceneTree, fish_scene: PackedScene,
 	spawn_x = min(spawn_x, screen_width - 50)
 	
 	# Spawn fish BELOW the bottom of the screen
-	var spawn_y = screen_height + randf_range(50, 150)  # 50-150 pixels below screen bottom
+	var spawn_y = viewport_height + randf_range(50, 150)  # 50-150 pixels below screen bottom
 	
 
 	
@@ -221,6 +228,6 @@ static func spawn_fish_at_bottom(scene_tree: SceneTree, fish_scene: PackedScene,
 	scene_tree.current_scene.add_child(fish)
 	
 	# Setup the fish with eagle reference and screen height
-	fish.setup_fish(eagle, screen_height)
+	fish.setup_fish(eagle, viewport_height)
 	
 	return fish

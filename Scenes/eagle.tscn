@@ -352,7 +352,7 @@ animated_sprite = NodePath("Animation")
 [node name="Animation" type="AnimatedSprite2D" parent="."]
 position = Vector2(-331, 1)
 sprite_frames = SubResource("SpriteFrames_kheon")
-animation = &"hit"
+animation = &"glide"
 autoplay = "glide"
 offset = Vector2(4, -37)
 flip_h = true

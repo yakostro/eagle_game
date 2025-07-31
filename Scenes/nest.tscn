@@ -1,5 +1,83 @@
-[gd_scene format=3 uid="uid://kjcy0srr3p6t"]
+[gd_scene load_steps=14 format=3 uid="uid://kjcy0srr3p6t"]
 
-[node name="Node2D" type="Node2D"]
+[ext_resource type="Script" path="res://scripts/nest.gd" id="1_u358j"]
+[ext_resource type="Texture2D" uid="uid://bba55sddydqay" path="res://sprites/nest/fed/fed1.png" id="2_adwbv"]
+[ext_resource type="Texture2D" uid="uid://bfcaycqmm7p8h" path="res://sprites/nest/fed/fed2.png" id="3_jn2qp"]
+[ext_resource type="Texture2D" uid="uid://kxq2e00obfml" path="res://sprites/nest/fed/fed3.png" id="4_0ggvm"]
+[ext_resource type="Texture2D" uid="uid://shf56lxttir4" path="res://sprites/nest/hungry/Frame 3.png" id="6_104ac"]
+[ext_resource type="Texture2D" uid="uid://cf64f1s2mhgjv" path="res://sprites/nest/hungry/Frame 4.png" id="7_xexj6"]
+[ext_resource type="Texture2D" uid="uid://thri0gn40npm" path="res://sprites/nest/hungry/Frame 5.png" id="8_2wjcv"]
+[ext_resource type="Texture2D" uid="uid://b6iniw2lnfhbg" path="res://sprites/nest/hungry/Frame 6.png" id="9_jxu2q"]
+[ext_resource type="Texture2D" uid="uid://cvpd6m71xrbid" path="res://sprites/nest/hungry/Frame 7.png" id="10_n1h44"]
+[ext_resource type="Texture2D" uid="uid://djc6nmvtefeqq" path="res://sprites/nest/hungry/Frame 8.png" id="11_rghc1"]
+[ext_resource type="Texture2D" uid="uid://do0qdyurp1kxt" path="res://sprites/nest/hungry/Frame 2.png" id="12_7hcef"]
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[sub_resource type="SpriteFrames" id="SpriteFrames_cwq4g"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_adwbv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_jn2qp")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_0ggvm")
+}],
+"loop": true,
+"name": &"fed",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("12_7hcef")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_104ac")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_xexj6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_2wjcv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_jxu2q")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_n1h44")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_rghc1")
+}],
+"loop": true,
+"name": &"hungry",
+"speed": 7.0
+}]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_2x5yl"]
+radius = 20.0
+height = 68.0
+
+[node name="Nest" type="Node2D"]
+script = ExtResource("1_u358j")
+
+[node name="FishPlaceholder" type="Sprite2D" parent="."]
+modulate = Color(0.74108, 0.741081, 0.74432, 1)
+position = Vector2(1, -11)
+rotation = -1.63998
+scale = Vector2(0.2, 0.2)
+
+[node name="Animation" type="AnimatedSprite2D" parent="."]
+scale = Vector2(0.5, 0.5)
+sprite_frames = SubResource("SpriteFrames_cwq4g")
+animation = &"fed"
+autoplay = "hungry"
+frame_progress = 0.188811
+
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+position = Vector2(0, 12)
+rotation = 1.5708
+shape = SubResource("CapsuleShape2D_2x5yl")
