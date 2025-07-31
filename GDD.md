@@ -93,7 +93,7 @@ Obstacles:
 ## Instantiation
 - Make one spawner for all obstacles (fish is not an obstacle)
 - Obstacle spawns once in a while (make export var)
-- Placed on the right side of the screen outside the screen and 
+- Placed on the right side of the screen outside the screen 
 - Moves to the left with the speed of an eagle (use the same 'eagle/world speed' variable for all moving obstacles)
 - At some obstacles could be spawn a nest
 
@@ -102,14 +102,13 @@ Obstacles:
 - [Then will be added more...]
 
 # Mountain
-- When instantiated mountain have to be scaled from 0.5 to 1.5 on Y axis of its size
-- The lowest edge of the mountain should always be on the edge of the screen (it is a zero )
+- When instantiated mountain should be placed at a random Y position: from SCREEN_HEIGHT-SPRITE_HEIGHT to SCREEN_HEIGHT-SPRITE_HEIGHT+offset. offset is a variable and == 500 px 
 
 
 # Nest
 ## Instantiation
 - Nest spawns once on every N (make a export var) obstacle
-- nest placed on the top of the obstacle sprite with 20 px offset down
+- nest placed inside the obstacle scene in the Marker2d 'NestPlaceholder'
 - create nest spawner in the same file where all obstacles are being spawned
 
 ## States

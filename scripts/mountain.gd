@@ -1,34 +1,30 @@
 extends StaticBody2D
 class_name Mountain
 
-@export var mountain_scale_min: float = 0.5  # Minimum mountain scale
-@export var mountain_scale_max: float = 1.5  # Maximum mountain scale
 @export var movement_speed: float = 200.0  # Speed mountain moves left
+@export var spawn_y_offset: float = 500.0  # Y offset from screen height for random positioning
 
 func _ready():
 	# Add to obstacles group for collision detection
 	add_to_group("obstacles")
 
 func setup_mountain(screen_width: float, screen_height: float):
-	"""Set up mountain with random scale and position at bottom of screen"""
-	# Random scale (as per GDD requirements: 0.5 to 1.5)
-	var scale_factor = randf_range(mountain_scale_min, mountain_scale_max)
-	scale = Vector2(scale_factor, scale_factor)
-	
-	# Position at bottom of screen with top-left pivot
+	"""Set up mountain with random Y position according to GDD"""
+	# Position off-screen to the right
 	var spawn_x = screen_width + 100  # Start off-screen to the right
 	
-	# Get sprite height to position bottom edge at screen bottom
+	# Get sprite height for positioning calculation
 	var sprite = get_node("Sprite2D")
 	var texture = sprite.texture
-	var sprite_height = texture.get_height() * scale_factor
+	var sprite_height = texture.get_height()
 	
-	# With top-left pivot: position so bottom of sprite touches screen bottom
-	var spawn_y = screen_height - sprite_height
+	# Random Y position: from SCREEN_HEIGHT-SPRITE_HEIGHT to SCREEN_HEIGHT-SPRITE_HEIGHT+offset (GDD requirement)
+	var base_y = screen_height - sprite_height
+	var spawn_y = randf_range(base_y, base_y + spawn_y_offset)
 	
 	global_position = Vector2(spawn_x, spawn_y)
 	
-	print("Mountain setup at position: ", global_position, " with scale: ", scale_factor)
+	print("Mountain setup at position: ", global_position, " (Y range: ", base_y, " to ", base_y + spawn_y_offset, ")")
 
 func _process(delta):
 	"""Handle automatic movement and cleanup"""
@@ -38,7 +34,7 @@ func _process(delta):
 	# Self-cleanup when off-screen (based on sprite width)
 	var sprite = get_node("Sprite2D")
 	var texture = sprite.texture
-	var sprite_width = texture.get_width() * scale.x
+	var sprite_width = texture.get_width()
 	
 	# Remove when the rightmost edge is off the left side of the screen
 	if global_position.x + sprite_width < 0:
@@ -52,5 +48,5 @@ func move_left(speed: float, delta: float):
 	# Return true if mountain is off-screen (for cleanup)
 	var sprite = get_node("Sprite2D")
 	var texture = sprite.texture
-	var sprite_width = texture.get_width() * scale.x
+	var sprite_width = texture.get_width()
 	return global_position.x + sprite_width < 0

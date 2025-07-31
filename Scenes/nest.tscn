@@ -73,7 +73,7 @@ scale = Vector2(0.5, 0.5)
 sprite_frames = SubResource("SpriteFrames_cwq4g")
 animation = &"fed"
 autoplay = "hungry"
-frame_progress = 0.188811
+frame_progress = 0.216502
 
 [node name="Area2D" type="Area2D" parent="."]
 
