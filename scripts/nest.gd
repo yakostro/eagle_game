@@ -82,6 +82,11 @@ func feed_nest(fish):
 	"""Feed the nest with a fish"""
 	if current_state != NestState.HUNGRY:
 		return
+	
+	# Only accept fish that was dropped by the eagle
+	if not fish.is_dropped:
+		print("Fish rejected - not dropped by eagle")
+		return
 		
 	print("Nest fed with fish!")
 	

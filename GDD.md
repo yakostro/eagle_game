@@ -110,6 +110,8 @@ Obstacles:
 - Nest spawns once on every N (make a export var) obstacle
 - nest placed inside the obstacle scene in the Marker2d 'NestPlaceholder'
 - create nest spawner in the same file where all obstacles are being spawned
+- Spawn at random mountain within min and max interval. 
+- Increase difficulty > more rare nest spawn.
 
 ## States
 - Hungry
@@ -121,6 +123,7 @@ Obstacles:
 	- It emits signal for eagle to increase moral points
 	- Nest switched to Fed state
 	- the sprite that is used in the fish is placed into the FishPlaceholder in the nest scene. preserve position, scale and rotation that fish sprite has before get into the nest
+	- fish should be fed to nest ONLY if it was dropped from the eagle. otherwise it shouldn't be fed
 
 ## Fed state
 - plays fed animation
