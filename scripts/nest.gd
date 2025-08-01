@@ -114,5 +114,5 @@ func feed_nest(fish):
 	# Emit signal for eagle to increase moral points
 	nest_fed.emit(moral_points_gain)
 	
-	# Remove the fish from the scene
-	fish.queue_free()
+	# Tell fish to handle its own cleanup
+	fish.feed_to_nest()

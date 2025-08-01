@@ -181,15 +181,19 @@ func get_morale_percentage() -> float:
 	return current_morale / max_morale
 
 # Nest interaction methods
-func on_nest_fed():
+func on_nest_fed(points: int = 0):
 	"""Called when a nest is successfully fed with a fish"""
-	gain_morale(morale_gain_per_fed_nest)
-	print("Nest fed! Eagle gained morale.")
+	# Use the points from nest if provided, otherwise use eagle's default value
+	var morale_to_gain: float = float(points) if points > 0 else morale_gain_per_fed_nest
+	gain_morale(morale_to_gain)
+	print("Nest fed! Eagle gained ", morale_to_gain, " morale points.")
 
-func on_nest_missed():
+func on_nest_missed(points: int = 0):
 	"""Called when a nest goes off screen without being fed"""
-	lose_morale(morale_loss_per_nest)
-	print("Nest missed! Eagle lost morale.")
+	# Use the points from nest if provided, otherwise use eagle's default value
+	var morale_to_lose: float = float(points) if points > 0 else morale_loss_per_nest
+	lose_morale(morale_to_lose)
+	print("Nest missed! Eagle lost ", morale_to_lose, " morale points.")
 
 # Hit system methods
 func hit_by_obstacle():

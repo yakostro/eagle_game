@@ -2,6 +2,9 @@ extends RigidBody2D
 
 class_name Fish
 
+# Signals
+signal fish_fed_to_nest  # Emitted when fish is fed to a nest
+
 @export var spawn_x_offset: float = 200.0  # How far to the right of eagle to spawn
 @export var spawn_x_variance: float = 100.0  # Random spawn position variance
 @export var jump_force: float = 500.0
@@ -202,6 +205,12 @@ func _on_lifetime_ended():
 	if not is_caught:
 
 		queue_free()
+
+func feed_to_nest():
+	"""Called when fish is fed to a nest - handles its own cleanup"""
+	print("Fish fed to nest - cleaning up")
+	fish_fed_to_nest.emit()  # Notify anyone listening
+	queue_free()  # Fish manages its own deletion
 
 # Static method to spawn fish at bottom of screen
 static func spawn_fish_at_bottom(scene_tree: SceneTree, fish_scene: PackedScene, eagle: Eagle, screen_width: float, viewport_height: float):

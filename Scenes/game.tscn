@@ -19,12 +19,13 @@ fish_scene = ExtResource("4_bafjl")
 eagle_reference = NodePath("../../Eagle")
 UI_fish_counter = NodePath("../../CanvasLayer/FishCounterLabel")
 
-[node name="ObstacleSpawner" type="Node2D" parent="Spawners"]
+[node name="ObstacleSpawner" type="Node2D" parent="Spawners" node_paths=PackedStringArray("eagle_reference")]
 z_index = -2
 position = Vector2(1920, 1080)
 script = ExtResource("3_6m21n")
 mountain_scene = ExtResource("4_yvdbw")
 nest_scene = ExtResource("1_gfvr7")
+eagle_reference = NodePath("../../Eagle")
 spawn_interval = 6.0
 
 [node name="Eagle" parent="." instance=ExtResource("1_ek57t")]

@@ -3,6 +3,7 @@ extends Node2D
 class_name ObstacleSpawner
 @export var mountain_scene: PackedScene  # Drag your Mountain.tscn here
 @export var nest_scene: PackedScene  # Drag your Nest.tscn here
+@export var eagle_reference: Eagle  # Reference to the eagle for signal connections
 
 # mountain balance
 @export var spawn_interval: float = 5.0  # Seconds between spawns
@@ -11,7 +12,7 @@ class_name ObstacleSpawner
 
 # Precise nest spawning system
 @export var min_skipped_obstacles: int = 0  # Minimum obstacles to skip before spawning nest
-@export var max_skipped_obstacles: int = 3  # Maximum obstacles to skip before spawning nest
+@export var max_skipped_obstacles: int = 0  # Maximum obstacles to skip before spawning nest
 
 # Nest difficulty progression
 @export var nest_difficulty_increase_interval: int = 10  # Increase difficulty every N obstacles
@@ -132,6 +133,10 @@ func spawn_nest_on_obstacle(obstacle: Node2D):
 		print("Error: No nest scene assigned to spawner!")
 		return
 	
+	if not eagle_reference:
+		print("Error: No eagle reference assigned to spawner for signal connections!")
+		return
+	
 	# Instantiate nest
 	var nest = nest_scene.instantiate()
 	
@@ -148,6 +153,11 @@ func spawn_nest_on_obstacle(obstacle: Node2D):
 		# Fallback to default positioning
 		nest.position = Vector2(0, 20)
 		print("Warning: No NestPlaceholder found, using default position")
+	
+	# Connect nest signals to eagle's morale methods
+	nest.nest_fed.connect(eagle_reference.on_nest_fed)
+	nest.nest_missed.connect(eagle_reference.on_nest_missed)
+	print("Connected nest signals to eagle morale system")
 
 # Method to manually spawn mountain (for testing)
 func spawn_mountain_now():
