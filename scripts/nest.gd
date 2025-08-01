@@ -93,8 +93,13 @@ func feed_nest(fish):
 	var fish_sprite = fish.get_node("Sprite2D")
 	if fish_sprite:
 		fish_placeholder.texture = fish_sprite.texture
-		# Preserve properties exactly as specified in GDD - preserve position, scale and rotation
-		fish_placeholder.scale = fish.scale  # Keep original fish scale
+		
+		# The fish sprite in the fish scene has scale Vector2(0.2, 0.2)
+		# The FishPlaceholder in nest scene also has scale Vector2(0.2, 0.2)
+		# We want to preserve the fish's scale RELATIVE to its sprite, not absolute
+		# So we keep the placeholder's default scale and don't override it
+		# fish_placeholder.scale remains Vector2(0.2, 0.2) as set in the nest scene
+		
 		fish_placeholder.rotation = fish.rotation  # Keep original fish rotation
 		# Position is already set by the placeholder position in the nest scene
 		print("Fish sprite displayed in nest with scale: ", fish_placeholder.scale, " rotation: ", fish_placeholder.rotation)

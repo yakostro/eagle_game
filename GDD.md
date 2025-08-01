@@ -120,7 +120,7 @@ Obstacles:
 - If a nest collides with the fish:
 	- It emits signal for eagle to increase moral points
 	- Nest switched to Fed state
-	- the sprite that is used in the fish is placed into the FishPlaceholder in the nest scene. preserve position, scale and rotation
+	- the sprite that is used in the fish is placed into the FishPlaceholder in the nest scene. preserve position, scale and rotation that fish sprite has before get into the nest
 
 ## Fed state
 - plays fed animation

@@ -29,6 +29,7 @@ var eagle_reference: Eagle
 var target_x: float
 var start_position: Vector2
 var screen_height: float  # Store screen height for cleanup
+var original_scale: Vector2  # Store original scale before being caught
 
 func setup_fish(eagle: Eagle, screen_height_value: float = 1080.0):
 	"""Call this after spawning the fish to set the eagle reference and screen height"""
@@ -37,6 +38,9 @@ func setup_fish(eagle: Eagle, screen_height_value: float = 1080.0):
 	calculate_target_and_jump()
 
 func _ready():
+	# Store original scale before any modifications
+	original_scale = scale
+	
 	# Set collision layers for proper detection
 	collision_layer = 1  # Fish are on layer 1 for nest detection
 	collision_mask = 0   # Fish don't need to detect other objects
@@ -171,8 +175,8 @@ func release_fish():
 	cooldown_timer.timeout.connect(_on_drop_cooldown_ended)
 	cooldown_timer.start()
 	
-	# Reset scale
-	scale = Vector2(1.0, 1.0)
+	# Reset scale to original size
+	scale = original_scale
 	
 	# Apply initial drop physics - starts falling mostly straight down
 	# Minimal initial horizontal velocity, leftward acceleration will be applied over time
@@ -187,6 +191,10 @@ func release_fish():
 func _on_drop_cooldown_ended():
 	"""Called when the drop cooldown timer expires - re-enable catching"""
 	can_be_caught = true
+
+func get_original_scale() -> Vector2:
+	"""Returns the original scale of the fish before being caught"""
+	return original_scale
 
 
 func _on_lifetime_ended():
