@@ -342,7 +342,7 @@ height = 31.6973
 radius = 8.69121
 height = 43.573
 
-[node name="Eagle" type="CharacterBody2D" node_paths=PackedStringArray("animated_sprite")]
+[node name="Eagle" type="CharacterBody2D" node_paths=PackedStringArray("animated_sprite") groups=["eagle"]]
 scale = Vector2(0.3, 0.3)
 collision_mask = 0
 motion_mode = 1

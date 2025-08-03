@@ -27,20 +27,6 @@ Detailed description
 Parameters:
 has_fish
 
-## Morale and energy
-Energy
-- Energy loses overtime
-- Make a energy_lose_points variable how much it lose in a sec
-- Energy_lose_points increased if the morale points goes down, so the less the morale is the faster an eagle lose his energy
-- When an eagle eats a fish - fish energy is added to the current energy. Energy defined in a particular fish
-- When an eagle hit an obstacle (tree, mountain, island, bullet etc), he losses amount of energy (defined by the obstacle)
-- When energy is 0, eagle dies
-
-Morale
-- When a NEST goes off screen without being fed, an eagle lose morale points
-- Morale can't go below 0
-- If morale is 0 eagle can still fly
-
 
 ## Catch fish
 - When eagle collides with fish and has no fish in claws, he catches it
@@ -57,12 +43,28 @@ Morale
 - Make a signal for this event so fish could disappear and UI animation about adding energy could be played
 - Add energy (from fish’s parameter) to the eagle
 
-## Hit v1
+## Hit
 - When eagle collides with the obstacle, it loses part of his energy
 - Eagle is not interacting with the obstacles like a physical body
 - Eagle blinks for a while and become immune to collisions for amount of time like in old-style games
 - play animation 'hit' and then get back to the animation state that corresponds to eagle movement state. The blinking could last longer than 'hit' animation
 - when eagle hit obstacle and has fish, 'drop fish' behavior  should be activated
+- when the eagle is hit by enemy bird it looses energy corresponding to the value defined in the bird script (default 20 energy points)
+
+
+# Morale and energy
+Energy
+- Energy loses overtime
+- Make a energy_lose_points variable how much it lose in a sec
+- Energy_lose_points increased if the morale points goes down, so the less the morale is the faster an eagle lose his energy
+- When an eagle eats a fish - fish energy is added to the current energy. Energy defined in a particular fish
+- When an eagle hit an obstacle (tree, mountain, island, bullet etc), he losses amount of energy (defined by the obstacle)
+- When energy is 0, eagle dies
+
+Morale
+- When a NEST goes off screen without being fed, an eagle lose morale points
+- Morale can't go below 0
+- If morale is 0 eagle can still fly
 
 
 # Fish
@@ -143,3 +145,28 @@ Obstacles:
 - If nest goes off the left side of the screen, it emits a signal for the eagle to decrease moral points. Also the instance of the nest is deleted
 - the world should be bigger than camera view and eagle shoul be able to move bot and top quite actively
 
+Enemies:
+- make a enemies spawner that will control spawn of different enemy types.
+
+# Enemy types:
+- enemy bird
+
+# Enemy bird
+## Instantiate
+- enemy bird is spawned on the right side of the screen
+- it spawned once in a while (make a var)
+- should be progression in difficulty 
+
+## Movement
+- when spawned enemy bird moves towards the eagle Y position by curve and tries to hit an eagle.
+- bird moves with the acceleration
+- if the eagle change its position, enemy bird tries to make it’s new trajectory towards his new Y position but it has a limitation - the speed of change direction (make a ver)
+- birds fly through the eagle and not stop on the eagle's X coordinate, they just continue moving towarsds left edge of the screen.
+- if an enemy bird hit the eagle it continue move with the same direction as it moved before and goes off the screen on a left side
+- When bird's X more than eagle's X - bird shouldnt consider eagle's change position 
+at all
+- birds must not collide and interact with the eagle, just check for collision
+
+## Misc
+- I have EnemyBird.tscn character body 2d with a sprite and collision capsule
+- when  enemy bird goes off screen it is  removed from the game

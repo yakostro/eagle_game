@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://bvfc1tl8ttpuo"]
+[gd_scene load_steps=14 format=3 uid="uid://bvfc1tl8ttpuo"]
 
 [ext_resource type="PackedScene" uid="uid://cd42djg346oqy" path="res://scenes/eagle.tscn" id="1_ek57t"]
 [ext_resource type="PackedScene" uid="uid://kjcy0srr3p6t" path="res://scenes/nest.tscn" id="1_gfvr7"]
@@ -11,8 +11,10 @@
 [ext_resource type="PackedScene" uid="uid://cmo168tpbivbp" path="res://scenes/obstacles/floating_island.tscn" id="6_pcqt2"]
 [ext_resource type="Script" path="res://scripts/spawners/fish_spawner.gd" id="6_xt0y2"]
 [ext_resource type="Script" path="res://scripts/spawners/nest_spawner.gd" id="7_2n0x0"]
+[ext_resource type="Script" path="res://scripts/spawners/enemies_spawner.gd" id="9_0j6sn"]
+[ext_resource type="PackedScene" uid="uid://cxlfn3myp1uwo" path="res://scenes/enemy_bird.tscn" id="10_tsjmq"]
 
-[node name="Game" type="Node"]
+[node name="Game" type="Node" groups=["game_area"]]
 
 [node name="Spawners" type="Node" parent="."]
 
@@ -37,6 +39,10 @@ position = Vector2(0, -1)
 script = ExtResource("7_2n0x0")
 nest_scene = ExtResource("1_gfvr7")
 eagle_reference = NodePath("../../Eagle")
+
+[node name="EnemiesSpawner" type="Node2D" parent="Spawners"]
+script = ExtResource("9_0j6sn")
+enemy_bird_scene = ExtResource("10_tsjmq")
 
 [node name="Eagle" parent="." instance=ExtResource("1_ek57t")]
 position = Vector2(755, 395)

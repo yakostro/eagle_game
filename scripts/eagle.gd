@@ -59,6 +59,9 @@ func _ready():
 	print("Eagle ready! Node name: ", name)
 	print("animated_sprite reference: ", animated_sprite)
 	
+	# Add eagle to group so enemies can find it
+	add_to_group("eagle")
+	
 	# Initialize movement controller (using default for now)
 	movement_controller = DefaultMovementController.new(self)
 	add_child(movement_controller)
@@ -214,6 +217,53 @@ func hit_by_obstacle():
 		if current_energy <= 0.0:
 			die()
 
+func hit_by_enemy(enemy_body):
+	"""Called when eagle is hit by an enemy bird"""
+	# Prevent multiple hits while immune
+	if is_immune:
+		print("hit_by_enemy() called but eagle is immune!")
+		return
+	
+	print("=== Eagle Hit by Enemy Processing ===")
+	print("Eagle hit by enemy! Processing hit...")
+	
+	# Reduce energy
+	current_energy -= hit_energy_loss
+	current_energy = max(0, current_energy)  # Don't go below 0
+	print("Lost ", hit_energy_loss, " energy. Current energy: ", current_energy)
+	
+	# Drop fish if carrying any
+	if carried_fish != null:
+		print("Eagle hit while carrying fish - dropping fish!")
+		drop_fish()
+	
+	# Tell movement controller to handle hit state
+	movement_controller.handle_hit_state()
+	print("Movement controller set to HIT state")
+	
+	# Set immunity and blinking
+	is_immune = true
+	immunity_timer = hit_immunity_duration
+	is_blinking = true
+	blink_timer = hit_blink_duration
+	blink_visible = true  # Start visible
+	blink_interval_timer = 0.0
+	hit_state_timer = 0.0  # Reset hit state timer
+	
+	# Tell the enemy bird it has hit the eagle
+	if enemy_body.has_method("on_hit_eagle"):
+		enemy_body.on_hit_eagle()
+	
+	# Emit hit signal
+	eagle_hit.emit()
+	
+	# Check for death
+	if current_energy <= 0.0:
+		die()
+	
+	print("Hit by enemy processing complete!")
+	print("=== End Eagle Hit by Enemy Processing ===")
+
 func update_hit_system(delta):
 	"""Update immunity and blinking timers"""
 	# Update hit state timeout (safety mechanism)
@@ -261,20 +311,27 @@ func end_hit_state():
 		print("Eagle control restored! Current state: ", MovementState.keys()[movement_controller.get_movement_state()])
 
 func _on_hit_detection_area_body_entered(body):
-	"""Called when the HitDetectionArea overlaps with a body (obstacle)"""
+	"""Called when the HitDetectionArea overlaps with a body (obstacle or enemy)"""
 	var current_movement_state = movement_controller.get_movement_state()
-	print("Hit detection area triggered by: ", body.name, " | Is obstacle: ", body.is_in_group("obstacles"), " | Is immune: ", is_immune, " | Current state: ", MovementState.keys()[current_movement_state])
+	var is_obstacle = body.is_in_group("obstacles")
+	var is_enemy = body.is_in_group("enemies")
 	
-	# Only process hits if not immune, not already in hit state, and the body is an obstacle
-	if not is_immune and current_movement_state != MovementState.HIT and body.is_in_group("obstacles"):
-		print("Eagle hit confirmed! Processing hit with obstacle: ", body.name)
-		hit_by_obstacle()
+	print("Hit detection area triggered by: ", body.name, " | Is obstacle: ", is_obstacle, " | Is enemy: ", is_enemy, " | Is immune: ", is_immune, " | Current state: ", MovementState.keys()[current_movement_state])
+	
+	# Only process hits if not immune, not already in hit state, and the body is an obstacle or enemy
+	if not is_immune and current_movement_state != MovementState.HIT and (is_obstacle or is_enemy):
+		if is_obstacle:
+			print("Eagle hit confirmed! Processing hit with obstacle: ", body.name)
+			hit_by_obstacle()
+		elif is_enemy:
+			print("Eagle hit confirmed! Processing hit with enemy: ", body.name)
+			hit_by_enemy(body)
 	elif is_immune:
 		print("Eagle is immune - hit ignored")
 	elif current_movement_state == MovementState.HIT:
 		print("Eagle already in hit state - hit ignored")
 	else:
-		print("Body is not an obstacle - hit ignored")
+		print("Body is not an obstacle or enemy - hit ignored")
 
 func handle_fish_actions():
 	"""Handle input for eating or dropping fish"""
