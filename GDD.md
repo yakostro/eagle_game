@@ -110,7 +110,7 @@ Obstacles:
 - When instantiated mountain should be placed at a random Y position: from SCREEN_HEIGHT-SPRITE_HEIGHT to SCREEN_HEIGHT-SPRITE_HEIGHT+offset. offset is a variable and == 500 px 
 
 # Stalactite
-- When instantiated stalactite should be placed at a random Y position: from -sprite_height + minimum_stalactite_height to maximum_sprite_height. maximum_sprite_height should be less than sprite_height. minimum_stalactite_height = 300
+- When instantiated stalactite should be placed at a random Y position: from -sprite_height + minimum_stalactite_height to 0
 - the nest could not be placed at the stalactite
 
 # Floating Island
@@ -120,7 +120,6 @@ Obstacles:
 ## Instantiation
 - Nest spawns once on every N (make a export var) obstacle
 - nest placed inside the obstacle scene in the Marker2d 'NestPlaceholder'
-- create nest spawner in the same file where all obstacles are being spawned
 - Spawn at random mountain within min and max interval. 
 - Increase difficulty > more rare nest spawn.
 

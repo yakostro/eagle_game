@@ -65,17 +65,19 @@ script = ExtResource("1_u358j")
 
 [node name="FishPlaceholder" type="Sprite2D" parent="."]
 modulate = Color(0.74108, 0.741081, 0.74432, 1)
-position = Vector2(1, -24.75)
+position = Vector2(1, -84)
 rotation = -1.63998
 scale = Vector2(0.3, 0.3)
 
 [node name="Animation" type="AnimatedSprite2D" parent="."]
+position = Vector2(0, -59.25)
 sprite_frames = SubResource("SpriteFrames_cwq4g")
 animation = &"fed"
 autoplay = "hungry"
 frame_progress = 0.216502
 
 [node name="Area2D" type="Area2D" parent="."]
+position = Vector2(0, -59.25)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 position = Vector2(0, 29)

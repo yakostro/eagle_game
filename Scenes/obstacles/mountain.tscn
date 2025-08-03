@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://bwhm8l7k51rw0"]
 
 [ext_resource type="Script" path="res://scripts/mountain.gd" id="1_eigoe"]
-[ext_resource type="Texture2D" uid="uid://i0t84ql5q1et" path="res://sprites/mountain.png" id="1_gupq6"]
+[ext_resource type="Texture2D" uid="uid://i0t84ql5q1et" path="res://sprites/obstacles/mountain.png" id="2_oa4js"]
 
 [sub_resource type="SegmentShape2D" id="SegmentShape2D_cwc11"]
 a = Vector2(-44, 0)
@@ -15,7 +15,7 @@ script = ExtResource("1_eigoe")
 movement_speed = 250.0
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-texture = ExtResource("1_gupq6")
+texture = ExtResource("2_oa4js")
 centered = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

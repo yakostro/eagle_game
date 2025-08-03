@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c25nhkv4ldfam"
-path="res://.godot/imported/floating_island.png-c21ed3cd1830f7027265cc8fb2790f30.ctex"
+uid="uid://i0t84ql5q1et"
+path="res://.godot/imported/mountain.png-6d1985b54214ba1d8488839d0c748ded.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/floating_island.png"
-dest_files=["res://.godot/imported/floating_island.png-c21ed3cd1830f7027265cc8fb2790f30.ctex"]
+source_file="res://sprites/obstacles/mountain.png"
+dest_files=["res://.godot/imported/mountain.png-6d1985b54214ba1d8488839d0c748ded.ctex"]
 
 [params]
 

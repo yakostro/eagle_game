@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cgan25epn3mlp"
-path="res://.godot/imported/nest.png-2457aad6325657110bd2472d7f53eadd.ctex"
+path="res://.godot/imported/nest.png-058a2aa0f8e69068b3a1006db3069b4a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/nest.png"
-dest_files=["res://.godot/imported/nest.png-2457aad6325657110bd2472d7f53eadd.ctex"]
+source_file="res://sprites/nest/nest.png"
+dest_files=["res://.godot/imported/nest.png-058a2aa0f8e69068b3a1006db3069b4a.ctex"]
 
 [params]
 
