@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://cxlfn3myp1uwo"]
+
+[ext_resource type="Texture2D" uid="uid://bo3806fywwky0" path="res://sprites/enemy_bird.png" id="1_sws6a"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_o0odj"]
+radius = 23.0
+height = 118.0
+
+[node name="CharacterBody2D" type="CharacterBody2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_sws6a")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(29, -1)
+rotation = 1.5708
+shape = SubResource("CapsuleShape2D_o0odj")

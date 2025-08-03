@@ -72,13 +72,14 @@ func handle_fish_carrying_change(has_fish: bool):
 		# Determine appropriate animation based on current movement
 		var eagle = get_parent() as Eagle
 		if eagle:
-			handle_movement_state_change(eagle.movement_state, eagle.movement_state)
+			var current_state = eagle.get_movement_state()
+			handle_movement_state_change(current_state, current_state)
 
-func handle_movement_state_change(_old_state: Eagle.MovementState, new_state: Eagle.MovementState):
-	print("Animation Controller received state change: ", Eagle.MovementState.keys()[_old_state], " -> ", Eagle.MovementState.keys()[new_state])
+func handle_movement_state_change(_old_state: BaseMovementController.MovementState, new_state: BaseMovementController.MovementState):
+	print("Animation Controller received state change: ", BaseMovementController.MovementState.keys()[_old_state], " -> ", BaseMovementController.MovementState.keys()[new_state])
 	
 	# If carrying fish, prioritize talons out animation (except for SCREECH and HIT)
-	if is_carrying_fish and animation_state != AnimationState.SCREECH and new_state != Eagle.MovementState.HIT:
+	if is_carrying_fish and animation_state != AnimationState.SCREECH and new_state != BaseMovementController.MovementState.HIT:
 		print("Fish carrying logic: switching to talons out")
 		if animation_state != AnimationState.FLAP_TALONS_OUT:
 			play_animation(AnimationState.FLAP_TALONS_OUT)
@@ -86,7 +87,7 @@ func handle_movement_state_change(_old_state: Eagle.MovementState, new_state: Ea
 	
 	# React to movement state changes using enum values
 	match new_state:
-		Eagle.MovementState.GLIDING:
+		BaseMovementController.MovementState.GLIDING:
 			# Check if we need to finish the current flap animation first
 			if animation_state == AnimationState.FLAP_CONTINUOUS:
 				# Don't interrupt mid-flap - let it finish first
@@ -95,14 +96,14 @@ func handle_movement_state_change(_old_state: Eagle.MovementState, new_state: Ea
 			elif animation_state != AnimationState.GLIDE_FLAP:
 				# Safe to switch immediately (not mid-flap)
 				play_animation(AnimationState.GLIDE)
-		Eagle.MovementState.LIFTING, Eagle.MovementState.DIVING:
+		BaseMovementController.MovementState.LIFTING, BaseMovementController.MovementState.DIVING:
 			# If we were finishing a flap, go back to continuous flapping
 			if animation_state == AnimationState.FLAP_FINISHING:
 				animation_state = AnimationState.FLAP_CONTINUOUS
 				print("Resuming continuous flapping")
 			else:
 				play_animation(AnimationState.FLAP_CONTINUOUS)
-		Eagle.MovementState.HIT:
+		BaseMovementController.MovementState.HIT:
 			# Save current state and play hit animation
 			print("HIT case reached in animation controller!")
 			if animation_state != AnimationState.HIT:
@@ -188,7 +189,8 @@ func _on_animation_finished():
 				# Fish was dropped/eaten during animation, return to normal
 				var eagle = get_parent() as Eagle
 				if eagle:
-					handle_movement_state_change(eagle.movement_state, eagle.movement_state)
+					var current_state = eagle.get_movement_state()
+					handle_movement_state_change(current_state, current_state)
 		AnimationState.FLAP_FINISHING:
 			# Flap finished, now transition to glide or talons out
 			print("Flap finished, transitioning to appropriate state")

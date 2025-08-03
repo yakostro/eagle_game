@@ -5,8 +5,8 @@ extends Node
 @export var eagle_reference: Eagle  # Reference to the eagle for signal connections
 
 # Precise nest spawning system
-@export var min_skipped_obstacles: int = 0  # Minimum obstacles to skip before spawning nest
-@export var max_skipped_obstacles: int = 0  # Maximum obstacles to skip before spawning nest
+@export var min_skipped_obstacles: int = 3  # Minimum obstacles to skip before spawning nest
+@export var max_skipped_obstacles: int = 6  # Maximum obstacles to skip before spawning nest
 
 # Nest difficulty progression
 @export var nest_difficulty_increase_interval: int = 10  # Increase difficulty every N obstacles

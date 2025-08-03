@@ -3,14 +3,14 @@
 [ext_resource type="PackedScene" uid="uid://cd42djg346oqy" path="res://scenes/eagle.tscn" id="1_ek57t"]
 [ext_resource type="PackedScene" uid="uid://kjcy0srr3p6t" path="res://scenes/nest.tscn" id="1_gfvr7"]
 [ext_resource type="PackedScene" uid="uid://cet764a7faoqm" path="res://scenes/wind_particles.tscn" id="2_wind"]
-[ext_resource type="Script" path="res://scripts/obstacle_spawner.gd" id="3_6m21n"]
+[ext_resource type="Script" path="res://scripts/spawners/obstacle_spawner.gd" id="3_6m21n"]
 [ext_resource type="Texture2D" uid="uid://bq584cyumqstu" path="res://particles/wind_particle_3.png" id="3_yd0cu"]
 [ext_resource type="PackedScene" uid="uid://bnbjiu5ct08nt" path="res://scenes/fish.tscn" id="4_bafjl"]
 [ext_resource type="PackedScene" uid="uid://bwhm8l7k51rw0" path="res://scenes/obstacles/mountain.tscn" id="4_yvdbw"]
 [ext_resource type="PackedScene" uid="uid://bwuudj6p2q8yl" path="res://scenes/obstacles/stalactite.tscn" id="5_hrbj0"]
 [ext_resource type="PackedScene" uid="uid://cmo168tpbivbp" path="res://scenes/obstacles/floating_island.tscn" id="6_pcqt2"]
-[ext_resource type="Script" path="res://scripts/fish_spawner.gd" id="6_xt0y2"]
-[ext_resource type="Script" path="res://scripts/nest_spawner.gd" id="7_2n0x0"]
+[ext_resource type="Script" path="res://scripts/spawners/fish_spawner.gd" id="6_xt0y2"]
+[ext_resource type="Script" path="res://scripts/spawners/nest_spawner.gd" id="7_2n0x0"]
 
 [node name="Game" type="Node"]
 

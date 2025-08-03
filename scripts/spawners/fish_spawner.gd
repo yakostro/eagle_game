@@ -3,9 +3,9 @@ extends Node2D
 class_name FishSpawner
 
 @export var fish_scene: PackedScene  # Drag your Fish.tscn here
-@export var spawn_interval: float = 3.0  # Seconds between spawns
-@export var spawn_interval_variance: float = 1.0  # Random variation in timing
-@export var min_spawn_interval: float = 1.0  # Minimum time between spawns
+@export var spawn_interval: float = 5.0  # Seconds between spawns
+@export var spawn_interval_variance: float = 2.0  # Random variation in timing
+@export var min_spawn_interval: float = 2.0  # Minimum time between spawns
 @export var eagle_reference: Eagle
 @export var UI_fish_counter: Label
 

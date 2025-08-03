@@ -8,24 +8,8 @@ extends CharacterBody2D
 
 @export var animated_sprite: AnimatedSprite2D
 
-# Movement states - simple and focused
-enum MovementState { GLIDING, LIFTING, DIVING, HIT }
-
-# Physics constants
-const MAX_UP_VELOCITY = -500.0
-const MAX_DOWN_VELOCITY = 700.0
-const LIFT_ACCELERATION = 3000.0
-const DIVE_ACCELERATION = 4000.0
-const DRAG = 500.0
-const NEUTRAL_DRAG = 800.0
-const NEUTRAL_THRESHOLD = 5.0
-
-# Rotation constants
-const MAX_ROTATION_UP = -45.0
-const MAX_ROTATION_DOWN = 45.0
-const ROTATION_SPEED = 3.0
-const MIN_SPEED_FOR_ROTATION = 50.0
-const MAX_SPEED_FOR_ROTATION = 1000.0
+# Import movement state enum from base controller
+const MovementState = BaseMovementController.MovementState
 
 # Game mechanics variables
 @export var max_energy: float = 100.0
@@ -45,7 +29,7 @@ const MAX_SPEED_FOR_ROTATION = 1000.0
 @export var hit_blink_interval: float = 0.1  # How fast the blinking occurs
 
 # Components
-var movement_state: MovementState = MovementState.GLIDING
+var movement_controller: BaseMovementController
 var animation_controller: EagleAnimationController
 
 # Energy and fish tracking
@@ -60,12 +44,11 @@ var is_blinking: bool = false  # Whether eagle is currently blinking
 var blink_timer: float = 0.0  # Time remaining for blinking effect
 var blink_visible: bool = true  # Current visibility state during blinking
 var blink_interval_timer: float = 0.0  # Timer for blink intervals
-var previous_movement_state: MovementState = MovementState.GLIDING  # State to return to after hit
+# Hit state is now managed by movement controller
 var hit_state_timer: float = 0.0  # Timer to force exit from hit state if animation doesn't finish
 var max_hit_state_duration: float = 1.0  # Maximum time allowed in hit state
 
-# Signals
-signal movement_state_changed(old_state: MovementState, new_state: MovementState)
+# Signals - movement_state_changed is now handled by movement controller
 signal screech_requested()
 signal fish_caught_changed(has_fish: bool)  # Signal when fish carrying state changes
 signal morale_changed(new_morale: float)  # Signal when morale changes
@@ -76,13 +59,18 @@ func _ready():
 	print("Eagle ready! Node name: ", name)
 	print("animated_sprite reference: ", animated_sprite)
 	
+	# Initialize movement controller (using default for now)
+	movement_controller = DefaultMovementController.new(self)
+	add_child(movement_controller)
+	print("Movement controller created and added as child")
+	
 	# Initialize animation controller
 	animation_controller = EagleAnimationController.new(animated_sprite)
 	add_child(animation_controller)
 	print("Animation controller created and added as child")
 	
 	# Connect signals
-	movement_state_changed.connect(animation_controller.handle_movement_state_change)
+	movement_controller.movement_state_changed.connect(animation_controller.handle_movement_state_change)
 	screech_requested.connect(animation_controller.handle_screech_request)
 	fish_caught_changed.connect(animation_controller.handle_fish_carrying_change)
 	print("Signals connected to animation controller")
@@ -100,19 +88,12 @@ func _physics_process(delta):
 	# 4. Update hit system (immunity and blinking)
 	update_hit_system(delta)
 	
-	# 5. Update movement state
-	update_movement_state()
+	# 5. Movement is now handled by movement_controller in its _physics_process
 	
-	# 6. Apply physics based on current state
-	apply_movement_physics(delta)
-	
-	# 7. Update rotation
-	update_rotation(delta)
-	
-	# 8. Apply movement
+	# 6. Apply movement (movement controller sets velocity, we apply it)
 	move_and_slide()
 	
-	# 9. Update UI
+	# 7. Update UI
 	update_UI()
 
 # Fish management methods
@@ -213,12 +194,9 @@ func hit_by_obstacle():
 			print("Eagle hit while carrying fish - dropping fish!")
 			drop_fish()
 		
-		# Save current state and switch to HIT state
-		if movement_state != MovementState.HIT:
-			previous_movement_state = movement_state
-		print("Setting movement state to HIT. Previous state was: ", MovementState.keys()[previous_movement_state])
-		var old_state = movement_state
-		movement_state = MovementState.HIT
+		# Tell movement controller to handle hit state
+		movement_controller.handle_hit_state()
+		print("Movement controller set to HIT state")
 		
 		# Start immunity and blinking
 		is_immune = true
@@ -228,10 +206,6 @@ func hit_by_obstacle():
 		blink_visible = true
 		blink_interval_timer = 0.0
 		hit_state_timer = 0.0  # Reset hit state timer
-		
-		# Emit movement state change signal to trigger hit animation
-		movement_state_changed.emit(old_state, MovementState.HIT)
-		print("Emitted movement_state_changed signal: ", MovementState.keys()[old_state], " -> ", MovementState.keys()[MovementState.HIT])
 		
 		# Emit hit signal
 		eagle_hit.emit()
@@ -243,7 +217,7 @@ func hit_by_obstacle():
 func update_hit_system(delta):
 	"""Update immunity and blinking timers"""
 	# Update hit state timeout (safety mechanism)
-	if movement_state == MovementState.HIT:
+	if movement_controller.get_movement_state() == MovementState.HIT:
 		hit_state_timer += delta
 		if hit_state_timer >= max_hit_state_duration:
 			print("Hit state timeout reached - forcing exit from hit state")
@@ -280,25 +254,24 @@ func is_eagle_immune() -> bool:
 
 func end_hit_state():
 	"""Called by animation controller when hit animation finishes"""
-	if movement_state == MovementState.HIT:
-		print("Ending hit state, returning to: ", MovementState.keys()[previous_movement_state])
-		var old_state = movement_state
-		movement_state = previous_movement_state
+	if movement_controller.get_movement_state() == MovementState.HIT:
+		print("Ending hit state, restoring movement controller")
+		movement_controller.restore_from_hit_state()
 		hit_state_timer = 0.0  # Reset hit state timer
-		movement_state_changed.emit(old_state, movement_state)
-		print("Eagle control restored! Current state: ", MovementState.keys()[movement_state])
+		print("Eagle control restored! Current state: ", MovementState.keys()[movement_controller.get_movement_state()])
 
 func _on_hit_detection_area_body_entered(body):
 	"""Called when the HitDetectionArea overlaps with a body (obstacle)"""
-	print("Hit detection area triggered by: ", body.name, " | Is obstacle: ", body.is_in_group("obstacles"), " | Is immune: ", is_immune, " | Current state: ", MovementState.keys()[movement_state])
+	var current_movement_state = movement_controller.get_movement_state()
+	print("Hit detection area triggered by: ", body.name, " | Is obstacle: ", body.is_in_group("obstacles"), " | Is immune: ", is_immune, " | Current state: ", MovementState.keys()[current_movement_state])
 	
 	# Only process hits if not immune, not already in hit state, and the body is an obstacle
-	if not is_immune and movement_state != MovementState.HIT and body.is_in_group("obstacles"):
+	if not is_immune and current_movement_state != MovementState.HIT and body.is_in_group("obstacles"):
 		print("Eagle hit confirmed! Processing hit with obstacle: ", body.name)
 		hit_by_obstacle()
 	elif is_immune:
 		print("Eagle is immune - hit ignored")
-	elif movement_state == MovementState.HIT:
+	elif current_movement_state == MovementState.HIT:
 		print("Eagle already in hit state - hit ignored")
 	else:
 		print("Body is not an obstacle - hit ignored")
@@ -332,6 +305,25 @@ func die():
 	eagle_died.emit()
 	# TODO: Handle death state - disable controls, play death animation, etc.
 
+# ===== MOVEMENT CONTROLLER MANAGEMENT =====
+
+func set_movement_controller(new_controller: BaseMovementController):
+	"""Change the movement controller - useful for experimenting with different movement feels"""
+	if movement_controller:
+		remove_child(movement_controller)
+		movement_controller.queue_free()
+	
+	movement_controller = new_controller
+	add_child(movement_controller)
+	
+	# Reconnect animation controller signal
+	movement_controller.movement_state_changed.connect(animation_controller.handle_movement_state_change)
+	print("Movement controller changed to: ", movement_controller.get_script().resource_path)
+
+func get_movement_state() -> MovementState:
+	"""Get current movement state from movement controller"""
+	return movement_controller.get_movement_state() if movement_controller else MovementState.GLIDING
+
 func handle_special_inputs():
 	# Handle screech input (H button)
 	if Input.is_action_just_pressed("screech"):
@@ -345,93 +337,14 @@ func handle_special_inputs():
 		print("DEBUG: Manual hit triggered!")
 		hit_by_obstacle()
 
-func update_movement_state():
-	# Don't update movement state during HIT - let animation controller handle it
-	if movement_state == MovementState.HIT:
-		# print("Skipping movement state update - currently in HIT state")
-		return
-		
-	var new_state = determine_movement_state()
-	
-	if new_state != movement_state:
-		var old_state = movement_state
-		print("Normal movement state change: ", MovementState.keys()[old_state], " -> ", MovementState.keys()[new_state])
-		movement_state = new_state
-		movement_state_changed.emit(old_state, new_state)
-
-func determine_movement_state() -> MovementState:
-	if Input.is_action_pressed("move_up"):
-		return MovementState.LIFTING
-	elif Input.is_action_pressed("move_down"):
-		if velocity.y > 200.0:  # Fast downward = diving
-			return MovementState.DIVING
-		else:
-			return MovementState.LIFTING
-	else:
-		return MovementState.GLIDING
-
-func apply_movement_physics(delta):
-	match movement_state:
-		MovementState.LIFTING:
-			apply_lifting_physics(delta)
-		MovementState.DIVING:
-			apply_diving_physics(delta)
-		MovementState.GLIDING:
-			apply_gliding_physics(delta)
-		MovementState.HIT:
-			apply_hit_physics(delta)
-	
-	# Clamp velocity
-	velocity.y = clamp(velocity.y, MAX_UP_VELOCITY, MAX_DOWN_VELOCITY)
-
-func apply_lifting_physics(delta):
-	if Input.is_action_pressed("move_up"):
-		velocity.y -= LIFT_ACCELERATION * delta
-	elif Input.is_action_pressed("move_down"):
-		velocity.y += DIVE_ACCELERATION * delta
-
-func apply_diving_physics(delta):
-	# Enhanced downward acceleration for diving
-	velocity.y += DIVE_ACCELERATION * 1.5 * delta
-
-func apply_gliding_physics(delta):
-	# Gentle return to neutral during gliding
-	if velocity.y > NEUTRAL_THRESHOLD:
-		velocity.y -= NEUTRAL_DRAG * delta
-	elif velocity.y < -NEUTRAL_THRESHOLD:
-		velocity.y += NEUTRAL_DRAG * delta
-	else:
-		velocity.y = 0.0
-
-func apply_hit_physics(delta):
-	# During hit, eagle maintains momentum but doesn't respond to input
-	# Apply gentle drag to slow down over time
-	if velocity.y > NEUTRAL_THRESHOLD:
-		velocity.y -= DRAG * delta
-	elif velocity.y < -NEUTRAL_THRESHOLD:
-		velocity.y += DRAG * delta
-
-func update_rotation(delta):
-	var speed = velocity.length()
-	var target_rotation = 0.0
-	
-	if speed > MIN_SPEED_FOR_ROTATION:
-		var speed_ratio = clamp((speed - MIN_SPEED_FOR_ROTATION) / (MAX_SPEED_FOR_ROTATION - MIN_SPEED_FOR_ROTATION), 0.0, 1.0)
-		
-		if velocity.y < 0:
-			target_rotation = -speed_ratio * abs(MAX_ROTATION_UP)
-		elif velocity.y > 0:
-			target_rotation = speed_ratio * MAX_ROTATION_DOWN
-	
-	var current_rotation_deg = rad_to_deg(rotation)
-	var new_rotation_deg = lerp(current_rotation_deg, target_rotation, ROTATION_SPEED * delta)
-	rotation = deg_to_rad(new_rotation_deg)
+# Movement methods removed - now handled by movement_controller
 
 func update_UI():
-	state_label.text = str(MovementState.keys()[movement_state])
+	var current_movement_state = movement_controller.get_movement_state()
+	state_label.text = str(MovementState.keys()[current_movement_state])
 	
 	# Add hit state timer if in hit state
-	if movement_state == MovementState.HIT:
+	if current_movement_state == MovementState.HIT:
 		state_label.text += " (T:" + str("%.1f" % hit_state_timer) + ")"
 	
 	# Add fish carrying status
