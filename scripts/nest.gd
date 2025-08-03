@@ -8,8 +8,8 @@ enum NestState {
 	FED
 }
 
-@export var moral_points_gain: int = 10  # Points gained when feeding nest
-@export var moral_points_loss: int = 5   # Points lost when nest goes off-screen
+@export var moral_points_gain: int = 15  # Points gained when feeding nest
+@export var moral_points_loss: int = 10   # Points lost when nest goes off-screen
 
 var current_state: NestState = NestState.HUNGRY
 var animation_player: AnimatedSprite2D

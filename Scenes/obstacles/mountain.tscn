@@ -5,7 +5,7 @@
 
 [sub_resource type="SegmentShape2D" id="SegmentShape2D_cwc11"]
 a = Vector2(-44, 0)
-b = Vector2(-214, 687)
+b = Vector2(-282, 962)
 
 [node name="Mountain" type="StaticBody2D"]
 z_index = -3

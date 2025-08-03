@@ -93,17 +93,28 @@ Obstacles:
 ## Instantiation
 - Make one spawner for all obstacles (fish is not an obstacle)
 - Obstacle spawns once in a while (make export var)
+- there are several types of obstacles
+- the spawner chose what type of obstacle will be placed
 - Placed on the right side of the screen outside the screen 
 - Moves to the left with the speed of an eagle (use the same 'eagle/world speed' variable for all moving obstacles)
 - At some obstacles could be spawn a nest
+- Nest could be spawn on the obstacles where the 'NestPlaceholder' is. Maybe it's worth to add a parameter determining is nest could be placed for the obstacle
 
 ## Obstacle types:
 - Mountain
+- Stalactite
+- Floating Island
 - [Then will be added more...]
 
 # Mountain
 - When instantiated mountain should be placed at a random Y position: from SCREEN_HEIGHT-SPRITE_HEIGHT to SCREEN_HEIGHT-SPRITE_HEIGHT+offset. offset is a variable and == 500 px 
 
+# Stalactite
+- When instantiated stalactite should be placed at a random Y position: from -sprite_height + minimum_stalactite_height to maximum_sprite_height. maximum_sprite_height should be less than sprite_height. minimum_stalactite_height = 300
+- the nest could not be placed at the stalactite
+
+# Floating Island
+- When instantiated stalactite should be placed at a random Y position: from minimum_top_offset = 500 to minimum_bottom_offset + sprite_height. minimum_bottom_offset = 300
 
 # Nest
 ## Instantiation
