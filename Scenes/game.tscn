@@ -46,6 +46,8 @@ enemy_bird_scene = ExtResource("10_tsjmq")
 
 [node name="Eagle" parent="." instance=ExtResource("1_ek57t")]
 position = Vector2(755, 395)
+energy_loss_per_flap = 1.0
+disable_passive_energy_loss = true
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(960, 540)

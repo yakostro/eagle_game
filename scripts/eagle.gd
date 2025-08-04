@@ -14,6 +14,8 @@ const MovementState = BaseMovementController.MovementState
 # Game mechanics variables
 @export var max_energy: float = 100.0
 @export var energy_loss_per_second: float = 1.0  # Base energy loss over time
+@export var energy_loss_per_flap: float = 3.0  # Energy lost per flap in flappy mode
+@export var disable_passive_energy_loss: bool = false  # For flappy bird mode
 
 # Morale system variables
 @export var max_morale: float = 100.0
@@ -77,6 +79,9 @@ func _ready():
 	screech_requested.connect(animation_controller.handle_screech_request)
 	fish_caught_changed.connect(animation_controller.handle_fish_carrying_change)
 	print("Signals connected to animation controller")
+
+	enable_flappy_mode()  # Switch to flappy bird controller
+
 
 func _physics_process(delta):
 	# 1. Handle special input actions
@@ -343,18 +348,26 @@ func handle_fish_actions():
 
 func update_energy(delta):
 	"""Update eagle's energy over time"""
-	# Calculate energy loss multiplier based on morale (lower morale = faster energy loss)
-	var morale_percentage = get_morale_percentage()
-	var energy_loss_multiplier = lerp(max_energy_loss_multiplier, min_energy_loss_multiplier, morale_percentage)
-	
-	# Lose energy over time (faster if low morale)
-	var actual_energy_loss = energy_loss_per_second * energy_loss_multiplier * delta
-	current_energy -= actual_energy_loss
-	current_energy = max(current_energy, 0.0)
+	# Only lose energy passively if not in flappy mode
+	if not disable_passive_energy_loss:
+		# Calculate energy loss multiplier based on morale (lower morale = faster energy loss)
+		var morale_percentage = get_morale_percentage()
+		var energy_loss_multiplier = lerp(max_energy_loss_multiplier, min_energy_loss_multiplier, morale_percentage)
+		
+		# Lose energy over time (faster if low morale)
+		var actual_energy_loss = energy_loss_per_second * energy_loss_multiplier * delta
+		current_energy -= actual_energy_loss
+		current_energy = max(current_energy, 0.0)
 	
 	# Check for death condition
 	if current_energy <= 0.0:
 		die()
+
+func consume_flap_energy():
+	"""Called by flappy movement controller when eagle flaps"""
+	current_energy -= energy_loss_per_flap
+	current_energy = max(current_energy, 0.0)
+	print("Eagle flapped! Energy lost: ", energy_loss_per_flap, " (Current: ", current_energy, ")")
 
 func die():
 	"""Called when the eagle dies from energy depletion"""
@@ -376,6 +389,20 @@ func set_movement_controller(new_controller: BaseMovementController):
 	# Reconnect animation controller signal
 	movement_controller.movement_state_changed.connect(animation_controller.handle_movement_state_change)
 	print("Movement controller changed to: ", movement_controller.get_script().resource_path)
+
+func enable_flappy_mode():
+	"""Switch to flappy bird movement controller"""
+	disable_passive_energy_loss = true
+	var flappy_controller = FlappyMovementController.new(self)
+	set_movement_controller(flappy_controller)
+	print("Switched to Flappy Bird movement controller!")
+
+func enable_default_mode():
+	"""Switch to default movement controller"""
+	disable_passive_energy_loss = false
+	var default_controller = DefaultMovementController.new(self)
+	set_movement_controller(default_controller)
+	print("Switched to Default movement controller!")
 
 func get_movement_state() -> MovementState:
 	"""Get current movement state from movement controller"""

@@ -3,8 +3,8 @@ extends Node
 
 # Enemy bird spawning configuration
 @export var enemy_bird_scene: PackedScene  # Drag the enemy_bird.tscn here in the editor
-@export var spawn_interval_min: float = 3.0  # Minimum time between spawns
-@export var spawn_interval_max: float = 6.0  # Maximum time between spawns
+@export var spawn_interval_min: float = 70.0  # Minimum time between spawns
+@export var spawn_interval_max: float = 100.0  # Maximum time between spawns
 @export var spawn_distance_from_screen: float = 100.0  # How far right of screen to spawn
 
 # Difficulty progression variables

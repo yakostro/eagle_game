@@ -2,7 +2,7 @@ class_name BaseObstacle
 extends StaticBody2D
 
 # Movement properties - should match eagle/world speed (as per GDD)
-@export var movement_speed: float = 200.0  # Speed obstacle moves left
+@export var movement_speed: float = 300.0  # Speed obstacle moves left
 
 # Nest support - define per obstacle type
 @export var can_carry_nest: bool = true
