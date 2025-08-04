@@ -11,20 +11,8 @@ extends CharacterBody2D
 # Import movement state enum from base controller
 const MovementState = BaseMovementController.MovementState
 
-# Game mechanics variables
-@export var max_energy: float = 100.0
-@export var energy_loss_per_second: float = 1.0  # Base energy loss over time
-
-# Morale system variables
-@export var max_morale: float = 100.0
-@export var morale_loss_per_nest: float = 15.0  # Morale lost when nest goes off screen
-@export var morale_gain_per_fed_nest: float = 20.0  # Morale gained when nest is fed
-@export var min_energy_loss_multiplier: float = 1.0  # Energy loss multiplier at max morale
-@export var max_energy_loss_multiplier: float = 3.0  # Energy loss multiplier at 0 morale
-
-# Hit system variables
-@export var hit_energy_loss: float = 20.0  # Energy lost when hitting an obstacle
-@export var hit_immunity_duration: float = 2.0  # Seconds of immunity after being hit
+# Game mechanics variables (now using GameBalance singleton)
+# Note: Individual @export vars removed - now using GameBalance singleton for all balance parameters
 @export var hit_blink_duration: float = 3.0  # Seconds of blinking effect (can be longer than immunity)
 @export var hit_blink_interval: float = 0.1  # How fast the blinking occurs
 
@@ -33,8 +21,8 @@ var movement_controller: BaseMovementController
 var animation_controller: EagleAnimationController
 
 # Energy and fish tracking
-var current_energy: float = 100.0
-var current_morale: float = 100.0  # Start with max morale
+var current_energy: float
+var current_morale: float
 var carried_fish: Fish = null  # Reference to the carried fish object
 
 # Hit system state tracking
@@ -58,6 +46,11 @@ signal eagle_hit()  # Signal when eagle gets hit by an obstacle
 func _ready():
 	print("Eagle ready! Node name: ", name)
 	print("animated_sprite reference: ", animated_sprite)
+	
+	# Initialize values from GameBalance singleton
+	current_energy = GameBalance.eagle_starting_energy
+	current_morale = GameBalance.starting_morale
+	print("Eagle initialized with energy: ", current_energy, " and morale: ", current_morale)
 	
 	# Add eagle to group so enemies can find it
 	add_to_group("eagle")
@@ -117,7 +110,7 @@ func eat_fish():
 		print("Eagle ate a fish!")
 		# Use the fish's energy value instead of fixed amount
 		var energy_gained = carried_fish.energy_value
-		current_energy = min(current_energy + energy_gained, max_energy)
+		current_energy = min(current_energy + energy_gained, GameBalance.eagle_max_energy)
 		print("Energy gained from fish: ", energy_gained, " (Total energy: ", current_energy, ")")
 		carried_fish.queue_free()  # Remove the fish from scene
 		carried_fish = null
@@ -151,7 +144,7 @@ func lose_morale(amount: float):
 func gain_morale(amount: float):
 	"""Called when the eagle gains morale (e.g., feeds a nest)"""
 	var old_morale = current_morale
-	current_morale = min(current_morale + amount, max_morale)
+	current_morale = min(current_morale + amount, GameBalance.max_morale)
 	if old_morale != current_morale:
 		print("Eagle gained morale: ", amount, " (Current: ", current_morale, ")")
 		morale_changed.emit(current_morale)
@@ -162,20 +155,20 @@ func get_current_morale() -> float:
 
 func get_morale_percentage() -> float:
 	"""Returns morale as a percentage (0.0 to 1.0)"""
-	return current_morale / max_morale
+	return current_morale / GameBalance.max_morale
 
 # Nest interaction methods
 func on_nest_fed(points: int = 0):
 	"""Called when a nest is successfully fed with a fish"""
-	# Use the points from nest if provided, otherwise use eagle's default value
-	var morale_to_gain: float = float(points) if points > 0 else morale_gain_per_fed_nest
+	# Use the points from nest if provided, otherwise use GameBalance default value
+	var morale_to_gain: float = float(points) if points > 0 else GameBalance.morale_gain_fed_chick
 	gain_morale(morale_to_gain)
 	print("Nest fed! Eagle gained ", morale_to_gain, " morale points.")
 
 func on_nest_missed(points: int = 0):
 	"""Called when a nest goes off screen without being fed"""
-	# Use the points from nest if provided, otherwise use eagle's default value
-	var morale_to_lose: float = float(points) if points > 0 else morale_loss_per_nest
+	# Use the points from nest if provided, otherwise use GameBalance default value
+	var morale_to_lose: float = float(points) if points > 0 else GameBalance.morale_loss_unfed_nest
 	lose_morale(morale_to_lose)
 	print("Nest missed! Eagle lost ", morale_to_lose, " morale points.")
 
@@ -188,9 +181,9 @@ func hit_by_obstacle():
 		print("Eagle hit by obstacle! Processing hit...")
 		
 		# Lose energy
-		current_energy -= hit_energy_loss
+		current_energy -= GameBalance.obstacle_hit_energy_loss
 		current_energy = max(current_energy, 0.0)
-		print("Lost ", hit_energy_loss, " energy. Current energy: ", current_energy)
+		print("Lost ", GameBalance.obstacle_hit_energy_loss, " energy. Current energy: ", current_energy)
 		
 		# Drop fish if carrying one (as per GDD requirement)
 		if has_fish():
@@ -203,7 +196,7 @@ func hit_by_obstacle():
 		
 		# Start immunity and blinking
 		is_immune = true
-		immunity_timer = hit_immunity_duration
+		immunity_timer = GameBalance.eagle_hit_immunity_duration
 		is_blinking = true
 		blink_timer = hit_blink_duration
 		blink_visible = true
@@ -228,9 +221,9 @@ func hit_by_enemy(enemy_body):
 	print("Eagle hit by enemy! Processing hit...")
 	
 	# Reduce energy
-	current_energy -= hit_energy_loss
+	current_energy -= GameBalance.enemy_bird_hit_energy_loss
 	current_energy = max(0, current_energy)  # Don't go below 0
-	print("Lost ", hit_energy_loss, " energy. Current energy: ", current_energy)
+	print("Lost ", GameBalance.enemy_bird_hit_energy_loss, " energy. Current energy: ", current_energy)
 	
 	# Drop fish if carrying any
 	if carried_fish != null:
@@ -243,7 +236,7 @@ func hit_by_enemy(enemy_body):
 	
 	# Set immunity and blinking
 	is_immune = true
-	immunity_timer = hit_immunity_duration
+	immunity_timer = GameBalance.eagle_hit_immunity_duration
 	is_blinking = true
 	blink_timer = hit_blink_duration
 	blink_visible = true  # Start visible
@@ -343,12 +336,11 @@ func handle_fish_actions():
 
 func update_energy(delta):
 	"""Update eagle's energy over time"""
-	# Calculate energy loss multiplier based on morale (lower morale = faster energy loss)
-	var morale_percentage = get_morale_percentage()
-	var energy_loss_multiplier = lerp(max_energy_loss_multiplier, min_energy_loss_multiplier, morale_percentage)
+	# Use GameBalance helper function to get energy loss rate based on current morale
+	var energy_loss_rate = GameBalance.get_energy_loss_rate(current_morale)
 	
-	# Lose energy over time (faster if low morale)
-	var actual_energy_loss = energy_loss_per_second * energy_loss_multiplier * delta
+	# Lose energy over time 
+	var actual_energy_loss = energy_loss_rate * delta
 	current_energy -= actual_energy_loss
 	current_energy = max(current_energy, 0.0)
 	

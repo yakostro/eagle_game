@@ -31,7 +31,6 @@ script = ExtResource("3_6m21n")
 mountain_scene = ExtResource("4_yvdbw")
 stalactite_scene = ExtResource("5_hrbj0")
 floating_island_scene = ExtResource("6_pcqt2")
-spawn_interval = 4.0
 nest_spawner = NodePath("../NestSpawner")
 
 [node name="NestSpawner" type="Node2D" parent="Spawners" node_paths=PackedStringArray("eagle_reference")]
@@ -45,7 +44,7 @@ script = ExtResource("9_0j6sn")
 enemy_bird_scene = ExtResource("10_tsjmq")
 
 [node name="Eagle" parent="." instance=ExtResource("1_ek57t")]
-position = Vector2(755, 395)
+position = Vector2(645, 395)
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(960, 540)

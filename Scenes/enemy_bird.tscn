@@ -11,10 +11,7 @@ height = 118.0
 scale = Vector2(0.4, 0.4)
 motion_mode = 1
 script = ExtResource("1_cldad")
-base_speed = 1000.0
-acceleration = 2500.0
 curve_strength = 8.0
-direction_change_speed = 1.0
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("1_sws6a")

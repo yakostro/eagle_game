@@ -1,8 +1,9 @@
 extends BaseObstacle
 class_name FloatingIsland
 
-@export var minimum_top_offset: float = 500.0  # Minimum offset from top according to GDD
-@export var minimum_bottom_offset: float = 300.0  # Minimum offset from bottom according to GDD
+# Positioning now controlled by GameBalance singleton
+# @export var minimum_top_offset: float = 500.0  # Now using GameBalance.floating_island_min_top_offset
+# @export var minimum_bottom_offset: float = 300.0  # Now using GameBalance.floating_island_min_bottom_offset
 
 func _ready():
 	# Call parent _ready first
@@ -17,8 +18,8 @@ func get_spawn_y_position(screen_height: float) -> float:
 	var sprite_height = texture.get_height()
 	
 	# Random Y position: from minimum_top_offset to minimum_bottom_offset + sprite_height (GDD requirement)
-	var min_y = minimum_top_offset
-	var max_y = screen_height - minimum_bottom_offset - sprite_height
+	var min_y = GameBalance.floating_island_min_top_offset
+	var max_y = screen_height - GameBalance.floating_island_min_bottom_offset - sprite_height
 	
 	# Ensure we have a valid range
 	if max_y <= min_y:

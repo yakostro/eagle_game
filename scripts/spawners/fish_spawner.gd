@@ -3,9 +3,10 @@ extends Node2D
 class_name FishSpawner
 
 @export var fish_scene: PackedScene  # Drag your Fish.tscn here
-@export var spawn_interval: float = 5.0  # Seconds between spawns
-@export var spawn_interval_variance: float = 2.0  # Random variation in timing
-@export var min_spawn_interval: float = 2.0  # Minimum time between spawns
+# Spawn timing now controlled by GameBalance singleton
+# @export var spawn_interval: float = 5.0  # Now using GameBalance parameters
+# @export var spawn_interval_variance: float = 2.0  # Now using GameBalance parameters  
+# @export var min_spawn_interval: float = 2.0  # Now using GameBalance parameters
 @export var eagle_reference: Eagle
 @export var UI_fish_counter: Label
 
@@ -23,10 +24,10 @@ func _ready():
 	# Get screen size
 	screen_size = get_viewport().get_visible_rect().size
 	
-	# Create and configure spawn timer
+	# Create and configure spawn timer using GameBalance parameters
 	spawn_timer = Timer.new()
 	add_child(spawn_timer)
-	spawn_timer.wait_time = spawn_interval
+	spawn_timer.wait_time = randf_range(GameBalance.fish_spawn_interval_min, GameBalance.fish_spawn_interval_max)
 	spawn_timer.timeout.connect(_on_spawn_timer_timeout)
 	spawn_timer.start()
 	
@@ -35,9 +36,8 @@ func _ready():
 func _on_spawn_timer_timeout():
 	spawn_fish()
 	
-	# Set random interval for next spawn
-	var next_interval = spawn_interval + randf_range(-spawn_interval_variance, spawn_interval_variance)
-	next_interval = max(next_interval, min_spawn_interval)
+	# Set random interval for next spawn using GameBalance parameters
+	var next_interval = randf_range(GameBalance.fish_spawn_interval_min, GameBalance.fish_spawn_interval_max)
 	spawn_timer.wait_time = next_interval
 	spawn_timer.start()
 
@@ -56,10 +56,8 @@ func spawn_fish():
 	print("Spawned fish at position: ", fish.global_position)
 	UI_fish_counter.text = '+1'
 
-# Method to increase difficulty over time
-func increase_difficulty():
-	spawn_interval = max(spawn_interval - 0.1, min_spawn_interval)
-	print("Spawn interval reduced to: ", spawn_interval)
+# Difficulty is now handled by the GameBalance singleton automatically
+# The spawn intervals will dynamically adjust based on game time
 
 # Method to manually spawn fish (for testing)
 func spawn_fish_now():

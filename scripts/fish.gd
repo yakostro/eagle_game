@@ -7,11 +7,18 @@ signal fish_fed_to_nest  # Emitted when fish is fed to a nest
 
 @export var spawn_x_offset: float = 200.0  # How far to the right of eagle to spawn
 @export var spawn_x_variance: float = 100.0  # Random spawn position variance
-@export var jump_force: float = 500.0
-@export var jump_force_variation: float = 100.0  # Random variation in jump force
-@export var horizontal_speed: float = 150.0  # Horizontal speed towards target
+# Jump parameters now controlled by GameBalance singleton
+# @export var jump_force: float = 500.0  # Now using GameBalance.get_fish_jump_parameters()
+# @export var jump_force_variation: float = 100.0  # Now using GameBalance parameters
+# @export var horizontal_speed: float = 150.0  # Now using GameBalance parameters
 @export var lifetime: float = 5.0
-@export var energy_value: float = 25.0  # Energy this fish provides when eaten
+# Energy value now comes from GameBalance singleton
+# @export var energy_value: float = 25.0  # Now using GameBalance.fish_energy_value
+
+# Property to get energy value from GameBalance
+var energy_value: float:
+	get:
+		return GameBalance.fish_energy_value
 
 
 # Fish attachment variables
@@ -47,7 +54,11 @@ func _ready():
 	# Set collision layers for proper detection
 	collision_layer = 1  # Fish are on layer 1 for nest detection
 	collision_mask = 0   # Fish don't need to detect other objects
-	gravity_scale = 1.0
+	gravity_scale = 1.0  # Use default gravity scale, custom gravity set in project
+	
+	# Set custom gravity from GameBalance
+	# Note: In Godot 4.2, you can set custom gravity via ProjectSettings or physics material
+	print("Fish initialized with energy value: ", energy_value)
 	
 	# Get the detection area and connect signal
 	var catch_area = $CatchArea
@@ -79,19 +90,20 @@ func calculate_target_and_jump():
 	
 
 	
+	# Get jump parameters from GameBalance singleton
+	var jump_params = GameBalance.get_fish_jump_parameters()
+	var jump_velocity = jump_params.velocity
+	var jump_angle = jump_params.angle
+	
 	# Calculate direction to target (should be LEFT since fish spawns to the right)
 	var direction = 1 if target_x > global_position.x else -1
-	var horizontal_velocity = horizontal_speed * direction
 	
-	# Apply random variation to jump force
-	var variation = randf_range(-jump_force_variation, jump_force_variation)
-	var actual_jump_force = jump_force + variation
+	# Apply the jump using GameBalance parameters
+	# Convert angle and velocity to velocity components
+	var horizontal_velocity = cos(jump_angle) * jump_velocity * direction
+	var vertical_velocity = -sin(jump_angle) * jump_velocity  # Negative for upward motion
 	
-	# Make sure jump force doesn't go below a minimum
-	actual_jump_force = max(actual_jump_force, 200.0)  # Minimum jump force
-	
-	# Apply the jump with calculated horizontal speed and varied jump force
-	linear_velocity = Vector2(horizontal_velocity, -actual_jump_force)
+	linear_velocity = Vector2(horizontal_velocity, vertical_velocity)
 	
 
 

@@ -3,20 +3,19 @@ extends Node
 
 # Enemy bird spawning configuration
 @export var enemy_bird_scene: PackedScene  # Drag the enemy_bird.tscn here in the editor
-@export var spawn_interval_min: float = 3.0  # Minimum time between spawns
-@export var spawn_interval_max: float = 6.0  # Maximum time between spawns
 @export var spawn_distance_from_screen: float = 100.0  # How far right of screen to spawn
 
-# Difficulty progression variables
-@export var difficulty_increase_interval: float = 30.0  # Increase difficulty every 30 seconds
-@export var difficulty_spawn_rate_multiplier: float = 0.9  # Multiply spawn intervals by this each difficulty increase
-@export var min_spawn_interval: float = 1.0  # Don't go below this spawn interval
+# Spawn timing and difficulty now controlled by GameBalance singleton
+# @export var spawn_interval_min: float = 10.0  # Now using GameBalance parameters
+# @export var spawn_interval_max: float = 15.0  # Now using GameBalance parameters
+# @export var difficulty_increase_interval: float = 30.0  # Now automatic via GameBalance
+# @export var difficulty_spawn_rate_multiplier: float = 0.9  # Now handled by GameBalance
+# @export var min_spawn_interval: float = 5.0  # Now using GameBalance parameters
 
 # Internal state
 var spawn_timer: float = 0.0  # Timer until next spawn
 var next_spawn_time: float = 0.0  # When to spawn next enemy
-var difficulty_timer: float = 0.0  # Timer for difficulty progression
-var current_difficulty_level: int = 0  # Current difficulty level
+# Difficulty progression now handled by GameBalance singleton
 
 # References
 var game_area: Node  # Parent node where enemies will be spawned
@@ -35,14 +34,8 @@ func _ready():
 	print("Enemies spawner initialized. First spawn in: ", next_spawn_time, " seconds")
 
 func _process(delta):
-	# Update timers
+	# Update spawn timer
 	spawn_timer += delta
-	difficulty_timer += delta
-	
-	# Check for difficulty progression
-	if difficulty_timer >= difficulty_increase_interval:
-		increase_difficulty()
-		difficulty_timer = 0.0
 	
 	# Check if it's time to spawn an enemy
 	if spawn_timer >= next_spawn_time:
@@ -78,33 +71,14 @@ func spawn_enemy_bird():
 	# Add to the game area
 	game_area.add_child(enemy_bird)
 	
-	print("Enemy bird spawned at position: ", enemy_bird.global_position, " (eagle Y: ", eagle.global_position.y, ") | Difficulty level: ", current_difficulty_level)
+	print("Enemy bird spawned at position: ", enemy_bird.global_position, " (eagle Y: ", eagle.global_position.y, ") | Game time: ", GameBalance.game_time_elapsed)
 
 func reset_spawn_timer():
-	"""Reset the spawn timer with a random interval"""
+	"""Reset the spawn timer with a random interval using GameBalance parameters"""
 	spawn_timer = 0.0
-	next_spawn_time = randf_range(spawn_interval_min, spawn_interval_max)
+	next_spawn_time = GameBalance.get_current_enemy_spawn_interval()
 	
 	print("Next enemy bird spawn in: ", next_spawn_time, " seconds")
 
-func increase_difficulty():
-	"""Increase the difficulty by spawning enemies more frequently"""
-	current_difficulty_level += 1
-	
-	# Reduce spawn intervals (make enemies spawn more frequently)
-	spawn_interval_min *= difficulty_spawn_rate_multiplier
-	spawn_interval_max *= difficulty_spawn_rate_multiplier
-	
-	# Don't let intervals go below minimum
-	spawn_interval_min = max(spawn_interval_min, min_spawn_interval)
-	spawn_interval_max = max(spawn_interval_max, min_spawn_interval)
-	
-	print("Difficulty increased! Level: ", current_difficulty_level)
-	print("New spawn intervals: ", spawn_interval_min, " - ", spawn_interval_max, " seconds")
-	
-	# Reset spawn timer with new intervals
-	reset_spawn_timer()
-
-func get_difficulty_level() -> int:
-	"""Get the current difficulty level"""
-	return current_difficulty_level
+# Difficulty progression is now handled automatically by the GameBalance singleton
+# Enemy spawn intervals adjust dynamically based on game time

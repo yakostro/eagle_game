@@ -1,7 +1,8 @@
 extends BaseObstacle
 class_name Mountain
 
-@export var spawn_y_offset: float = 500.0  # Y offset from screen height for random positioning
+# Positioning now controlled by GameBalance singleton
+# @export var spawn_y_offset: float = 500.0  # Now using GameBalance.mountain_y_position_offset
 
 func _ready():
 	# Call parent _ready first
@@ -15,9 +16,9 @@ func get_spawn_y_position(screen_height: float) -> float:
 	
 	# Random Y position: from SCREEN_HEIGHT-SPRITE_HEIGHT to SCREEN_HEIGHT-SPRITE_HEIGHT+offset (GDD requirement)
 	var base_y = screen_height - sprite_height
-	var spawn_y = randf_range(base_y, base_y + spawn_y_offset)
+	var spawn_y = randf_range(base_y, base_y + GameBalance.mountain_y_position_offset)
 	
-	print("Mountain Y positioning: base=", base_y, " range=", base_y, " to ", base_y + spawn_y_offset, " chosen=", spawn_y)
+	print("Mountain Y positioning: base=", base_y, " range=", base_y, " to ", base_y + GameBalance.mountain_y_position_offset, " chosen=", spawn_y)
 	return spawn_y
 
 func get_obstacle_type() -> String:

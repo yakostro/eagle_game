@@ -1,13 +1,10 @@
 class_name EnemyBird
 extends CharacterBody2D
 
-# Movement configuration variables (for balancing)
-@export var base_speed: float = 800.0  # Base movement speed
-@export var acceleration: float = 1500.0  # How fast bird accelerates
-@export var curve_strength: float = 5.0  # How much the bird curves towards eagle
-@export var direction_change_speed: float = 5  # How fast bird can change direction when eagle moves
-@export var max_direction_change_rate: float = 90.0  # Max degrees per second for direction change
-@export var hit_distance: float = 50.0  # Distance at which bird hits eagle
+# Movement configuration variables (now using GameBalance singleton)
+# Individual @export vars removed - now using GameBalance singleton for balance parameters
+@export var curve_strength: float = 5.0  # Visual curve effect (not part of balance system)
+@export var hit_distance: float = 50.0  # Hit detection distance (collision parameter)
 
 # References
 var eagle_target: Eagle = null  # Reference to the eagle
@@ -98,14 +95,14 @@ func update_target_direction(delta):
 	var y_strength = min(abs(y_distance) / 200.0, 1.0) * curve_strength * 0.1
 	desired_direction.y = y_direction * y_strength
 	
-	# Smoothly adjust current target direction
-	var blend_factor = direction_change_speed * delta
+	# Smoothly adjust current target direction using GameBalance parameter
+	var blend_factor = GameBalance.enemy_bird_direction_change_speed * delta
 	target_direction = target_direction.lerp(desired_direction.normalized(), blend_factor)
 
 func apply_movement(delta):
-	# Accelerate towards target direction
-	var desired_velocity = target_direction * base_speed
-	current_velocity = current_velocity.move_toward(desired_velocity, acceleration * delta)
+	# Accelerate towards target direction using GameBalance parameters
+	var desired_velocity = target_direction * GameBalance.enemy_bird_max_speed
+	current_velocity = current_velocity.move_toward(desired_velocity, GameBalance.enemy_bird_acceleration * delta)
 	
 	# Move directly without collision detection (pass through everything)
 	global_position += current_velocity * delta

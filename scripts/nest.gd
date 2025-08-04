@@ -8,8 +8,18 @@ enum NestState {
 	FED
 }
 
-@export var moral_points_gain: int = 15  # Points gained when feeding nest
-@export var moral_points_loss: int = 10   # Points lost when nest goes off-screen
+# Morale points now controlled by GameBalance singleton
+# @export var moral_points_gain: int = 15  # Now using GameBalance.morale_gain_fed_chick
+# @export var moral_points_loss: int = 10   # Now using GameBalance.morale_loss_unfed_nest
+
+# Properties to get values from GameBalance
+var moral_points_gain: int:
+	get:
+		return int(GameBalance.morale_gain_fed_chick)
+
+var moral_points_loss: int:
+	get:
+		return int(GameBalance.morale_loss_unfed_nest)
 
 var current_state: NestState = NestState.HUNGRY
 var animation_player: AnimatedSprite2D

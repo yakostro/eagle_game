@@ -5,10 +5,10 @@ class_name DefaultMovementController
 extends BaseMovementController
 
 # Physics constants - moved from eagle.gd
-@export var max_up_velocity: float = -500.0
-@export var max_down_velocity: float = 700.0
-@export var lift_acceleration: float = 3000.0
-@export var dive_acceleration: float = 4000.0
+@export var max_up_velocity: float = -400.0
+@export var max_down_velocity: float = 500.0
+@export var lift_acceleration: float = 2500.0
+@export var dive_acceleration: float = 3000.0
 @export var drag: float = 500.0
 @export var neutral_drag: float = 800.0
 @export var neutral_threshold: float = 5.0

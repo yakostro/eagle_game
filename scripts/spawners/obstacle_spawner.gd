@@ -12,13 +12,11 @@ class_name ObstacleSpawner
 @export var stalactite_weight: int = 2
 @export var floating_island_weight: int = 1
 
-# Obstacle spawning balance
-@export var spawn_interval: float = 5.0  # Seconds between spawns
-@export var spawn_interval_variance: float = 1.0  # Random variation in timing
-@export var min_spawn_interval: float = 3.0  # Minimum time between spawns
-
-# Movement speed (should match eagle/world speed as per GDD)
-@export var obstacle_movement_speed: float = 200.0
+# Obstacle spawning and movement now controlled by GameBalance singleton
+# @export var spawn_interval: float = 5.0  # Now using GameBalance parameters
+# @export var spawn_interval_variance: float = 1.0  # Now using GameBalance parameters
+# @export var min_spawn_interval: float = 3.0  # Now using GameBalance parameters
+# @export var obstacle_movement_speed: float = 300.0  # Now using GameBalance.get_current_world_speed()
 
 # Reference to nest spawner for coordination
 @export var nest_spawner: NestSpawner
@@ -47,10 +45,10 @@ func _ready():
 	else:
 		print("⚠️  No NestSpawner connected - nests will not spawn")
 	
-	# Create and configure spawn timer
+	# Create and configure spawn timer using GameBalance parameters
 	spawn_timer = Timer.new()
 	add_child(spawn_timer)
-	spawn_timer.wait_time = spawn_interval
+	spawn_timer.wait_time = GameBalance.get_current_obstacle_spawn_interval()
 	spawn_timer.timeout.connect(_on_spawn_timer_timeout)
 	spawn_timer.start()
 	
@@ -58,7 +56,7 @@ func _ready():
 	print("   Available obstacle types: ", obstacle_types.size())
 	for obstacle_type in obstacle_types:
 		print("   - ", obstacle_type.name, " (weight: ", obstacle_type.weight, ")")
-	print("   Spawn interval: ", spawn_interval, "±", spawn_interval_variance, " seconds")
+	print("   Initial spawn interval: ", spawn_timer.wait_time, " seconds (dynamic via GameBalance)")
 
 func _setup_obstacle_types():
 	"""Initialize the obstacle types array with scenes and weights"""
@@ -79,10 +77,8 @@ func _setup_obstacle_types():
 func _on_spawn_timer_timeout():
 	spawn_random_obstacle()
 	
-	# Set random interval for next spawn
-	var next_interval = spawn_interval + randf_range(-spawn_interval_variance, spawn_interval_variance)
-	next_interval = max(next_interval, min_spawn_interval)
-	spawn_timer.wait_time = next_interval
+	# Set next spawn interval using GameBalance (automatically adjusts for difficulty)
+	spawn_timer.wait_time = GameBalance.get_current_obstacle_spawn_interval()
 	spawn_timer.start()
 
 func spawn_random_obstacle():
@@ -102,8 +98,8 @@ func spawn_random_obstacle():
 	var obstacle = obstacle_scene.instantiate()
 	get_tree().current_scene.add_child(obstacle)
 	
-	# Set up the obstacle with shared movement speed
-	obstacle.set_movement_speed(obstacle_movement_speed)
+	# Set up the obstacle with current world speed from GameBalance
+	obstacle.set_movement_speed(GameBalance.get_current_world_speed())
 	obstacle.setup_obstacle(screen_size.x, screen_size.y)
 	
 	# Increment obstacle counter
@@ -136,10 +132,8 @@ func _get_weighted_random_obstacle_type() -> Dictionary:
 	# Fallback to first type
 	return obstacle_types[0]
 
-# Method to increase difficulty over time
-func increase_difficulty():
-	spawn_interval = max(spawn_interval - 0.2, min_spawn_interval)
-	print("🔥 Difficulty increased - Spawn interval: ", spawn_interval)
+# Difficulty progression is now handled automatically by the GameBalance singleton
+# Obstacle spawn intervals and movement speed adjust dynamically based on game time
 
 # Method to manually spawn obstacle (for testing)
 func spawn_obstacle_now():
