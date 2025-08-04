@@ -5,19 +5,21 @@ class_name FlappyMovementController
 extends BaseMovementController
 
 # Physics constants for Flappy Bird mechanics
-@export var gravity: float = 100.0  # Constant downward force
-@export var flap_force: float = -200.0  # Upward force when flapping (negative = up)
+@export var gravity: float = 50.0  # Constant downward force
+@export var flap_force: float = -300.0  # Upward force when flapping (negative = up)
 @export var max_fall_velocity: float = 400.0  # Maximum downward velocity
-@export var max_rise_velocity: float = -1000.0  # Maximum upward velocity (negative = up)
+@export var max_rise_velocity: float = -300.0  # Maximum upward velocity (negative = up)
+@export var ascent_drag: float = 400.0  # Extra drag applied to upward movement when not flapping
 
 # Dive mechanics (preserving from original system)
 @export var dive_acceleration: float = 1500.0  # Extra acceleration when diving
 @export var max_dive_velocity: float = 800.0  # Maximum velocity when diving
 
 # Rotation constants
-@export var max_rotation_up: float = -30.0  # Rotation when moving up (degrees)
-@export var max_rotation_down: float = 80.0  # Rotation when moving down (degrees)
-@export var rotation_speed: float = 0.5  # How fast rotation changes
+@export var max_rotation_up: float = -30.0  # Rotation when moving up (degrees) - gentle
+@export var max_rotation_down: float = 80.0  # Rotation when moving down (degrees) - dramatic
+@export var rotation_speed_normal: float = 0.5  # Normal rotation speed
+@export var rotation_speed_correction: float = 2.0  # Fast rotation when correcting from down to up
 @export var min_speed_for_rotation: float = 60.0  # Minimum speed to start rotating
 
 # Input state tracking
@@ -80,8 +82,8 @@ func apply_movement_physics(delta: float):
 func apply_flap_physics(velocity: Vector2, delta: float) -> Vector2:
 	"""Apply upward flap force and gravity"""
 	if flap_pressed_this_frame:
-		# Give upward impulse (flap)
-		velocity.y = flap_force
+		# Add upward impulse (flap) to existing velocity - allows building up speed!
+		velocity.y += flap_force
 		# Signal eagle that energy should be consumed for flapping
 		if eagle_body and eagle_body.has_method("consume_flap_energy"):
 			eagle_body.consume_flap_energy()
@@ -103,6 +105,11 @@ func apply_gravity_physics(velocity: Vector2, delta: float) -> Vector2:
 	# Constant gravity pulls eagle down
 	velocity.y += gravity * delta
 	
+	# Apply extra drag to upward movement when not actively flapping
+	# This makes the eagle stop ascending quickly after releasing UP
+	if velocity.y < 0:  # Moving upward
+		velocity.y += ascent_drag * delta  # Add drag (positive value slows upward movement)
+	
 	return velocity
 
 func apply_hit_physics(velocity: Vector2, delta: float) -> Vector2:
@@ -113,7 +120,7 @@ func apply_hit_physics(velocity: Vector2, delta: float) -> Vector2:
 	return velocity
 
 func update_rotation(delta: float):
-	"""Update rotation based on velocity for Flappy Bird feel"""
+	"""Update rotation based on velocity with fast correction from positive to negative angles"""
 	var velocity = get_velocity()
 	var speed = abs(velocity.y)  # Only consider vertical speed for rotation
 	var target_rotation = 0.0
@@ -122,13 +129,21 @@ func update_rotation(delta: float):
 		if velocity.y < 0:  # Moving up
 			target_rotation = max_rotation_up
 		elif velocity.y > 0:  # Moving down
-			# Scale rotation based on speed
+			# Scale rotation based on speed for more dramatic effect
 			var speed_ratio = clamp(speed / max_fall_velocity, 0.0, 1.0)
 			target_rotation = speed_ratio * max_rotation_down
 	
-	# Smoothly interpolate to target rotation
+	# Determine rotation speed based on direction of rotation change
 	var current_rotation_deg = rad_to_deg(get_rotation())
-	var new_rotation_deg = lerp(current_rotation_deg, target_rotation, rotation_speed * delta)
+	var rotation_speed_to_use = rotation_speed_normal
+	
+	# Fast correction when rotating counterclockwise from positive angle toward zero/negative
+	# (Eagle correcting from downward tilt back to upward tilt)
+	if current_rotation_deg > 0 and target_rotation < current_rotation_deg:
+		rotation_speed_to_use = rotation_speed_correction
+	
+	# Smoothly interpolate to target rotation with appropriate speed
+	var new_rotation_deg = lerp(current_rotation_deg, target_rotation, rotation_speed_to_use * delta)
 	set_rotation(deg_to_rad(new_rotation_deg))
 
 func handle_hit_state():
