@@ -1,7 +1,8 @@
-[gd_scene load_steps=75 format=3 uid="uid://cd42djg346oqy"]
+[gd_scene load_steps=76 format=3 uid="uid://cd42djg346oqy"]
 
 [ext_resource type="Texture2D" uid="uid://bx2kqxbypi61f" path="res://sprites/bald_eagle/Flying/__eagle_flying_000.png" id="1_7vcbr"]
 [ext_resource type="Script" path="res://scripts/eagle.gd" id="1_pt68i"]
+[ext_resource type="Material" uid="uid://c33d6gccjo86f" path="res://shaders/eagle_shader.tres" id="2_6ha2m"]
 [ext_resource type="Texture2D" uid="uid://74410xiobhg0" path="res://sprites/bald_eagle/Flying/__eagle_flying_001.png" id="2_hto6r"]
 [ext_resource type="Texture2D" uid="uid://cgqqn1ucgjtdw" path="res://sprites/bald_eagle/Flying/__eagle_flying_002.png" id="3_hrt4n"]
 [ext_resource type="Texture2D" uid="uid://cjg35so46w2rb" path="res://sprites/bald_eagle/Flying/__eagle_flying_003.png" id="4_lfcxg"]
@@ -350,6 +351,7 @@ script = ExtResource("1_pt68i")
 animated_sprite = NodePath("Animation")
 
 [node name="Animation" type="AnimatedSprite2D" parent="."]
+material = ExtResource("2_6ha2m")
 position = Vector2(-331, 1)
 sprite_frames = SubResource("SpriteFrames_kheon")
 animation = &"glide"
@@ -358,15 +360,18 @@ offset = Vector2(4, -37)
 flip_h = true
 
 [node name="CollisionShape" type="CollisionShape2D" parent="."]
+visible = false
 position = Vector2(-310, 103.333)
 rotation = 1.5708
 scale = Vector2(6.52, 9.18)
 shape = SubResource("CapsuleShape2D_yl77t")
 
 [node name="Screech" type="AudioStreamPlayer2D" parent="."]
+visible = false
 stream = ExtResource("42_g63mg")
 
 [node name="CarriedFishHolder" type="Node2D" parent="."]
+visible = false
 position = Vector2(-243, 50)
 
 [node name="HitDetectionArea" type="Area2D" parent="."]
@@ -374,6 +379,7 @@ collision_layer = 4
 collision_mask = 2
 
 [node name="HitDetectionShape" type="CollisionShape2D" parent="HitDetectionArea"]
+visible = false
 position = Vector2(-243.333, 13.3333)
 rotation = 1.5708
 scale = Vector2(6.52, 9.18)
