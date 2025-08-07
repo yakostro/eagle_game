@@ -7,6 +7,7 @@ extends Node
 # Precise nest spawning system
 @export var min_skipped_obstacles: int = 3  # Minimum obstacles to skip before spawning nest
 @export var max_skipped_obstacles: int = 6  # Maximum obstacles to skip before spawning nest
+@export var warn_before_obstacles: int = 1  # How many obstacles before the nest to warn the player
 
 # Nest difficulty progression
 @export var nest_difficulty_increase_interval: int = 10  # Increase difficulty every N obstacles
@@ -16,6 +17,7 @@ extends Node
 # Nest spawning system variables
 var obstacles_since_last_nest: int = 0  # Track obstacles spawned since last nest
 var next_nest_spawn_target: int = 0  # How many obstacles to skip before next nest
+var warned_this_cycle: bool = false
 
 # Difficulty progression tracking
 var initial_min_skipped: int = 0  # Store initial values
@@ -23,18 +25,22 @@ var initial_max_skipped: int = 0
 var last_difficulty_increase_at: int = 0  # Track when we last increased difficulty
 var total_obstacles_processed: int = 0  # Total obstacles we've seen
 
+signal nest_incoming(obstacles_remaining: int)
+signal nest_spawned(nest: Node)
+
 func _ready():
 	# Store initial nest difficulty values
 	initial_min_skipped = min_skipped_obstacles
 	initial_max_skipped = max_skipped_obstacles
-	
+
 	# Initialize nest spawn target
 	_set_next_nest_spawn_target()
-	
+
 	print("🏠 Nest spawner initialized")
 	print("   Initial nest difficulty: min=", min_skipped_obstacles, " max=", max_skipped_obstacles)
 	print("   First nest will spawn after ", next_nest_spawn_target, " obstacles")
 	print("   Difficulty will increase every ", nest_difficulty_increase_interval, " obstacles")
+
 
 func on_obstacle_spawned(obstacle: BaseObstacle):
 	"""Called when an obstacle is spawned - decide if it should get a nest"""
@@ -45,6 +51,12 @@ func on_obstacle_spawned(obstacle: BaseObstacle):
 	# Increment counters
 	total_obstacles_processed += 1
 	obstacles_since_last_nest += 1
+
+	# Emit a heads-up when we are close to the spawn target
+	var remaining: int = next_nest_spawn_target - obstacles_since_last_nest
+	if not warned_this_cycle and remaining <= warn_before_obstacles and remaining >= 0:
+		nest_incoming.emit(max(remaining, 0))
+		warned_this_cycle = true
 	
 	# Check if we should increase nest difficulty
 	if total_obstacles_processed - last_difficulty_increase_at >= nest_difficulty_increase_interval:
@@ -110,6 +122,9 @@ func spawn_nest_on_obstacle(obstacle: BaseObstacle):
 	nest.nest_missed.connect(eagle_reference.on_nest_missed)
 	print("   🔗 Connected nest signals to eagle morale system")
 
+	# Notify UI or other systems that a nest has spawned
+	nest_spawned.emit(nest)
+
 func _increase_nest_difficulty():
 	"""Increase nest spawning difficulty over time"""
 	# Don't increase if we've reached maximum difficulty
@@ -143,4 +158,5 @@ func _increase_nest_difficulty():
 func _set_next_nest_spawn_target():
 	"""Set random nest spawn target within current difficulty range"""
 	next_nest_spawn_target = randi_range(min_skipped_obstacles, max_skipped_obstacles)
+	warned_this_cycle = false
 	print("   🎯 Next nest will spawn after skipping ", next_nest_spawn_target, " obstacles")

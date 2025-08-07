@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://bvfc1tl8ttpuo"]
+[gd_scene load_steps=15 format=3 uid="uid://bvfc1tl8ttpuo"]
 
 [ext_resource type="PackedScene" uid="uid://cd42djg346oqy" path="res://scenes/eagle.tscn" id="1_ek57t"]
 [ext_resource type="PackedScene" uid="uid://kjcy0srr3p6t" path="res://scenes/nest.tscn" id="1_gfvr7"]
@@ -13,6 +13,7 @@
 [ext_resource type="Script" path="res://scripts/spawners/nest_spawner.gd" id="7_2n0x0"]
 [ext_resource type="Script" path="res://scripts/spawners/enemies_spawner.gd" id="9_0j6sn"]
 [ext_resource type="PackedScene" uid="uid://cxlfn3myp1uwo" path="res://scenes/enemy_bird.tscn" id="10_tsjmq"]
+[ext_resource type="Script" path="res://scripts/ui_feedback.gd" id="11_ui"]
 
 [node name="Game" type="Node" groups=["game_area"]]
 
@@ -108,3 +109,32 @@ S - dive
 E - eat fish
 Space - drop fish
 H- screech"
+
+[node name="NestNotice" type="Label" parent="CanvasLayer"]
+visible = false
+offset_left = 650.0
+offset_top = 30.0
+offset_right = 1270.0
+offset_bottom = 120.0
+theme_override_font_sizes/font_size = 48
+text = "Nest ahead!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MoralePop" type="Label" parent="CanvasLayer"]
+visible = false
+offset_left = 650.0
+offset_top = 30.0
+offset_right = 1270.0
+offset_bottom = 120.0
+theme_override_font_sizes/font_size = 48
+text = "Morale +10"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="UIFeedback" type="Node" parent="CanvasLayer"]
+script = ExtResource("11_ui")
+nest_spawner_path = NodePath("../../Spawners/NestSpawner")
+eagle_path = NodePath("../../Eagle")
+nest_notice_label_path = NodePath("../NestNotice")
+morale_pop_label_path = NodePath("../MoralePop")

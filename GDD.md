@@ -1,6 +1,18 @@
 
 # Game concept. The Last Eagle
 
+# Story and world
+## Story:
+
+there is a postapocalyptic world and a lot of species are about to extinct. there are the last adult eagle left and a lot of abandoned nests with hungry eagle chicks. The only mission of this exhausted bald eagle is to feed this chicks and hope that the specie will survive even at a price of it’s own life
+
+## Mood and feel:
+- Grim mood
+- ‘Morale’ parameter is a key. Player has to realize how BAD actually the missing nest is. It’s a key.
+	- We should show it super explicitly to user and the influence should be visible and feelable.
+	- When the nest appear. Show user that nest is important.
+
+
 *Aim*: You play as the last eagle whose mission is to feed eagle chicks so the species can survive
 Core gameplay: fly, evade obstacles, catch fish, feed chicks to get morale or eat fish to get energy, keep balance between morale and energy. The difficulty (obstacles, quantity of fish) raises through time
 Lose: if energy drops to 0
