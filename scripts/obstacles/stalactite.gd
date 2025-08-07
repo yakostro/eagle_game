@@ -1,7 +1,8 @@
 extends BaseObstacle
 class_name Stalactite
 
-@export var minimum_stalactite_height: float = 300.0  # Minimum height from top according to GDD
+@export var min_stalactite_height: float = 150.0  # Minimum height from top according to GDD
+@export var max_stalactite_height: float = 400.0
 
 func _ready():
 	# Call parent _ready first
@@ -16,7 +17,7 @@ func get_spawn_y_position(_screen_height: float) -> float:
 	var sprite_height = texture.get_height()
 	
 	# Random Y position:
-	var min_y = -sprite_height + minimum_stalactite_height
+	var min_y = -sprite_height + min_stalactite_height
 	var max_y = 0
 	var spawn_y = randf_range(min_y, max_y)
 	

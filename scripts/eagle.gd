@@ -416,10 +416,10 @@ func handle_special_inputs():
 		# Trigger screech animation
 		screech_requested.emit()
 	
-	# DEBUG: Test hit system with T key
-	if Input.is_action_just_pressed("ui_select"):  # Spacebar/Enter for testing
-		print("DEBUG: Manual hit triggered!")
-		hit_by_obstacle()
+	## DEBUG: Test hit system with T key
+	#if Input.is_action_just_pressed("ui_select"):  # Spacebar/Enter for testing
+		#print("DEBUG: Manual hit triggered!")
+		#hit_by_obstacle()
 
 # Movement methods removed - now handled by movement_controller
 

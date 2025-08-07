@@ -58,7 +58,7 @@ void fragment() {
     float brush_noise = layered_noise(noise_uv, 1.0, noise_roughness);
     
     // Преобразуем шум в живописный эффект
-    float brush_effect = smoothstep(0.3, 0.7, brush_noise);
+    float brush_effect = smoothstep(0.9, 0.9, brush_noise);
     brush_effect = mix(0.8, 1.2, brush_effect); // варьируем яркость
     
     // Применяем шум как живописную текстуру

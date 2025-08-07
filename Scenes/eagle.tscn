@@ -1,8 +1,7 @@
-[gd_scene load_steps=76 format=3 uid="uid://cd42djg346oqy"]
+[gd_scene load_steps=75 format=3 uid="uid://cd42djg346oqy"]
 
 [ext_resource type="Texture2D" uid="uid://bx2kqxbypi61f" path="res://sprites/bald_eagle/Flying/__eagle_flying_000.png" id="1_7vcbr"]
 [ext_resource type="Script" path="res://scripts/eagle.gd" id="1_pt68i"]
-[ext_resource type="Material" uid="uid://c33d6gccjo86f" path="res://shaders/eagle_shader.tres" id="2_6ha2m"]
 [ext_resource type="Texture2D" uid="uid://74410xiobhg0" path="res://sprites/bald_eagle/Flying/__eagle_flying_001.png" id="2_hto6r"]
 [ext_resource type="Texture2D" uid="uid://cgqqn1ucgjtdw" path="res://sprites/bald_eagle/Flying/__eagle_flying_002.png" id="3_hrt4n"]
 [ext_resource type="Texture2D" uid="uid://cjg35so46w2rb" path="res://sprites/bald_eagle/Flying/__eagle_flying_003.png" id="4_lfcxg"]
@@ -351,7 +350,6 @@ script = ExtResource("1_pt68i")
 animated_sprite = NodePath("Animation")
 
 [node name="Animation" type="AnimatedSprite2D" parent="."]
-material = ExtResource("2_6ha2m")
 position = Vector2(-331, 1)
 sprite_frames = SubResource("SpriteFrames_kheon")
 animation = &"glide"

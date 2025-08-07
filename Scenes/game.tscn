@@ -86,7 +86,7 @@ offset_right = 40.0
 offset_bottom = 23.0
 size_flags_horizontal = 0
 size_flags_vertical = 0
-theme_override_font_sizes/font_size = 19
+theme_override_font_sizes/font_size = 25
 
 [node name="FishCounterLabel" type="Label" parent="CanvasLayer"]
 offset_top = 51.0
@@ -95,3 +95,16 @@ offset_bottom = 78.0
 size_flags_horizontal = 0
 size_flags_vertical = 0
 theme_override_font_sizes/font_size = 19
+
+[node name="Controls" type="Label" parent="CanvasLayer"]
+offset_top = 107.0
+offset_right = 127.0
+offset_bottom = 254.0
+size_flags_horizontal = 0
+size_flags_vertical = 0
+theme_override_font_sizes/font_size = 19
+text = "W - flap wings
+S - dive
+E - eat fish
+Space - drop fish
+H- screech"
