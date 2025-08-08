@@ -157,13 +157,14 @@ func set_wind_intensity(intensity: float):
 	set_base_wind_volume(base_vol)
 	set_additional_wind_volume(additional_vol)
 
-# Input for testing
-func _input(event):
-	if event.is_action_pressed("ui_accept"):  # Spacebar
-		toggle_wind()
-	elif event.is_action_pressed("ui_left"):   # Left arrow  
-		set_wind_intensity(0.3)
-	elif event.is_action_pressed("ui_right"):  # Right arrow
-		set_wind_intensity(1.0)
-	elif event.is_action_pressed("ui_up"):     # Up arrow
-		_play_additional_wind_segment()  # Manual trigger for testing
+# Input for testing - DISABLED to prevent conflicts with game controls
+# Use these methods directly for testing instead of keyboard input
+#func _input(event):
+#	if event.is_action_pressed("ui_accept"):  # Spacebar
+#		toggle_wind()
+#	elif event.is_action_pressed("ui_left"):   # Left arrow  
+#		set_wind_intensity(0.3)
+#	elif event.is_action_pressed("ui_right"):  # Right arrow
+#		set_wind_intensity(1.0)
+#	elif event.is_action_pressed("ui_up"):     # Up arrow
+#		_play_additional_wind_segment()  # Manual trigger for testing

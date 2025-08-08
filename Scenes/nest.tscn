@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://kjcy0srr3p6t"]
+[gd_scene load_steps=15 format=3 uid="uid://kjcy0srr3p6t"]
 
 [ext_resource type="Script" path="res://scripts/nest.gd" id="1_u358j"]
 [ext_resource type="Texture2D" uid="uid://bba55sddydqay" path="res://sprites/nest/fed/fed1.png" id="2_adwbv"]
@@ -11,6 +11,7 @@
 [ext_resource type="Texture2D" uid="uid://cvpd6m71xrbid" path="res://sprites/nest/hungry/Frame 7.png" id="10_n1h44"]
 [ext_resource type="Texture2D" uid="uid://djc6nmvtefeqq" path="res://sprites/nest/hungry/Frame 8.png" id="11_rghc1"]
 [ext_resource type="Texture2D" uid="uid://do0qdyurp1kxt" path="res://sprites/nest/hungry/Frame 2.png" id="12_7hcef"]
+[ext_resource type="AudioStream" uid="uid://bqc1ew5w0xgum" path="res://sounds/flap_and_cry.ogg" id="12_201yh"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_cwq4g"]
 animations = [{
@@ -83,3 +84,7 @@ position = Vector2(0, -59.25)
 position = Vector2(0, 29)
 rotation = 1.5708
 shape = SubResource("CapsuleShape2D_2x5yl")
+
+[node name="NestSound" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("12_201yh")
+autoplay = true

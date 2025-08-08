@@ -16,9 +16,6 @@
 [node name="FishSpawner" parent="Spawners" index="0" node_paths=PackedStringArray("eagle_reference")]
 eagle_reference = NodePath("../../Eagle")
 
-[node name="ObstacleSpawner" parent="Spawners" index="1" node_paths=PackedStringArray("nest_spawner")]
-nest_spawner = NodePath("../NestSpawner")
-
 [node name="NestSpawner" parent="Spawners" index="2" node_paths=PackedStringArray("eagle_reference")]
 eagle_reference = NodePath("../../Eagle")
 
@@ -118,6 +115,7 @@ morale_pop_label_path = NodePath("../MoralePop")
 
 [node name="EmbientSound" type="Node2D" parent="."]
 script = ExtResource("6_gwv1y")
+additional_wind_volume = -20.0
 
 [node name="BaseWind" type="AudioStreamPlayer2D" parent="EmbientSound"]
 stream = ExtResource("6_rxhl4")

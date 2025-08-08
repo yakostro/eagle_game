@@ -4,6 +4,9 @@
 class_name EagleAnimationController
 extends Node
 
+# Signals
+signal flap_animation_started()  # Emitted when any flap animation starts
+
 # Animation states - separate from movement states
 enum AnimationState {
 	GLIDE,
@@ -150,15 +153,18 @@ func play_animation(new_animation_state: AnimationState):
 			animated_sprite.play("glide")
 		AnimationState.FLAP_CONTINUOUS:
 			animated_sprite.play("flap")
+			flap_animation_started.emit()  # Emit flap sound signal
 		AnimationState.FLAP_FINISHING:
 			# Don't change animation - let current flap finish
 			pass
 		AnimationState.GLIDE_FLAP:
 			animated_sprite.play("flap")
+			flap_animation_started.emit()  # Emit flap sound signal
 		AnimationState.SCREECH:
 			animated_sprite.play("screech")
 		AnimationState.FLAP_TALONS_OUT:
 			animated_sprite.play("talons_out")
+			flap_animation_started.emit()  # Emit flap sound signal
 		AnimationState.HIT:
 			print("AnimationState.HIT case reached in play_animation!")
 			print("animated_sprite reference: ", animated_sprite)
@@ -181,10 +187,12 @@ func _on_animation_finished():
 		AnimationState.FLAP_CONTINUOUS:
 			# Keep looping the flap animation for continuous input
 			animated_sprite.play("flap")
+			flap_animation_started.emit()  # Emit flap sound signal for each loop
 		AnimationState.FLAP_TALONS_OUT:
 			# Keep looping the talons out animation while carrying fish
 			if is_carrying_fish:
 				animated_sprite.play("talons_out")
+				flap_animation_started.emit()  # Emit flap sound signal for each loop
 			else:
 				# Fish was dropped/eaten during animation, return to normal
 				var eagle = get_parent() as Eagle
@@ -210,8 +218,10 @@ func _on_animation_finished():
 				# Continue flapping
 				if is_carrying_fish:
 					animated_sprite.play("talons_out")
+					flap_animation_started.emit()  # Emit flap sound signal
 				else:
 					animated_sprite.play("flap")
+					flap_animation_started.emit()  # Emit flap sound signal
 		AnimationState.SCREECH:
 			# Screech finished, return to previous state
 			print("Screech finished, returning to previous state")

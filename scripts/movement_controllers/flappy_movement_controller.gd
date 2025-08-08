@@ -87,6 +87,9 @@ func apply_flap_physics(velocity: Vector2, delta: float) -> Vector2:
 		# Signal eagle that energy should be consumed for flapping
 		if eagle_body and eagle_body.has_method("consume_flap_energy"):
 			eagle_body.consume_flap_energy()
+		# Play flapping sound
+		if eagle_body and eagle_body.has_method("play_flap_sound"):
+			eagle_body.play_flap_sound()
 	
 	# Always apply gravity
 	velocity.y += gravity * delta

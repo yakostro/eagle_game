@@ -4,6 +4,7 @@ extends CharacterBody2D
 #@onready var animated_sprite = $Animation
 #@onready var animated_sprite = $AnimatedSprite2D
 @onready var screech_audio = $Screech
+@onready var flap_audio = $FlapSound
 @onready var state_label = $"../CanvasLayer/StateLabel"
 
 @export var animated_sprite: AnimatedSprite2D
@@ -78,6 +79,7 @@ func _ready():
 	movement_controller.movement_state_changed.connect(animation_controller.handle_movement_state_change)
 	screech_requested.connect(animation_controller.handle_screech_request)
 	fish_caught_changed.connect(animation_controller.handle_fish_carrying_change)
+	animation_controller.flap_animation_started.connect(play_flap_sound)
 	print("Signals connected to animation controller")
 
 	enable_flappy_mode()  # Switch to flappy bird controller
@@ -368,6 +370,12 @@ func consume_flap_energy():
 	current_energy -= energy_loss_per_flap
 	current_energy = max(current_energy, 0.0)
 	print("Eagle flapped! Energy lost: ", energy_loss_per_flap, " (Current: ", current_energy, ")")
+
+func play_flap_sound():
+	"""Called when eagle flaps to play the flapping sound"""
+	if flap_audio != null:
+		flap_audio.play()
+		print("Playing flap sound")
 
 func die():
 	"""Called when the eagle dies from energy depletion"""
