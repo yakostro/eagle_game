@@ -8,14 +8,18 @@ class_name ObstacleSpawner
 @export var floating_island_scene: PackedScene  # Drag your FloatingIsland.tscn here
 
 # Spawn weights for obstacle types (higher = more likely to spawn)
-@export var mountain_weight: int = 2 #2
+@export var mountain_weight: int = 0 #2
 @export var stalactite_weight: int = 10 #2
-@export var floating_island_weight: int = 5 #5
+@export var floating_island_weight: int = 0 #5
 
 # Obstacle spawning balance
 @export var spawn_interval: float = 5.0  # Seconds between spawns
 @export var spawn_interval_variance: float = 1.0  # Random variation in timing
 @export var min_spawn_interval: float = 3.0  # Minimum time between spawns
+
+# Difficulty progression variables
+@export var difficulty_increase_interval: float = 30.0  # Increase difficulty every 30 seconds
+@export var difficulty_spawn_rate_multiplier: float = 0.9  # Multiply spawn interval by this each difficulty increase
 
 # Movement speed (should match eagle/world speed as per GDD)
 @export var obstacle_movement_speed: float = 300.0
@@ -24,6 +28,8 @@ class_name ObstacleSpawner
 @export var nest_spawner: NestSpawner
 
 var spawn_timer: Timer
+var difficulty_timer: float = 0.0  # Timer for difficulty progression
+var current_difficulty_level: int = 0  # Current difficulty level
 var screen_size: Vector2
 var obstacle_count: int = 0  # Counter to track spawned obstacles for difficulty progression
 
@@ -59,6 +65,20 @@ func _ready():
 	for obstacle_type in obstacle_types:
 		print("   - ", obstacle_type.name, " (weight: ", obstacle_type.weight, ")")
 	print("   Spawn interval: ", spawn_interval, "±", spawn_interval_variance, " seconds")
+
+func _process(delta):
+	# Update difficulty timer
+	difficulty_timer += delta
+	
+	# Check for difficulty progression
+	if difficulty_timer >= difficulty_increase_interval:
+		increase_difficulty()
+		difficulty_timer = 0.0
+	
+	# Debug key to manually spawn obstacle (O key for Obstacle)
+	if Input.is_action_just_pressed("ui_accept"):  # Enter key for testing
+		spawn_obstacle_now()
+		print("🎮 Manual obstacle spawn triggered!")
 
 func _setup_obstacle_types():
 	"""Initialize the obstacle types array with scenes and weights"""
@@ -138,10 +158,20 @@ func _get_weighted_random_obstacle_type() -> Dictionary:
 
 # Method to increase difficulty over time
 func increase_difficulty():
-	spawn_interval = max(spawn_interval - 0.2, min_spawn_interval)
-	print("🔥 Difficulty increased - Spawn interval: ", spawn_interval)
+	current_difficulty_level += 1
+	
+	# Reduce spawn interval (make obstacles spawn more frequently)
+	spawn_interval *= difficulty_spawn_rate_multiplier
+	spawn_interval = max(spawn_interval, min_spawn_interval)
+	
+	print("🔥 Obstacle difficulty increased! Level: ", current_difficulty_level)
+	print("   New spawn interval: ", spawn_interval, "±", spawn_interval_variance, " seconds")
 
 # Method to manually spawn obstacle (for testing)
 func spawn_obstacle_now():
 	spawn_random_obstacle()
+
+# Get the current difficulty level
+func get_difficulty_level() -> int:
+	return current_difficulty_level
 

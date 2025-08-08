@@ -18,7 +18,7 @@ func get_spawn_y_position(_screen_height: float) -> float:
 	
 	# Random Y position:
 	var min_y = -sprite_height + min_stalactite_height
-	var max_y = 0
+	var max_y = -sprite_height + max_stalactite_height
 	var spawn_y = randf_range(min_y, max_y)
 	
 	print("Stalactite Y positioning: sprite_height=", sprite_height, " range=", min_y, " to ", max_y, " chosen=", spawn_y)
