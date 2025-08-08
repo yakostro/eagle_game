@@ -8,9 +8,9 @@ class_name ObstacleSpawner
 @export var floating_island_scene: PackedScene  # Drag your FloatingIsland.tscn here
 
 # Spawn weights for obstacle types (higher = more likely to spawn)
-@export var mountain_weight: int = 2 #4
-@export var stalactite_weight: int = 2 #2
-@export var floating_island_weight: int = 5 #1
+@export var mountain_weight: int = 2 #2
+@export var stalactite_weight: int = 10 #2
+@export var floating_island_weight: int = 5 #5
 
 # Obstacle spawning balance
 @export var spawn_interval: float = 5.0  # Seconds between spawns

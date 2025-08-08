@@ -13,7 +13,7 @@ dest_files=["res://.godot/imported/screech.mp3-66ecf4299ce176c1c5d1cf8a4e0bbfb9.
 [params]
 
 loop=false
-loop_offset=0
-bpm=0
+loop_offset=0.0
+bpm=0.0
 beat_count=0
 bar_beats=4

@@ -1,4 +1,4 @@
-[gd_scene load_steps=77 format=3 uid="uid://cd42djg346oqy"]
+[gd_scene load_steps=76 format=3 uid="uid://cd42djg346oqy"]
 
 [ext_resource type="Texture2D" uid="uid://bx2kqxbypi61f" path="res://sprites/bald_eagle/Flying/__eagle_flying_000.png" id="1_7vcbr"]
 [ext_resource type="Script" path="res://scripts/eagle.gd" id="1_pt68i"]
@@ -51,7 +51,6 @@
 [ext_resource type="Texture2D" uid="uid://p83njlgyof1m" path="res://sprites/bald_eagle/__eagle_dead_000.png" id="40_631kk"]
 [ext_resource type="Texture2D" uid="uid://difupqbo8hin6" path="res://sprites/bald_eagle/Flying swark/__eagle_flying_swark_008.png" id="40_mq70w"]
 [ext_resource type="Texture2D" uid="uid://cyod03ycgnbgh" path="res://sprites/bald_eagle/Flying swark/__eagle_flying_swark_009.png" id="41_flc4h"]
-[ext_resource type="AudioStream" path="res://sounds/screech.mp3" id="42_g63mg"]
 [ext_resource type="Texture2D" uid="uid://dvl0sgq3r62bj" path="res://sprites/bald_eagle/Swoop attack/__eagle_swoop_attack_pose_000.png" id="42_uv7xr"]
 [ext_resource type="Texture2D" uid="uid://dndamuebbcdgl" path="res://sprites/bald_eagle/Swoop attack/__eagle_swoop_attack_pose_001.png" id="43_d6557"]
 [ext_resource type="Texture2D" uid="uid://6juairqphllv" path="res://sprites/bald_eagle/Swoop attack/__eagle_swoop_attack_pose_002.png" id="44_7wes3"]
@@ -376,7 +375,6 @@ shape = SubResource("CapsuleShape2D_yl77t")
 
 [node name="Screech" type="AudioStreamPlayer2D" parent="."]
 visible = false
-stream = ExtResource("42_g63mg")
 
 [node name="FlapSound" type="AudioStreamPlayer2D" parent="."]
 visible = false

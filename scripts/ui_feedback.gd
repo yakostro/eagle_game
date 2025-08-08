@@ -101,5 +101,3 @@ func _resolve_nodes():
 		morale_pop_label = get_node_or_null(morale_pop_label_path) as Label
 	if not morale_pop_label:
 		morale_pop_label = get_tree().current_scene.find_child("MoralePop", true, false) as Label
-
-
