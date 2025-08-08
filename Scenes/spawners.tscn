@@ -1,0 +1,36 @@
+[gd_scene load_steps=11 format=3 uid="uid://eu78pwwdfttt"]
+
+[ext_resource type="Script" path="res://scripts/spawners/fish_spawner.gd" id="1_8dfof"]
+[ext_resource type="PackedScene" uid="uid://bnbjiu5ct08nt" path="res://scenes/fish.tscn" id="2_hvx33"]
+[ext_resource type="Script" path="res://scripts/spawners/obstacle_spawner.gd" id="3_rwnif"]
+[ext_resource type="PackedScene" uid="uid://bwhm8l7k51rw0" path="res://scenes/obstacles/mountain.tscn" id="4_igpbm"]
+[ext_resource type="PackedScene" uid="uid://bwuudj6p2q8yl" path="res://scenes/obstacles/stalactite.tscn" id="5_fdkuf"]
+[ext_resource type="PackedScene" uid="uid://cmo168tpbivbp" path="res://scenes/obstacles/floating_island.tscn" id="6_6aqsa"]
+[ext_resource type="Script" path="res://scripts/spawners/nest_spawner.gd" id="7_jhiaf"]
+[ext_resource type="PackedScene" uid="uid://kjcy0srr3p6t" path="res://scenes/nest.tscn" id="8_c15wd"]
+[ext_resource type="Script" path="res://scripts/spawners/enemies_spawner.gd" id="9_u2r7c"]
+[ext_resource type="PackedScene" uid="uid://cxlfn3myp1uwo" path="res://scenes/enemy_bird.tscn" id="10_78fw8"]
+
+[node name="Spawners" type="Node"]
+
+[node name="FishSpawner" type="Node2D" parent="."]
+script = ExtResource("1_8dfof")
+fish_scene = ExtResource("2_hvx33")
+
+[node name="ObstacleSpawner" type="Node2D" parent="."]
+z_index = -2
+position = Vector2(1920, 1080)
+script = ExtResource("3_rwnif")
+mountain_scene = ExtResource("4_igpbm")
+stalactite_scene = ExtResource("5_fdkuf")
+floating_island_scene = ExtResource("6_6aqsa")
+spawn_interval = 4.0
+
+[node name="NestSpawner" type="Node2D" parent="."]
+position = Vector2(0, -1)
+script = ExtResource("7_jhiaf")
+nest_scene = ExtResource("8_c15wd")
+
+[node name="EnemiesSpawner" type="Node2D" parent="."]
+script = ExtResource("9_u2r7c")
+enemy_bird_scene = ExtResource("10_78fw8")

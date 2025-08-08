@@ -7,8 +7,6 @@ class_name FishSpawner
 @export var spawn_interval_variance: float = 2.0  # Random variation in timing
 @export var min_spawn_interval: float = 2.0  # Minimum time between spawns
 @export var eagle_reference: Eagle
-@export var UI_fish_counter: Label
-
 var spawn_timer: Timer
 var screen_size: Vector2
 #var eagle_reference: Eagle
@@ -30,8 +28,6 @@ func _ready():
 	spawn_timer.timeout.connect(_on_spawn_timer_timeout)
 	spawn_timer.start()
 	
-	print("Fish spawner initialized. Screen size: ", screen_size)
-
 func _on_spawn_timer_timeout():
 	spawn_fish()
 	
@@ -51,15 +47,11 @@ func spawn_fish():
 		return
 	
 	# Use the Fish's static spawn method with eagle reference
-	var fish = Fish.spawn_fish_at_bottom(get_tree(), fish_scene, eagle_reference, screen_size.x, screen_size.y)
-	
-	print("Spawned fish at position: ", fish.global_position)
-	UI_fish_counter.text = '+1'
+	var _fish = Fish.spawn_fish_at_bottom(get_tree(), fish_scene, eagle_reference, screen_size.x, screen_size.y)
 
 # Method to increase difficulty over time
 func increase_difficulty():
 	spawn_interval = max(spawn_interval - 0.1, min_spawn_interval)
-	print("Spawn interval reduced to: ", spawn_interval)
 
 # Method to manually spawn fish (for testing)
 func spawn_fish_now():

@@ -182,3 +182,11 @@ at all
 ## Misc
 - I have EnemyBird.tscn character body 2d with a sprite and collision capsule
 - when  enemy bird goes off screen it is  removed from the game
+
+
+Sounds
+# ambient
+- I have embient sound node in the game scene.
+- And two wind sounds. I want to intermix them.
+- wind_woosh_loop.ogg should be the basic.
+- additional_wind.wav should be mixed time to time. different parts of it like a span from 5 to 8 sec. and the next time - another part of this audio. with fade. 

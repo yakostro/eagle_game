@@ -1,7 +1,8 @@
-[gd_scene load_steps=75 format=3 uid="uid://cd42djg346oqy"]
+[gd_scene load_steps=76 format=3 uid="uid://cd42djg346oqy"]
 
 [ext_resource type="Texture2D" uid="uid://bx2kqxbypi61f" path="res://sprites/bald_eagle/Flying/__eagle_flying_000.png" id="1_7vcbr"]
 [ext_resource type="Script" path="res://scripts/eagle.gd" id="1_pt68i"]
+[ext_resource type="Texture2D" uid="uid://7ytkeqrqdwb" path="res://sprites/bald_eagle/__eagle diving_1.png" id="2_3fjag"]
 [ext_resource type="Texture2D" uid="uid://74410xiobhg0" path="res://sprites/bald_eagle/Flying/__eagle_flying_001.png" id="2_hto6r"]
 [ext_resource type="Texture2D" uid="uid://cgqqn1ucgjtdw" path="res://sprites/bald_eagle/Flying/__eagle_flying_002.png" id="3_hrt4n"]
 [ext_resource type="Texture2D" uid="uid://cjg35so46w2rb" path="res://sprites/bald_eagle/Flying/__eagle_flying_003.png" id="4_lfcxg"]
@@ -74,6 +75,14 @@
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_kheon"]
 animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_3fjag")
+}],
+"loop": false,
+"name": &"dive",
+"speed": 10.0
+}, {
 "frames": [{
 "duration": 1.0,
 "texture": ExtResource("1_7vcbr")
@@ -352,7 +361,7 @@ animated_sprite = NodePath("Animation")
 [node name="Animation" type="AnimatedSprite2D" parent="."]
 position = Vector2(-331, 1)
 sprite_frames = SubResource("SpriteFrames_kheon")
-animation = &"glide"
+animation = &"flap"
 autoplay = "glide"
 offset = Vector2(4, -37)
 flip_h = true
