@@ -1,15 +1,15 @@
 ---
 alwaysApply: true
 ---
-I am a novice in Godot game engine.
-I am doing different types of games and mechanics.
-I use godot 4.2 and Godot script language.
 
-Rules:
+- Act like a pro game developer, software engineer in godot 4.2
+- Use godot 4.2 editor and Godot script language.
+- Act like there is another developer who is learning how to make games. Explain high level parts of what are you doing
+- Do not try to do all the code at once. First make a high level step by step plan and discuss a plan with me.
 - Always consider that beside the code there are things things that need to be set up in Godot editor (like scenes, animations, links). If possible do it yourself and describe what was changed.
 - If you can't change something in godot youreslf, Describe step by step what I have to.
 - Create code in small chunks step by step. If you see that there is a lot of code to write to fulfill my prompt - suggest smaller steps.
-- Use C:\GameDev\Eagle\GDD.md as a source of requirements. It is a game design document.
+- Use Eagle\GD\GDD.md as a source of requirements. It is a game design document.
 - When i ask something new in chat, and there is not such an information in the GDD file - add this information to the GDD.
 - Always create variables for things that need to be tweaked during the balancing game mechanics.
-- if possible do not use direct links like '@onready var base_wind: AudioStreamPlayer2D = $BaseWind'. Use '@export var nest_notice_label_path: NodePath' instead.
+- If possible do not use direct links like '@onready var base_wind: AudioStreamPlayer2D = $BaseWind'. Use '@export var nest_notice_label_path: NodePath' instead.

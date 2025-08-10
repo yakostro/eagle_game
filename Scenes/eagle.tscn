@@ -1,4 +1,4 @@
-[gd_scene load_steps=76 format=3 uid="uid://cd42djg346oqy"]
+[gd_scene load_steps=77 format=3 uid="uid://cd42djg346oqy"]
 
 [ext_resource type="Texture2D" uid="uid://bx2kqxbypi61f" path="res://sprites/bald_eagle/Flying/__eagle_flying_000.png" id="1_7vcbr"]
 [ext_resource type="Script" path="res://scripts/eagle.gd" id="1_pt68i"]
@@ -71,6 +71,7 @@
 [ext_resource type="Texture2D" uid="uid://ckfwvta6o66r7" path="res://sprites/bald_eagle/Flying talons out/__eagle_flying_talons_out_007.png" id="59_81p4b"]
 [ext_resource type="Texture2D" uid="uid://bmwdos6ajrk26" path="res://sprites/bald_eagle/Flying talons out/__eagle_flying_talons_out_008.png" id="60_ure4v"]
 [ext_resource type="Texture2D" uid="uid://dsdd1ra0msex" path="res://sprites/bald_eagle/Flying talons out/__eagle_flying_talons_out_009.png" id="61_yfpvs"]
+[ext_resource type="AudioStream" uid="uid://c0prxo4y0h3cc" path="res://sounds/eagle/screech.mp3" id="72_qb8h7"]
 [ext_resource type="AudioStream" uid="uid://b18fhacr8moao" path="res://sounds/eagle/short_flap.wav" id="73_fcyee"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_kheon"]
@@ -375,6 +376,7 @@ shape = SubResource("CapsuleShape2D_yl77t")
 
 [node name="Screech" type="AudioStreamPlayer2D" parent="."]
 visible = false
+stream = ExtResource("72_qb8h7")
 
 [node name="FlapSound" type="AudioStreamPlayer2D" parent="."]
 visible = false
