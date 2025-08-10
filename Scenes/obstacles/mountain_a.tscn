@@ -1,0 +1,28 @@
+[gd_scene load_steps=4 format=3 uid="uid://dc4pbamcmsruq"]
+
+[ext_resource type="Script" path="res://scripts/obstacles/mountain.gd" id="1_ibdu6"]
+[ext_resource type="Texture2D" uid="uid://ofr1po1rc47o" path="res://sprites/obstacles/standing_stone_1/grey_no_grass_no_swirls.png" id="3_n3hnl"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_06802"]
+radius = 62.0
+height = 1742.0
+
+[node name="MountainA" type="StaticBody2D"]
+z_index = -3
+scale = Vector2(0.55, 0.55)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("1_ibdu6")
+movement_speed = 250.0
+
+[node name="GreyNoGrassNoSwirls" type="Sprite2D" parent="."]
+texture = ExtResource("3_n3hnl")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(288, 943)
+shape = SubResource("CapsuleShape2D_06802")
+debug_color = Color(0.337255, 0.188235, 0.721569, 0.8)
+
+[node name="NestPlaceholder" type="Marker2D" parent="."]
+position = Vector2(295, 52)

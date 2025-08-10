@@ -6,12 +6,12 @@
 shader = ExtResource("1_dapeo")
 shader_parameter/saturation = 0.8
 shader_parameter/blend_strength = 0.6
-shader_parameter/noise_scale = 1000.0
+shader_parameter/noise_scale = 0.16
 shader_parameter/noise_intensity = 0.3
 shader_parameter/noise_roughness = 0.5
 shader_parameter/outline_strength = 0.3
 shader_parameter/outline_color = Vector3(0.1, 0.1, 0.1)
 shader_parameter/contrast = 1.2
-shader_parameter/brightness = 0.9
-shader_parameter/color_temperature = 0.0
-shader_parameter/stylization_strength = 0.6
+shader_parameter/brightness = 0.93
+shader_parameter/color_temperature = 0.52
+shader_parameter/stylization_strength = -0.51

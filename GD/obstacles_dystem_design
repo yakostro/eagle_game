@@ -1,0 +1,58 @@
+## Obstacles System (High Level)
+
+### Purpose
+Create readable, varied hazards that pace the run, teach spatial awareness, and host nests where intended.
+
+### Types and Roles
+- Mountain: ground silhouette; can host nests on ledges.
+- Stalactite: ceiling hazard; no nests.
+- Floating Island: mid-air platform; may host nests.
+
+### Variants
+- Each type supports multiple visual/collision variants.
+- Mountains: three variants with unique nest placements.
+
+### Spawning Model
+- One spawner controls the global mix using weights per type.
+- Fixed base cadence with slight randomness.
+- Difficulty increases by shortening the interval.
+
+### Movement and Cleanup
+- All obstacles move left at the world/eagle speed for cohesion.
+- Remove obstacles once they fully leave the screen.
+
+### Nest Integration
+- Nests only appear on obstacles that include a `NestPlaceholder` point.
+- Nest timing uses “skip N obstacles” logic; N grows over time for difficulty.
+- The nest is parented to the obstacle and positioned at its placeholder.
+
+### Scene Standards (per obstacle)
+- Single physics root with sprite, collision, and optional `NestPlaceholder`.
+- Visuals: enter from the right cleanly; scale consistent with the eagle/world.
+- Collisions: simple and forgiving over pixel-perfect accuracy.
+
+### Difficulty Progression
+- Increase pressure by:
+  - Slightly higher spawn frequency.
+  - Rarer nest appearances (larger N).
+  - Richer variant mix (visual novelty over raw hardness).
+
+### QA Acceptance
+- Spawn mix matches intended weights.
+- Obstacles scroll smoothly and delete off-screen.
+- Nests only appear on eligible obstacles and at the intended spots.
+- Collisions feel fair; silhouettes match enough to be readable.
+- Variants show correctly with their unique nest placements.
+
+## Prompt for Coding Agent
+
+- Goal: Integrate real mountain art using three distinct variants, each with its own nest placement, and plug them into the existing obstacle and nest systems.
+- Decision (Conceptual):
+  - Make three separate mountain scenes (one per variant), each with proper sprite, collision, and a single `NestPlaceholder` where chicks should be.
+  - Update the obstacle spawner to select randomly among these mountain scenes when it decides to spawn a “Mountain” (keep current nest flow intact).
+  - Do not change the nest system logic; it should keep attaching to `NestPlaceholder` on the spawned obstacle.
+
+- Deliverables:
+  - Three mountain variant scenes with final art and validated nest spots.
+  - Spawner accepts multiple mountain scenes and chooses one at spawn time.
+  - Short playtest pass confirming: spawn variety, correct nest placement, smooth movement, and cleanup.

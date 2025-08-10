@@ -3,6 +3,9 @@
 .import/
 export_presets.cfg
 
+# Project-specific ignores
+all_sprites_gitignored/
+
 # Imported translations (automatically generated from CSV files)
 *.translation
 

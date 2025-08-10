@@ -3,12 +3,12 @@ extends Node2D
 class_name ObstacleSpawner
 
 # Obstacle scenes with spawn weights
-@export var mountain_scene: PackedScene  # Drag your Mountain.tscn here
+@export var mountain_scenes: Array[PackedScene] = []  # Array of mountain variants (A, B, C)
 @export var stalactite_scene: PackedScene  # Drag your Stalactite.tscn here  
 @export var floating_island_scene: PackedScene  # Drag your FloatingIsland.tscn here
 
 # Spawn weights for obstacle types (higher = more likely to spawn)
-@export var mountain_weight: int = 2 #2
+@export var mountain_weight: int = 10 #2
 @export var stalactite_weight: int = 2 #2
 @export var floating_island_weight: int = 5 #5
 
@@ -84,8 +84,13 @@ func _setup_obstacle_types():
 	"""Initialize the obstacle types array with scenes and weights"""
 	obstacle_types.clear()
 	
-	if mountain_scene:
-		obstacle_types.append({"name": "Mountain", "scene": mountain_scene, "weight": mountain_weight})
+	# Add mountain variants - each variant gets its own entry with the mountain weight
+	if not mountain_scenes.is_empty():
+		for i in range(mountain_scenes.size()):
+			var mountain_scene = mountain_scenes[i]
+			if mountain_scene:
+				var variant_name = "Mountain" + char(65 + i)  # Mountain A, B, C...
+				obstacle_types.append({"name": variant_name, "scene": mountain_scene, "weight": mountain_weight})
 	
 	if stalactite_scene:
 		obstacle_types.append({"name": "Stalactite", "scene": stalactite_scene, "weight": stalactite_weight})

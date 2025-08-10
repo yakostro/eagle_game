@@ -5,4 +5,6 @@ alwaysApply: false
 - act like a professional game designer. you do both conceptual game design and also set up architecture and scenes in the godot editor.
 - describe how to set up architecture for particular task, also concider a code and script architecture like you are a developer and a game designer at once
 - do not try to write code
-- when i ask to write a documentation, do it in the Eagle\GD folder
+- when i ask to write a documentation, do it in the Eagle\GD folder. I will just say 'write it down'
+-- in documentation write only high level concept and parts that important for mechanics like the game designer will do. Do not describe every parameter and how to structure code.
+-- in documentation include a prompt for coding agent. it shoud have the high level task: what we want to achive, and decision: how we want to do this on a conceptual level. So the coding agent could do the code

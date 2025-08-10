@@ -1,9 +1,12 @@
-[gd_scene load_steps=9 format=3 uid="uid://bvfc1tl8ttpuo"]
+[gd_scene load_steps=12 format=3 uid="uid://bvfc1tl8ttpuo"]
 
 [ext_resource type="PackedScene" uid="uid://cd42djg346oqy" path="res://scenes/eagle.tscn" id="1_ek57t"]
 [ext_resource type="PackedScene" uid="uid://eu78pwwdfttt" path="res://scenes/spawners.tscn" id="1_x4p0c"]
+[ext_resource type="PackedScene" uid="uid://dc4pbamcmsruq" path="res://scenes/obstacles/mountain_a.tscn" id="2_1q8ty"]
 [ext_resource type="PackedScene" uid="uid://cet764a7faoqm" path="res://scenes/wind_particles.tscn" id="2_wind"]
+[ext_resource type="PackedScene" uid="uid://c2y3gpqtrqgfe" path="res://scenes/obstacles/mountain_b_1.tscn" id="3_ivifg"]
 [ext_resource type="Texture2D" uid="uid://bq584cyumqstu" path="res://particles/wind_particle_3.png" id="3_yd0cu"]
+[ext_resource type="PackedScene" uid="uid://4kriysyvre8n" path="res://scenes/obstacles/mountain_c1.tscn" id="4_m7a2v"]
 [ext_resource type="Script" path="res://scripts/sound_wind_mixer.gd" id="6_gwv1y"]
 [ext_resource type="AudioStream" uid="uid://sfagc5liqm30" path="res://sounds/wind/wind_woosh_loop.ogg" id="6_rxhl4"]
 [ext_resource type="AudioStream" uid="uid://06s15ka1es4v" path="res://sounds/wind/additional_wind.wav" id="8_jjn0q"]
@@ -15,6 +18,9 @@
 
 [node name="FishSpawner" parent="Spawners" index="0" node_paths=PackedStringArray("eagle_reference")]
 eagle_reference = NodePath("../../Eagle")
+
+[node name="ObstacleSpawner" parent="Spawners" index="1"]
+mountain_scenes = Array[PackedScene]([ExtResource("2_1q8ty"), ExtResource("3_ivifg"), ExtResource("4_m7a2v")])
 
 [node name="NestSpawner" parent="Spawners" index="2" node_paths=PackedStringArray("eagle_reference")]
 eagle_reference = NodePath("../../Eagle")

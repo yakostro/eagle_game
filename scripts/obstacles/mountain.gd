@@ -1,8 +1,8 @@
 extends BaseObstacle
 class_name Mountain
 
-@export var min_mountain_height: float = 100.0
-@export var max_mountain_height: float = 300.0  # Maximum height offset from screen height for random positioning
+@export var min_mountain_height: float = 500.0
+@export var max_mountain_height: float = 500.0  # Maximum height offset from screen height for random positioning
 
 func _ready():
 	# Call parent _ready first
@@ -15,7 +15,7 @@ func get_spawn_y_position(screen_height: float) -> float:
 	#var sprite_height = texture.get_height()
 	
 	# Random Y position: from SCREEN_HEIGHT-SPRITE_HEIGHT to SCREEN_HEIGHT-SPRITE_HEIGHT+offset (GDD requirement)
-	var min_y = screen_height
+	var min_y = screen_height - min_mountain_height
 	var max_y = screen_height - max_mountain_height
 	var spawn_y = randf_range(min_y, max_y)
 	return spawn_y
