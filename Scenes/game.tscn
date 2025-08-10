@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://bvfc1tl8ttpuo"]
+[gd_scene load_steps=13 format=3 uid="uid://bvfc1tl8ttpuo"]
 
 [ext_resource type="PackedScene" uid="uid://cd42djg346oqy" path="res://scenes/eagle.tscn" id="1_ek57t"]
 [ext_resource type="PackedScene" uid="uid://eu78pwwdfttt" path="res://scenes/spawners.tscn" id="1_x4p0c"]
@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://4kriysyvre8n" path="res://scenes/obstacles/mountain_c1.tscn" id="4_m7a2v"]
 [ext_resource type="Script" path="res://scripts/sound_wind_mixer.gd" id="6_gwv1y"]
 [ext_resource type="AudioStream" uid="uid://sfagc5liqm30" path="res://sounds/wind/wind_woosh_loop.ogg" id="6_rxhl4"]
+[ext_resource type="Material" uid="uid://bmc1yhctwob0n" path="res://shaders/color_palette.tres" id="8_c8hqn"]
 [ext_resource type="AudioStream" uid="uid://06s15ka1es4v" path="res://sounds/wind/additional_wind.wav" id="8_jjn0q"]
 [ext_resource type="Script" path="res://scripts/ui_feedback.gd" id="11_ui"]
 
@@ -21,6 +22,8 @@ eagle_reference = NodePath("../../Eagle")
 
 [node name="ObstacleSpawner" parent="Spawners" index="1"]
 mountain_scenes = Array[PackedScene]([ExtResource("2_1q8ty"), ExtResource("3_ivifg"), ExtResource("4_m7a2v")])
+mountain_weight = 2
+floating_island_weight = 2
 
 [node name="NestSpawner" parent="Spawners" index="2" node_paths=PackedStringArray("eagle_reference")]
 eagle_reference = NodePath("../../Eagle")
@@ -58,7 +61,18 @@ color = Color(1, 0.996078, 0.996078, 0.231373)
 hue_variation_min = -0.72
 hue_variation_max = 0.11
 
+[node name="PaletteLayer" type="CanvasLayer" parent="."]
+layer = 10
+
+[node name="PaletteColorRect" type="ColorRect" parent="PaletteLayer"]
+material = ExtResource("8_c8hqn")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
+layer = 20
 offset = Vector2(20, 20)
 transform = Transform2D(1, 0, 0, 1, 20, 20)
 

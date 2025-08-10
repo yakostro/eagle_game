@@ -184,6 +184,25 @@ at all
 - when  enemy bird goes off screen it is  removed from the game
 
 
+# Art Direction
+## Limited Color Palette System
+- The entire game uses a limited color palette enforced through a global post-processing shader
+- Uses DawnBringer 16 (DB16) palette by default: 16 carefully chosen colors that work well together
+- Palette is applied via screen-space shader that:
+  - Remaps all rendered colors to the nearest palette color
+  - Uses ordered dithering (4x4 Bayer matrix) to reduce color banding
+  - Processes game world but excludes UI (UI rendered in higher CanvasLayer)
+- Configurable parameters:
+  - `palette_size`: Number of colors in palette (1-64)
+  - `use_dither`: Enable/disable dithering effect
+  - `dither_strength`: Intensity of dithering pattern
+  - `saturation`, `contrast`, `brightness`: Color adjustments before palette mapping
+- Benefits:
+  - Unified art style across all sprites and backgrounds
+  - Retro/pixel art aesthetic without requiring pixel-perfect artwork
+  - Easy to experiment with different color schemes
+  - Performance-friendly single-pass effect
+
 Sounds
 # ambient
 - I have embient sound node in the game scene.

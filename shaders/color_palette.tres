@@ -1,3 +1,28 @@
-[gd_resource type="ShaderMaterial" format=3 uid="uid://bmc1yhctwob0n"]
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://bmc1yhctwob0n"]
+
+[ext_resource type="Shader" path="res://shaders/palette_post.gdshader" id="1_cbi00"]
 
 [resource]
+shader = ExtResource("1_cbi00")
+shader_parameter/palette_size = 8
+shader_parameter/color_0 = Color(0.196, 0.294, 0.447, 1)
+shader_parameter/color_1 = Color(0.373, 0.588, 0.714, 1)
+shader_parameter/color_2 = Color(0.631, 0.792, 0.886, 1)
+shader_parameter/color_3 = Color(0.89, 0.933, 0.949, 1)
+shader_parameter/color_4 = Color(0.627, 0.369, 0.243, 1)
+shader_parameter/color_5 = Color(0.518, 0.631, 0.357, 1)
+shader_parameter/color_6 = Color(0.267, 0.4, 0.267, 1)
+shader_parameter/color_7 = Color(0.133, 0.196, 0.196, 1)
+shader_parameter/color_8 = Color(0.094, 0.063, 0.063, 1)
+shader_parameter/color_9 = Color(0.541, 0.278, 0.2, 1)
+shader_parameter/color_10 = Color(0.898, 0.427, 0.235, 1)
+shader_parameter/color_11 = Color(0.957, 0.957, 0.957, 1)
+shader_parameter/color_12 = Color(0.702, 0.702, 0.702, 1)
+shader_parameter/color_13 = Color(0.435, 0.435, 0.435, 1)
+shader_parameter/color_14 = Color(0.235, 0.235, 0.235, 1)
+shader_parameter/color_15 = Color(0.09, 0.09, 0.09, 1)
+shader_parameter/use_dither = true
+shader_parameter/dither_strength = 0.35
+shader_parameter/saturation = 1.0
+shader_parameter/contrast = 1.0
+shader_parameter/brightness = 1.0

@@ -23,7 +23,7 @@ debug_color = Color(0.337255, 0.188235, 0.721569, 0.8)
 [node name="NestPlaceholder" type="Marker2D" parent="."]
 position = Vector2(907, 485)
 
-[node name="MountainNewStyle1" type="Sprite2D" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="."]
 scale = Vector2(1.7069, 1.74652)
 texture = ExtResource("2_meo6d")
 centered = false
