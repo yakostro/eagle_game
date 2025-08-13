@@ -203,6 +203,58 @@ at all
   - Easy to experiment with different color schemes
   - Performance-friendly single-pass effect
 
+# Parallax Background System
+## Three-Layer Parallax Structure
+The game uses a sophisticated 3-layer parallax background system that creates depth and atmosphere:
+
+### Layer 1: Gradient Background (Furthest)
+- **Purpose**: Provides atmospheric sky/horizon backdrop
+- **Movement**: Static or very slow scroll (0.0 speed multiplier by default)
+- **Implementation**: Configurable gradient from top color to bottom color
+- **Z-index**: -40 (furthest back)
+- **Configuration**: 
+  - `gradient_top_color`: Sky color (default: dark purple-gray)
+  - `gradient_bottom_color`: Horizon color (default: slightly lighter)
+  - `enable_gradient_layer`: Toggle on/off
+
+### Layer 2: Mountain Layer (Middle Distance)
+- **Purpose**: Distant terrain silhouettes (mountains, hills)
+- **Movement**: Slow parallax scroll (0.1 speed multiplier)
+- **Implementation**: Repeating sprite textures or placeholder mountain shapes
+- **Z-index**: -30 (middle depth)
+- **Textures**: Uses `mountain_textures` array or creates placeholder mountains
+- **Configuration**:
+  - `mountain_scroll_speed`: Parallax speed multiplier
+  - `mountain_vertical_offset`: Vertical positioning adjustment
+  - `mountain_transparency`: Transparency level (0.0 = invisible, 1.0 = opaque)
+  - `enable_mountain_layer`: Toggle on/off
+
+### Layer 3: Mid Layer (Closest)
+- **Purpose**: Mid-distance environmental elements (rocks, debris, structures)
+- **Movement**: Faster parallax scroll (0.4 speed multiplier)
+- **Implementation**: Repeating sprite textures or placeholder elements
+- **Z-index**: -20 (closest parallax layer)
+- **Textures**: Uses `middle_textures` array or creates placeholder rocks
+- **Configuration**:
+  - `middle_scroll_speed`: Parallax speed multiplier
+  - `middle_vertical_offset`: Vertical positioning adjustment
+  - `middle_transparency`: Transparency level (0.0 = invisible, 1.0 = opaque)
+  - `enable_middle_layer`: Toggle on/off
+
+## Parallax System Features
+- **Seamless Scrolling**: All layers wrap seamlessly for infinite scrolling
+- **Performance Optimization**: Individual layers can be toggled for performance
+- **Dynamic Configuration**: Colors, speeds, and offsets can be adjusted at runtime
+- **Transparency Control**: Each layer supports individual transparency settings with smooth fading
+- **World Speed Sync**: All movement synced with main game world movement speed
+- **Depth Illusion**: Proper speed ratios create convincing depth perception
+
+## Technical Implementation
+- **Script**: `ParallaxBackgroundSystem` class in `scripts/systems/parallax_background_system.gd`
+- **Dependencies**: Syncs with obstacle system world movement speed
+- **Texture Support**: Each layer supports texture arrays or procedural generation
+- **Debug Support**: Built-in debug output for position tracking
+
 Sounds
 # ambient
 - I have embient sound node in the game scene.

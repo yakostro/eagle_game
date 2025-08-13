@@ -37,7 +37,8 @@ func sync_world_movement_speed():
 		var world_speed = obstacle_spawner.obstacle_movement_speed
 		parallax_background.set_world_movement_speed(world_speed)
 		print("🔄 Synced world movement speed: ", world_speed, " px/s")
-		print("   - Background layer speed: ", parallax_background.get_background_scroll_speed(), " px/s")
+		print("   - Gradient layer speed: ", parallax_background.get_gradient_scroll_speed(), " px/s")
+		print("   - Mountain layer speed: ", parallax_background.get_mountain_scroll_speed(), " px/s")
 		print("   - Middle layer speed: ", parallax_background.get_middle_scroll_speed(), " px/s")
 
 func update_world_speed(new_speed: float):
