@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=3 uid="uid://bfhkdj8w2x9qr"]
+
+[ext_resource type="Script" path="res://scripts/systems/parallax_background_system.gd" id="1_0a4nm"]
+
+[node name="ParallaxBackground" type="Node2D"]
+z_index = -30
+script = ExtResource("1_0a4nm")
+enable_middle_layer = true
+background_scroll_speed = 0.1
+middle_scroll_speed = 0.4
+background_vertical_offset = 0.0
+middle_vertical_offset = 50.0
+world_movement_speed = 300.0
