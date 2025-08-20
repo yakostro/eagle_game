@@ -5,3 +5,4 @@
 [node name="ParallaxBackground" type="Node2D"]
 z_index = -30
 script = ExtResource("1_0a4nm")
+mountain_scale = 0.5

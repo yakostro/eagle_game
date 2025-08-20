@@ -9,7 +9,7 @@ class_name ObstacleSpawner
 
 # Spawn weights for obstacle types (higher = more likely to spawn)
 @export var mountain_weight: int = 10 #2
-@export var stalactite_weight: int = 2 #2
+@export var stalactite_weight: int = 5 #2
 @export var floating_island_weight: int = 5 #5
 
 # Obstacle spawning balance

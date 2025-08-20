@@ -25,6 +25,7 @@ class_name ParallaxBackgroundSystem
 @export var middle_vertical_offset: float = 50.0  # Vertical offset for middle layer (+ = down, - = up)
 
 @export_group("Layer Visual Effects")
+@export_range(0.1, 5.0) var mountain_scale: float = 1.0  # Mountain background sprite scale (inspector controllable)
 @export_range(0.0, 1.0) var mountain_transparency: float = 1.0  # Mountain layer transparency (0 = invisible, 1 = opaque)
 @export_range(0.0, 1.0) var middle_transparency: float = 1.0  # Middle layer transparency (0 = invisible, 1 = opaque)
 
@@ -154,11 +155,12 @@ func create_mountain_sprites():
 	# Use the first texture for the mountains
 	var texture = mountain_textures[0]
 	
-	# Calculate scaling and dimensions
+	# Calculate scaling and dimensions using inspector-controllable scale
 	var texture_width = texture.get_width()
 	var texture_height = texture.get_height()
-	var scale_factor = screen_height / texture_height
+	var scale_factor = mountain_scale  # Use the inspector-controllable scale
 	var scaled_width = texture_width * scale_factor
+	var scaled_height = texture_height * scale_factor
 	
 	# Create enough sprites to cover screen width + extra for scrolling
 	var sprites_needed = int(ceil((screen_width * 3) / scaled_width)) + 1
@@ -168,7 +170,8 @@ func create_mountain_sprites():
 		sprite.texture = texture
 		sprite.scale = Vector2(scale_factor, scale_factor)
 		sprite.position.x = i * scaled_width
-		sprite.position.y = screen_height / 2 + mountain_vertical_offset
+		# Position sprite so its bottom edge aligns with screen bottom (plus offset)
+		sprite.position.y = screen_height - (scaled_height / 2) + mountain_vertical_offset
 		sprite.centered = true
 		
 		mountain_layer.add_child(sprite)
@@ -262,7 +265,7 @@ func _process(delta):
 			var texture = mountain_textures[0] if not mountain_textures.is_empty() else null
 			if texture:
 				var texture_width = texture.get_width()
-				var scale_factor = screen_height / texture.get_height()
+				var scale_factor = mountain_scale  # Use the inspector-controllable scale
 				var scaled_width = texture_width * scale_factor
 				
 				# Reset position when we've scrolled one full texture width
@@ -333,9 +336,11 @@ func set_gradient_vertical_offset(offset: float):
 func set_mountain_vertical_offset(offset: float):
 	"""Update mountain layer vertical offset"""
 	mountain_vertical_offset = offset
-	# Update existing mountain sprites
+	# Update existing mountain sprites to maintain bottom-edge alignment
 	for sprite in mountain_sprites:
-		sprite.position.y = screen_height / 2 + mountain_vertical_offset
+		if sprite.texture:
+			var scaled_height = sprite.texture.get_height() * mountain_scale
+			sprite.position.y = screen_height - (scaled_height / 2) + mountain_vertical_offset
 	print("🏔️  Mountain vertical offset set to: ", offset)
 
 func set_middle_vertical_offset(offset: float):
@@ -380,6 +385,19 @@ func set_middle_transparency(transparency: float):
 	if middle_layer:
 		middle_layer.modulate.a = middle_transparency
 	print("🏔️  Middle layer transparency set to: ", middle_transparency)
+
+func set_mountain_scale(new_scale: float):
+	"""Update mountain layer scale and reposition sprites to maintain bottom-edge alignment"""
+	mountain_scale = clamp(new_scale, 0.1, 5.0)
+	
+	# Update existing mountain sprites
+	for sprite in mountain_sprites:
+		if sprite.texture:
+			sprite.scale = Vector2(mountain_scale, mountain_scale)
+			var scaled_height = sprite.texture.get_height() * mountain_scale
+			sprite.position.y = screen_height - (scaled_height / 2) + mountain_vertical_offset
+	
+	print("🏔️  Mountain scale set to: ", mountain_scale)
 
 func fade_mountain_layer(target_transparency: float, duration: float):
 	"""Smoothly fade mountain layer to target transparency over specified duration"""
