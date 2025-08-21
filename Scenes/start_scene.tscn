@@ -1,0 +1,73 @@
+[gd_scene load_steps=3 format=3 uid="uid://cxouy6sqvmqgf"]
+
+[ext_resource type="Script" path="res://scripts/start_scene.gd" id="1_start_scene"]
+[ext_resource type="Texture2D" uid="uid://cdj6srlerwki2" path="res://sprites/background/back_start_scene.png" id="2_vo4sb"]
+
+[node name="StartScene" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_start_scene")
+press_any_button_label_path = NodePath("UILayer/UIContainer/PressAnyButtonLabel")
+background_image_path = NodePath("BackgroundLayer/BackgroundImage")
+
+[node name="BackgroundLayer" type="CanvasLayer" parent="."]
+layer = -10
+
+[node name="BackgroundImage" type="TextureRect" parent="BackgroundLayer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+texture = ExtResource("2_vo4sb")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="UILayer" type="CanvasLayer" parent="."]
+layer = 10
+
+[node name="UIContainer" type="Control" parent="UILayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PressAnyButtonLabel" type="Label" parent="UILayer/UIContainer"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -200.0
+offset_top = -100.0
+offset_right = 200.0
+offset_bottom = -60.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "Press any button to start"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="GameTitle" type="Label" parent="UILayer/UIContainer"]
+visible = false
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 50.0
+offset_top = -250.0
+offset_right = 550.0
+offset_bottom = -200.0
+grow_vertical = 0
+text = "The Last Eagle"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AudioController" type="Node" parent="."]
+
+[node name="BackgroundMusic" type="AudioStreamPlayer" parent="AudioController"]

@@ -9,7 +9,7 @@ alwaysApply: true
 - Always consider that beside the code there are things things that need to be set up in Godot editor (like scenes, animations, links). If possible do it yourself and describe what was changed.
 - If you can't change something in godot youreslf, Describe step by step what I have to.
 - Create code in small chunks step by step. If you see that there is a lot of code to write to fulfill my prompt - suggest smaller steps.
-- Use Eagle\GD\GDD.md as a source of requirements. It is a game design document.
+- Use Eagle\GD folder as a source of requirements. It is a game design documents. I will point to particular documents if needed.
 - When i ask something new in chat, and there is not such an information in the GDD file - add this information to the GDD.
 - Always create variables for things that need to be tweaked during the balancing game mechanics.
 - If possible do not use direct links like '@onready var base_wind: AudioStreamPlayer2D = $BaseWind'. Use '@export var nest_notice_label_path: NodePath' instead.

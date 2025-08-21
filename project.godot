@@ -11,13 +11,14 @@ config_version=5
 [application]
 
 config/name="Eagle"
-run/main_scene="res://scenes/game.tscn"
+run/main_scene="res://scenes/start_scene.tscn"
 config/features=PackedStringArray("4.2", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
 
 GameBalance="*res://scripts/game_balance.gd"
+SceneManager="*res://scripts/scene_manager.gd"
 
 [display]
 

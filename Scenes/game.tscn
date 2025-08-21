@@ -23,6 +23,7 @@ parallax_background_path = NodePath("ParallaxBackground")
 [node name="ParallaxBackground" parent="." instance=ExtResource("1_parallax")]
 enable_middle_layer = false
 middle_vertical_offset = 200.0
+gradient_bottom_color = Color(0.505882, 0.345098, 0.407843, 1)
 mountain_textures = Array[Texture2D]([ExtResource("3_b7kfd")])
 middle_textures = Array[Texture2D]([ExtResource("4_36n1e")])
 
