@@ -10,3 +10,8 @@ Art style:
 - Limited color pallete
 - Grim mood
 - Cold colors
+
+Always add this to prompt in the scenario.com:
+white background. side view perspective. grim mood with purple tones.
+
+Piece of mountanious rocks on the left side, with the bald eagle nest with 3 chicks in it. grim mood and violet tone colors, twilight, mountanious region on a background. Soaring eagle in the sky, bottom to top perspective at the eagle. Large text on the right 'The Last Eagle' in a style of western movies. Like poster. Cartoonish style. Black outlines middle weight

@@ -260,4 +260,31 @@ Sounds
 - I have embient sound node in the game scene.
 - And two wind sounds. I want to intermix them.
 - wind_woosh_loop.ogg should be the basic.
-- additional_wind.wav should be mixed time to time. different parts of it like a span from 5 to 8 sec. and the next time - another part of this audio. with fade. 
+- additional_wind.wav should be mixed time to time. different parts of it like a span from 5 to 8 sec. and the next time - another part of this audio. with fade.
+
+# Scene Management & UI Flow
+
+## Start Scene
+- **Purpose**: Entry point for the game, sets atmospheric tone
+- **Visual**: Large background image showing post-apocalyptic landscape
+- **UI**: "Press any button to start" text at bottom center
+- **Input**: Universal input detection (any keyboard key, mouse button, or gamepad)
+- **Audio**: Optional background music (configurable in inspector)
+- **Transition**: Leads to main game scene (game.tscn)
+
+## Scene Flow Architecture
+```
+Start Scene → Main Game → Game Over Scene → [Back to Start Scene]
+```
+
+## Game Over Scene (Future)
+- Will display final score (chicks survived)
+- Options to restart or return to start screen
+- Maintains same atmospheric visual design
+- Uses centralized Scene Manager for transitions
+
+## Technical Architecture
+- **Scene Manager**: Global singleton handles all scene transitions
+- **UI Layering**: UI elements exempt from color palette shader
+- **Audio Integration**: Background music complements wind sound system
+- **Input System**: Universal input detection across all scenes 
