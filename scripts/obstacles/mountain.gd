@@ -1,8 +1,8 @@
 extends BaseObstacle
 class_name Mountain
 
-@export var min_mountain_height: float = 500.0
-@export var max_mountain_height: float = 500.0  # Maximum height offset from screen height for random positioning
+@export var min_mountain_offset: float = 0.0     # Minimum additional offset from base position  
+@export var max_mountain_offset: float = 500.0  # Maximum additional offset (GDD specifies 500px)
 
 func _ready():
 	# Call parent _ready first
@@ -10,14 +10,17 @@ func _ready():
 
 func get_spawn_y_position(screen_height: float) -> float:
 	"""Implement mountain-specific Y positioning according to GDD"""
-	# Get sprite height for positioning calculation
-	#var texture = sprite_node.texture
-	#var sprite_height = texture.get_height()
+	# Get actual sprite height accounting for scaling applied in scene
+	var actual_sprite_height = get_actual_sprite_height()
 	
-	# Random Y position: from SCREEN_HEIGHT-SPRITE_HEIGHT to SCREEN_HEIGHT-SPRITE_HEIGHT+offset (GDD requirement)
-	var min_y = screen_height - min_mountain_height
-	var max_y = screen_height - max_mountain_height
+	# According to GDD: from SCREEN_HEIGHT-SPRITE_HEIGHT to SCREEN_HEIGHT-SPRITE_HEIGHT+offset
+	var base_y = screen_height - actual_sprite_height
+	var min_y = base_y + min_mountain_offset  # SCREEN_HEIGHT - SPRITE_HEIGHT + min_offset
+	var max_y = base_y + max_mountain_offset  # SCREEN_HEIGHT - SPRITE_HEIGHT + max_offset
+	
 	var spawn_y = randf_range(min_y, max_y)
+	
+	print("Mountain Y positioning: scaled_height=", actual_sprite_height, " base_y=", base_y, " range=", min_y, " to ", max_y, " chosen=", spawn_y)
 	return spawn_y
 
 func get_obstacle_type() -> String:

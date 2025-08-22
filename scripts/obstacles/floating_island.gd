@@ -12,13 +12,12 @@ func _ready():
 
 func get_spawn_y_position(screen_height: float) -> float:
 	"""Implement floating island-specific Y positioning according to GDD"""
-	# Get sprite height for positioning calculation
-	var texture = sprite_node.texture
-	var sprite_height = texture.get_height()
+	# Get actual sprite height accounting for scaling applied in scene
+	var actual_sprite_height = get_actual_sprite_height()
 	
 	# Random Y position: from minimum_top_offset to minimum_bottom_offset + sprite_height (GDD requirement)
 	var min_y = minimum_top_offset
-	var max_y = screen_height - minimum_bottom_offset - sprite_height
+	var max_y = screen_height - minimum_bottom_offset - actual_sprite_height
 	
 	# Ensure we have a valid range
 	if max_y <= min_y:
@@ -27,7 +26,7 @@ func get_spawn_y_position(screen_height: float) -> float:
 	
 	var spawn_y = randf_range(min_y, max_y)
 	
-	print("FloatingIsland Y positioning: sprite_height=", sprite_height, " range=", min_y, " to ", max_y, " chosen=", spawn_y)
+	print("FloatingIsland Y positioning: scaled_height=", actual_sprite_height, " range=", min_y, " to ", max_y, " chosen=", spawn_y)
 	return spawn_y
 
 func get_obstacle_type() -> String:

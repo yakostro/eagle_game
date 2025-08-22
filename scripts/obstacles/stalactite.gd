@@ -12,16 +12,15 @@ func _ready():
 
 func get_spawn_y_position(_screen_height: float) -> float:
 	"""Implement stalactite-specific Y positioning according to GDD"""
-	# Get sprite height for positioning calculation
-	var texture = sprite_node.texture
-	var sprite_height = texture.get_height()
+	# Get actual sprite height accounting for scaling applied in scene
+	var actual_sprite_height = get_actual_sprite_height()
 	
-	# Random Y position:
-	var min_y = -sprite_height + min_stalactite_height
-	var max_y = -sprite_height + max_stalactite_height
+	# According to GDD: stalactites should spawn from (-sprite_height + minimum_stalactite_height) to 0
+	var min_y = -actual_sprite_height + min_stalactite_height
+	var max_y = 0  # Stalactites hang from the top of screen (Y=0)
 	var spawn_y = randf_range(min_y, max_y)
 	
-	print("Stalactite Y positioning: sprite_height=", sprite_height, " range=", min_y, " to ", max_y, " chosen=", spawn_y)
+	print("Stalactite Y positioning: scaled_height=", actual_sprite_height, " range=", min_y, " to ", max_y, " chosen=", spawn_y)
 	return spawn_y
 
 func get_obstacle_type() -> String:

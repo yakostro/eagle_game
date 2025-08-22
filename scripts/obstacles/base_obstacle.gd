@@ -57,10 +57,10 @@ func cleanup_when_offscreen():
 	if not sprite_node or not sprite_node.texture:
 		return
 	
-	var sprite_width = sprite_node.texture.get_width()
+	var actual_sprite_width = get_actual_sprite_width()
 	
 	# Remove when the rightmost edge is off the left side of the screen
-	if global_position.x + sprite_width < 0:
+	if global_position.x + actual_sprite_width < 0:
 		print(get_obstacle_type(), " ", name, " removed (off-screen)")
 		queue_free()
 
@@ -72,8 +72,8 @@ func move_left(speed: float, delta: float):
 	if not sprite_node or not sprite_node.texture:
 		return false
 	
-	var sprite_width = sprite_node.texture.get_width()
-	return global_position.x + sprite_width < 0
+	var actual_sprite_width = get_actual_sprite_width()
+	return global_position.x + actual_sprite_width < 0
 
 func set_movement_speed(speed: float):
 	"""Allow spawner to set movement speed (for shared eagle/world speed)"""
@@ -86,3 +86,27 @@ func get_nest_placeholder() -> Marker2D:
 func has_nest_placeholder() -> bool:
 	"""Check if this obstacle can actually place a nest"""
 	return can_carry_nest and get_nest_placeholder() != null
+
+func get_actual_sprite_height() -> float:
+	"""Get the actual sprite height accounting for scaling applied in the scene"""
+	if not sprite_node or not sprite_node.texture:
+		push_error("get_actual_sprite_height(): No sprite or texture available!")
+		return 0.0
+	
+	var full_height = sprite_node.texture.get_height()
+	# Account for both sprite scaling and root node scaling
+	var total_scale_y = sprite_node.scale.y * self.scale.y
+	var scaled_height = full_height * total_scale_y
+	return scaled_height
+
+func get_actual_sprite_width() -> float:
+	"""Get the actual sprite width accounting for scaling applied in the scene"""
+	if not sprite_node or not sprite_node.texture:
+		push_error("get_actual_sprite_width(): No sprite or texture available!")
+		return 0.0
+	
+	var full_width = sprite_node.texture.get_width()
+	# Account for both sprite scaling and root node scaling
+	var total_scale_x = sprite_node.scale.x * self.scale.x
+	var scaled_width = full_width * total_scale_x
+	return scaled_width
