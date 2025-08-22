@@ -80,6 +80,7 @@ func _setup_input():
 	"""Setup input detection system"""
 	# Make sure this node can receive input
 	set_process_unhandled_input(true)
+	set_process_input(true)  # Also enable regular input for mouse handling
 	print("StartScene: Input detection enabled")
 
 func _start_scene():
@@ -100,7 +101,7 @@ func _start_scene():
 func _unhandled_input(event: InputEvent):
 	"""
 	Handle universal input detection
-	Responds to ANY keyboard key, mouse button, or gamepad input
+	Responds to keyboard keys and gamepad input
 	"""
 	# Ignore input if already detected or during scene transition
 	if input_detected or SceneManager.is_transitioning:
@@ -112,11 +113,6 @@ func _unhandled_input(event: InputEvent):
 	if event is InputEventKey and event.pressed:
 		should_trigger = true
 		print("StartScene: Keyboard input detected - Key: ", event.keycode)
-	
-	# Check for mouse input (any mouse button)
-	elif event is InputEventMouseButton and event.pressed:
-		should_trigger = true
-		print("StartScene: Mouse input detected - Button: ", event.button_index)
 	
 	# Check for gamepad input (any gamepad button)
 	elif event is InputEventJoypadButton and event.pressed:
@@ -181,12 +177,16 @@ func _set_audio_volume(volume: float):
 	if audio_player:
 		audio_player.volume_db = linear_to_db(volume)
 
-# Debug functions for development
 func _input(event):
-	"""Debug input monitoring (only in debug builds)"""
-	if OS.is_debug_build():
-		if event is InputEventKey and event.pressed:
-			print("StartScene Debug: Key event - ", event.as_text())
+	"""Handle mouse input events"""
+	# Handle mouse clicks (they don't reach _unhandled_input due to Control node consuming them)
+	if event is InputEventMouseButton and event.pressed:
+		if not input_detected and not SceneManager.is_transitioning:
+			print("StartScene: Mouse input detected - Button: ", event.button_index)
+			_handle_start_input()
+			return
+
+# Debug functions for development
 
 func debug_trigger_start():
 	"""Debug function to manually trigger scene start"""

@@ -19,6 +19,8 @@
 script = ExtResource("12_gm")
 obstacle_spawner_path = NodePath("Spawners/ObstacleSpawner")
 parallax_background_path = NodePath("ParallaxBackground")
+eagle_path = NodePath("Eagle")
+nest_spawner_path = NodePath("Spawners/NestSpawner")
 
 [node name="ParallaxBackground" parent="." instance=ExtResource("1_parallax")]
 enable_middle_layer = false
