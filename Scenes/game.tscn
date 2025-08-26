@@ -159,7 +159,8 @@ nest_notice_label_path = NodePath("../NestNotice")
 morale_pop_label_path = NodePath("../MoralePop")
 
 [node name="EnergyMoraleUI" parent="CanvasLayer" instance=ExtResource("13_energy_ui")]
-eagle_path = NodePath("../../Eagle")
+bar_height = 10.0
+icon_size = Vector2(20, 20)
 
 [node name="EmbientSound" type="Node2D" parent="."]
 script = ExtResource("6_gwv1y")

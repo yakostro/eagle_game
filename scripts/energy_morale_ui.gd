@@ -14,7 +14,9 @@ class_name EnergyMoraleUI
 @export_group("Visual Configuration")
 @export var energy_color: Color = Color(0.6, 0.3, 0.8, 1.0)  # Purple
 @export var energy_loss_feedback_color: Color = Color(1.0, 1.0, 1.0, 0.8)  # White
-@export var morale_lock_color: Color = Color(0.4, 0.4, 0.4, 1.0)  # Gray
+@export var morale_lock_color: Color = Color(0.4, 0.4, 0.4, 0.3)  # Gray (subtle background for pattern)
+@export var background_color: Color = Color(0.2, 0.2, 0.2, 0.8)  # Dark gray background
+@export var diagonal_pattern_texture: Texture2D = preload("res://sprites/ui/diagonal_pattern.png")  # Disabled pattern
 @export var energy_loss_feedback_duration: float = 0.5  # How long white flash lasts
 
 @export_group("Bar Configuration")
@@ -127,6 +129,9 @@ func setup_ui_elements():
 	# Initialize values
 	update_energy_display()
 	update_morale_capacity_display()
+	
+	# Create diagonal pattern overlay
+	create_diagonal_pattern_overlay()
 
 func apply_progress_bar_colors():
 	"""Apply colors to progress bars using theme overrides"""
@@ -150,9 +155,48 @@ func apply_progress_bar_colors():
 	
 	# Set background for progress bars
 	var bg_style = StyleBoxFlat.new()
-	bg_style.bg_color = Color(0.2, 0.2, 0.2, 0.8)  # Dark background
+	bg_style.bg_color = background_color
 	energy_progress_bar.add_theme_stylebox_override("background", bg_style)
 	energy_loss_feedback.add_theme_stylebox_override("background", bg_style)
+
+func create_diagonal_pattern_overlay():
+	"""Create a diagonal pattern overlay for the morale lock area"""
+	var container = get_node("Container/ProgressBarContainer") as Control
+	
+	# Remove any existing diagonal overlay
+	var existing_overlay = container.get_node_or_null("DiagonalPatternOverlay")
+	if existing_overlay:
+		existing_overlay.queue_free()
+	
+	# Only create pattern if there's actually locked capacity
+	var locked_capacity_percent = 100.0 - current_morale_percent
+	if locked_capacity_percent <= 0:
+		return
+	
+	# Create TextureRect for the diagonal pattern
+	var pattern_overlay = TextureRect.new()
+	pattern_overlay.name = "DiagonalPatternOverlay"
+	pattern_overlay.texture = diagonal_pattern_texture
+	pattern_overlay.stretch_mode = TextureRect.STRETCH_TILE
+	
+	# Position it exactly like the morale lock ColorRect
+	pattern_overlay.anchor_left = 1.0
+	pattern_overlay.anchor_right = 1.0
+	pattern_overlay.anchor_top = 0.0
+	pattern_overlay.anchor_bottom = 1.0
+	
+	# Calculate the same width as the morale lock
+	var locked_width = bar_width * (locked_capacity_percent / 100.0)
+	pattern_overlay.offset_left = -locked_width
+	pattern_overlay.offset_right = 0.0
+	pattern_overlay.offset_top = 0.0
+	pattern_overlay.offset_bottom = 0.0
+	
+	# Make it non-interactive
+	pattern_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	
+	# Add as child of the progress bar container
+	container.add_child(pattern_overlay)
 
 func create_lightning_icon():
 	"""Create a simple lightning bolt icon programmatically"""
@@ -208,6 +252,9 @@ func update_morale_capacity_display():
 	# Position the ColorRect from the right side
 	# Since it's anchored to the right (anchor_left = 1.0), we use negative offset_left
 	morale_lock.offset_left = -locked_width
+	
+	# Update diagonal pattern overlay
+	create_diagonal_pattern_overlay()
 	
 ## Utility methods for external access
 

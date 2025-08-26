@@ -11,6 +11,12 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_energy_ui")
+energy_color = Color(0.631373, 0.490196, 0.137255, 1)
+energy_loss_feedback_color = Color(1, 1, 1, 0.745098)
+morale_lock_color = Color(0.188235, 0.145098, 0.227451, 1)
+background_color = Color(0.188235, 0.145098, 0.227451, 1)
+bar_height = 18.0
+icon_size = Vector2(20, 20)
 
 [node name="Container" type="HBoxContainer" parent="."]
 layout_mode = 1
@@ -18,14 +24,14 @@ anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -200.0
-offset_top = 20.0
+offset_top = 8.0
 offset_right = 200.0
-offset_bottom = 70.0
+offset_bottom = 28.0
 grow_horizontal = 2
 alignment = 1
 
 [node name="EnergyIcon" type="TextureRect" parent="Container"]
-custom_minimum_size = Vector2(40, 40)
+custom_minimum_size = Vector2(20, 20)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -33,14 +39,14 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="ProgressBarContainer" type="Control" parent="Container"]
-custom_minimum_size = Vector2(300, 40)
+custom_minimum_size = Vector2(300, 18)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
 
 [node name="EnergyProgressBar" type="ProgressBar" parent="Container/ProgressBarContainer"]
 layout_mode = 1
-anchors_preset = 15
+anchors_preset = -1
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
@@ -49,7 +55,6 @@ value = 100.0
 show_percentage = false
 
 [node name="EnergyLossFeedback" type="ProgressBar" parent="Container/ProgressBarContainer"]
-visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0

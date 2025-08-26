@@ -106,6 +106,15 @@ func _physics_process(delta):
 	# 7. Update UI
 	update_UI()
 
+func _unhandled_input(event):
+	"""Handle debug input for testing"""
+	if event is InputEventKey and event.pressed:
+		# DEBUG: M key to decrease morale (for testing diagonal pattern)
+		if event.keycode == KEY_M:
+			print("DEBUG: Manual morale decrease triggered!")
+			lose_morale(15.0)
+			get_viewport().set_input_as_handled()
+
 # Fish management methods
 func catch_fish(fish: Fish) -> bool:
 	"""Called when the eagle catches a fish. Returns true if successful."""
@@ -446,6 +455,8 @@ func handle_special_inputs():
 		screech_audio.play()
 		# Trigger screech animation
 		screech_requested.emit()
+	
+
 	
 
 
