@@ -38,9 +38,9 @@ eagle_reference = NodePath("../../Eagle")
 
 [node name="ObstacleSpawner" parent="Spawners" index="1"]
 mountain_scenes = Array[PackedScene]([ExtResource("2_1q8ty")])
-mountain_weight = 1
-stalactite_weight = 10
-floating_island_weight = 1
+mountain_weight = 2
+stalactite_weight = 2
+floating_island_weight = 2
 spawn_interval = 3.0
 spawn_interval_variance = 1.5
 min_spawn_interval = 2.0

@@ -1,7 +1,7 @@
 extends BaseObstacle
 class_name Mountain
 
-@export var min_mountain_offset: float = 0.0     # Minimum additional offset from base position  
+@export var min_mountain_offset: float = 300.0     # Minimum additional offset from base position  
 @export var max_mountain_offset: float = 500.0  # Maximum additional offset (GDD specifies 500px)
 
 func _ready():
