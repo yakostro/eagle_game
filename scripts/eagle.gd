@@ -124,8 +124,11 @@ func eat_fish():
 		print("Eagle ate a fish!")
 		# Use the fish's energy value instead of fixed amount
 		var energy_gained = carried_fish.energy_value
-		current_energy = min(current_energy + energy_gained, max_energy)
-		print("Energy gained from fish: ", energy_gained, " (Total energy: ", current_energy, ")")
+		
+		# Respect morale-based capacity limits
+		var max_capacity = get_effective_max_energy()
+		current_energy = min(current_energy + energy_gained, max_capacity)
+		print("Energy gained from fish: ", energy_gained, " (Total energy: ", current_energy, "/", max_capacity, ")")
 		carried_fish.queue_free()  # Remove the fish from scene
 		carried_fish = null
 		fish_caught_changed.emit(false)
@@ -151,16 +154,30 @@ func lose_morale(amount: float):
 	"""Called when the eagle loses morale (e.g., nest goes off screen)"""
 	var old_morale = current_morale
 	current_morale = max(current_morale - amount, 0.0)  # Can't go below 0
+	
 	if old_morale != current_morale:
 		print("Eagle lost morale: ", amount, " (Current: ", current_morale, ")")
+		
+		# When morale decreases, energy capacity shrinks - clamp energy if needed
+		var new_max_energy = get_effective_max_energy()
+		if current_energy > new_max_energy:
+			current_energy = new_max_energy
+			print("Energy clamped to new capacity: ", current_energy, "/", new_max_energy)
+		
 		morale_changed.emit(current_morale)
 
 func gain_morale(amount: float):
 	"""Called when the eagle gains morale (e.g., feeds a nest)"""
 	var old_morale = current_morale
 	current_morale = min(current_morale + amount, max_morale)
+	
 	if old_morale != current_morale:
 		print("Eagle gained morale: ", amount, " (Current: ", current_morale, ")")
+		
+		# When morale increases, energy capacity increases (but don't auto-fill energy)
+		var new_max_energy = get_effective_max_energy()
+		print("Energy capacity increased to: ", new_max_energy, " (Current energy: ", current_energy, ")")
+		
 		morale_changed.emit(current_morale)
 
 func get_current_morale() -> float:
@@ -170,6 +187,12 @@ func get_current_morale() -> float:
 func get_morale_percentage() -> float:
 	"""Returns morale as a percentage (0.0 to 1.0)"""
 	return current_morale / max_morale
+
+func get_effective_max_energy() -> float:
+	"""Returns maximum energy capacity based on current morale"""
+	# Morale directly affects energy capacity (100% morale = 100% capacity)
+	var morale_percentage = get_morale_percentage()
+	return max_energy * morale_percentage
 
 # Nest interaction methods
 func on_nest_fed(points: int = 0):
@@ -424,10 +447,7 @@ func handle_special_inputs():
 		# Trigger screech animation
 		screech_requested.emit()
 	
-	## DEBUG: Test hit system with T key
-	#if Input.is_action_just_pressed("ui_select"):  # Spacebar/Enter for testing
-		#print("DEBUG: Manual hit triggered!")
-		#hit_by_obstacle()
+
 
 # Movement methods removed - now handled by movement_controller
 

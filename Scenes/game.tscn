@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://bvfc1tl8ttpuo"]
+[gd_scene load_steps=16 format=3 uid="uid://bvfc1tl8ttpuo"]
 
 [ext_resource type="PackedScene" uid="uid://cd42djg346oqy" path="res://scenes/eagle.tscn" id="1_ek57t"]
 [ext_resource type="PackedScene" uid="uid://bfhkdj8w2yaqr" path="res://scenes/parallax_background.tscn" id="1_parallax"]
@@ -14,6 +14,7 @@
 [ext_resource type="AudioStream" uid="uid://06s15ka1es4v" path="res://sounds/wind/additional_wind.wav" id="8_jjn0q"]
 [ext_resource type="Script" path="res://scripts/ui_feedback.gd" id="11_ui"]
 [ext_resource type="Script" path="res://scripts/game_manager.gd" id="12_gm"]
+[ext_resource type="PackedScene" uid="uid://gdoloxvu6nf3" path="res://scenes/energy_morale_ui.tscn" id="13_energy_ui"]
 
 [node name="Game" type="Node" groups=["game_area"]]
 script = ExtResource("12_gm")
@@ -156,6 +157,9 @@ nest_spawner_path = NodePath("../../Spawners/NestSpawner")
 eagle_path = NodePath("../../Eagle")
 nest_notice_label_path = NodePath("../NestNotice")
 morale_pop_label_path = NodePath("../MoralePop")
+
+[node name="EnergyMoraleUI" parent="CanvasLayer" instance=ExtResource("13_energy_ui")]
+eagle_path = NodePath("../../Eagle")
 
 [node name="EmbientSound" type="Node2D" parent="."]
 script = ExtResource("6_gwv1y")
