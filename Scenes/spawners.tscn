@@ -17,7 +17,7 @@ script = ExtResource("1_8dfof")
 fish_scene = ExtResource("2_hvx33")
 
 [node name="ObstacleSpawner" type="Node2D" parent="." node_paths=PackedStringArray("nest_spawner")]
-z_index = -2
+z_index = -3
 position = Vector2(1920, 1080)
 script = ExtResource("3_rwnif")
 stalactite_scene = ExtResource("5_fdkuf")

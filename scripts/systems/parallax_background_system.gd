@@ -123,7 +123,7 @@ func setup_mountain_layer():
 	"""Create and configure the mountain layer (distant mountains/terrain)"""
 	mountain_layer = Node2D.new()
 	mountain_layer.name = "MountainLayer"
-	mountain_layer.z_index = -30  # Behind middle layer, in front of gradient
+	mountain_layer.z_index = ZOrder.PARALLAX_MOUNTAINS  # Behind middle layer, in front of gradient
 	mountain_layer.modulate.a = mountain_transparency  # Apply transparency
 	add_child(mountain_layer)
 	
@@ -137,7 +137,7 @@ func setup_middle_layer():
 	"""Create and configure the middle layer (mid-distance elements)"""
 	middle_layer = Node2D.new()
 	middle_layer.name = "MiddleLayer"
-	middle_layer.z_index = -20  # Between background and foreground
+	middle_layer.z_index = ZOrder.PARALLAX_MIDDLE  # Between background and foreground
 	middle_layer.modulate.a = middle_transparency  # Apply transparency
 	add_child(middle_layer)
 	
