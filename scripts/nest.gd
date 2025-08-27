@@ -47,8 +47,11 @@ func _process(_delta):
 	"""Handle missed signal when nest goes off-screen"""
 	# Only emit missed signal if nest is still hungry and hasn't emitted before
 	if current_state == NestState.HUNGRY and not has_emitted_missed:
-		if global_position.x < -100:  # Off the left side of screen
-			print("Nest missed - going off screen")
+		# Check if the nest itself has gone off-screen by checking its actual global position
+		# The nest's global_position already accounts for its position on the obstacle
+		# We emit when the nest itself crosses the left edge of the screen
+		if global_position.x < 0:  # Nest has gone off the left side of screen
+			print("Nest missed - going off screen at position: ", global_position.x)
 			nest_missed.emit(moral_points_loss)
 			has_emitted_missed = true
 
