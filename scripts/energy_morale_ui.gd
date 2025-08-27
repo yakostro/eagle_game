@@ -21,8 +21,8 @@ class_name EnergyMoraleUI
 
 @export_group("Bar Configuration")
 @export var bar_width: float = 300.0
-@export var bar_height: float = 40.0
-@export var icon_size: Vector2 = Vector2(40, 40)
+@export var bar_height: float = 18.0
+@export var icon_size: Vector2 = Vector2(20, 20)
 
 # Internal references
 @onready var energy_icon: TextureRect = get_node(energy_icon_path)

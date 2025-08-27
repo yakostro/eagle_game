@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://bvfc1tl8ttpuo"]
+[gd_scene load_steps=17 format=3 uid="uid://bvfc1tl8ttpuo"]
 
 [ext_resource type="PackedScene" uid="uid://cd42djg346oqy" path="res://scenes/eagle.tscn" id="1_ek57t"]
 [ext_resource type="PackedScene" uid="uid://bfhkdj8w2yaqr" path="res://scenes/parallax_background.tscn" id="1_parallax"]
@@ -15,6 +15,7 @@
 [ext_resource type="Script" path="res://scripts/ui_feedback.gd" id="11_ui"]
 [ext_resource type="Script" path="res://scripts/game_manager.gd" id="12_gm"]
 [ext_resource type="PackedScene" uid="uid://gdoloxvu6nf3" path="res://scenes/energy_morale_ui.tscn" id="13_energy_ui"]
+[ext_resource type="FontFile" uid="uid://kcdyir8efr7o" path="res://font/Bangers-Regular.ttf" id="14_b8rty"]
 
 [node name="Game" type="Node" groups=["game_area"]]
 script = ExtResource("12_gm")
@@ -98,8 +99,6 @@ mouse_filter = 2
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 layer = 20
-offset = Vector2(20, 20)
-transform = Transform2D(1, 0, 0, 1, 20, 20)
 
 [node name="StateLabel" type="Label" parent="CanvasLayer"]
 offset_right = 40.0
@@ -131,17 +130,18 @@ H- screech"
 
 [node name="NestNotice" type="Label" parent="CanvasLayer"]
 visible = false
-offset_left = 650.0
-offset_top = 30.0
-offset_right = 1270.0
-offset_bottom = 120.0
-theme_override_font_sizes/font_size = 48
+offset_left = 797.0
+offset_top = 63.0
+offset_right = 1123.0
+offset_bottom = 113.0
+theme_override_colors/font_color = Color(0.9976, 0.971488, 0.919254, 0.784314)
+theme_override_fonts/font = ExtResource("14_b8rty")
+theme_override_font_sizes/font_size = 40
 text = "Nest ahead!"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="MoralePop" type="Label" parent="CanvasLayer"]
-visible = false
 offset_left = 650.0
 offset_top = 30.0
 offset_right = 1270.0
@@ -159,7 +159,25 @@ nest_notice_label_path = NodePath("../NestNotice")
 morale_pop_label_path = NodePath("../MoralePop")
 
 [node name="EnergyMoraleUI" parent="CanvasLayer" instance=ExtResource("13_energy_ui")]
-bar_height = 10.0
+
+[node name="Container" type="BoxContainer" parent="CanvasLayer"]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 1282.0
+offset_bottom = -914.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="NestNotice2" type="Label" parent="CanvasLayer/Container"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.996078, 0.952941, 0.866667, 0.784314)
+theme_override_fonts/font = ExtResource("14_b8rty")
+theme_override_font_sizes/font_size = 40
+text = "Nest ahead!"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="EmbientSound" type="Node2D" parent="."]
 script = ExtResource("6_gwv1y")

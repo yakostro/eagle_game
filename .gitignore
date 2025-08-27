@@ -29,7 +29,8 @@ desktop.ini
 # Build outputs
 build/
 dist/
-Exe/
+exe/
+fonts/
 *.exe
 *.dll
 *.so

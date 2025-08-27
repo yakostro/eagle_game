@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://gdoloxvu6nf3"]
+[gd_scene load_steps=3 format=3 uid="uid://gdoloxvu6nf3"]
 
 [ext_resource type="Script" path="res://scripts/energy_morale_ui.gd" id="1_energy_ui"]
+[ext_resource type="Texture2D" uid="uid://dvw8gyb7bbuo8" path="res://sprites/ui/energy_icon.png" id="2_qg3rf"]
 
 [node name="EnergyMoraleUI" type="Control"]
 layout_mode = 3
@@ -15,38 +16,38 @@ energy_color = Color(0.631373, 0.490196, 0.137255, 1)
 energy_loss_feedback_color = Color(1, 1, 1, 0.745098)
 morale_lock_color = Color(0.188235, 0.145098, 0.227451, 1)
 background_color = Color(0.188235, 0.145098, 0.227451, 1)
-bar_height = 18.0
-icon_size = Vector2(20, 20)
+bar_width = 400.0
+icon_size = Vector2(30, 30)
 
 [node name="Container" type="HBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -200.0
+offset_left = -217.0
 offset_top = 8.0
-offset_right = 200.0
-offset_bottom = 28.0
+offset_right = 217.0
+offset_bottom = 48.0
 grow_horizontal = 2
-alignment = 1
 
 [node name="EnergyIcon" type="TextureRect" parent="Container"]
-custom_minimum_size = Vector2(20, 20)
+custom_minimum_size = Vector2(40, 40)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
+texture = ExtResource("2_qg3rf")
 expand_mode = 1
 stretch_mode = 5
 
 [node name="ProgressBarContainer" type="Control" parent="Container"]
-custom_minimum_size = Vector2(300, 18)
+custom_minimum_size = Vector2(400, 18)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
 
 [node name="EnergyProgressBar" type="ProgressBar" parent="Container/ProgressBarContainer"]
 layout_mode = 1
-anchors_preset = -1
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
