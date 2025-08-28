@@ -6,7 +6,7 @@ class_name UIFeedback
 @export var nest_spawner_path: NodePath
 @export var eagle_path: NodePath
 @export var nest_notice_label_path: NodePath
-@export var morale_pop_label_path: NodePath
+@export var morale_pop_container_path: NodePath
 @export var nest_notice_duration: float = 1.5
 @export var morale_pop_duration: float = 1.2
 
@@ -17,7 +17,9 @@ var _previous_morale: float = -1.0
 var nest_spawner: Node
 var eagle: Node
 var nest_notice_label: Label
-var morale_pop_label: Label
+var morale_pop_container: Node
+var chicks_label: Label  # "Chicks gonna die" label
+var morale_label: Label  # "-Morale" label
 
 func _ready():
 	_resolve_nodes()
@@ -25,6 +27,11 @@ func _ready():
 	if nest_spawner and nest_spawner.has_signal("nest_incoming"):
 		if not nest_spawner.nest_incoming.is_connected(_on_nest_incoming):
 			nest_spawner.nest_incoming.connect(_on_nest_incoming)
+	
+	# Connect to nest_spawned signal to connect to individual nest_missed signals
+	if nest_spawner and nest_spawner.has_signal("nest_spawned"):
+		if not nest_spawner.nest_spawned.is_connected(_on_nest_spawned):
+			nest_spawner.nest_spawned.connect(_on_nest_spawned)
 
 	if eagle:
 		# Cache current morale if the eagle has the method
@@ -35,8 +42,8 @@ func _ready():
 
 	if nest_notice_label:
 		nest_notice_label.visible = false
-	if morale_pop_label:
-		morale_pop_label.visible = false
+	if morale_pop_container:
+		morale_pop_container.visible = false
 
 	_nest_timer = Timer.new()
 	_nest_timer.one_shot = true
@@ -59,27 +66,40 @@ func _hide_nest_notice():
 	if nest_notice_label:
 		nest_notice_label.visible = false
 
-func _on_morale_changed(new_morale: float):
-	if not morale_pop_label:
+func _on_nest_spawned(nest: Node):
+	"""Called when a new nest is spawned - connect to its missed signal"""
+	if not nest:
 		return
-	var delta := 0.0
-	if _previous_morale >= 0.0:
-		delta = new_morale - _previous_morale
-	_previous_morale = new_morale
+	
+	# Connect to this specific nest's missed signal
+	if nest.has_signal("nest_missed"):
+		nest.nest_missed.connect(_on_nest_missed)
 
-	if abs(delta) < 0.01:
+func _on_nest_missed(_points: int = 0):
+	"""Called when a nest goes off screen without being fed"""
+	if not morale_pop_container:
 		return
-
-	var sign_str := "+" if delta > 0.0 else "-"
-	var value := int(abs(delta))
-	morale_pop_label.text = "Morale " + sign_str + str(value)
-	morale_pop_label.modulate = Color(0.2, 1.0, 0.2) if delta > 0 else Color(1.0, 0.3, 0.3)
-	morale_pop_label.visible = true
+	
+	# Set text for both labels
+	if chicks_label:
+		chicks_label.text = "Chicks gonna die"
+	if morale_label:
+		morale_label.text = "-Morale"
+		morale_label.modulate = Color(1.0, 0.3, 0.3)  # Red color for negative
+	
+	# Show the container
+	morale_pop_container.visible = true
 	_morale_timer.start(morale_pop_duration)
 
+func _on_morale_changed(new_morale: float):
+	# Note: The MoralePopContainer is now only used for nest missed feedback
+	# Positive morale changes (feeding nests) don't show UI feedback currently
+	# If you want to add positive morale feedback, create a separate UI element
+	_previous_morale = new_morale
+
 func _hide_morale_pop():
-	if morale_pop_label:
-		morale_pop_label.visible = false
+	if morale_pop_container:
+		morale_pop_container.visible = false
 
 func _resolve_nodes():
 	if nest_spawner_path != NodePath(""):
@@ -97,7 +117,18 @@ func _resolve_nodes():
 	if not nest_notice_label:
 		nest_notice_label = get_tree().current_scene.find_child("NestNotice", true, false) as Label
 
-	if morale_pop_label_path != NodePath(""):
-		morale_pop_label = get_node_or_null(morale_pop_label_path) as Label
-	if not morale_pop_label:
-		morale_pop_label = get_tree().current_scene.find_child("MoralePop", true, false) as Label
+	if morale_pop_container_path != NodePath(""):
+		morale_pop_container = get_node_or_null(morale_pop_container_path)
+	if not morale_pop_container:
+		morale_pop_container = get_tree().current_scene.find_child("MoralePopContainer", true, false)
+	
+	# Find child labels within the container
+	if morale_pop_container:
+		# Look for common label names - adjust these names as needed
+		chicks_label = morale_pop_container.find_child("ChicksLabel", true, false) as Label
+		if not chicks_label:
+			chicks_label = morale_pop_container.find_child("ChicksDieLabel", true, false) as Label
+		
+		morale_label = morale_pop_container.find_child("MoraleLabel", true, false) as Label
+		if not morale_label:
+			morale_label = morale_pop_container.find_child("MoralePop", true, false) as Label
