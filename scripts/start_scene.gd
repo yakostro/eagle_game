@@ -19,7 +19,7 @@ signal start_game_requested
 
 # Scene configuration
 @export_group("Scene Settings")
-@export var game_scene_path: String = "res://scenes/game.tscn"
+@export var intro_scene_path: String = "res://scenes/intro.tscn"
 @export var enable_fade_transition: bool = true
 
 # UI configuration - using NodePath for flexible connection
@@ -142,7 +142,7 @@ func _handle_start_input():
 	await get_tree().create_timer(input_delay).timeout
 	
 	# Start scene transition
-	_transition_to_game()
+	_transition_to_intro()
 
 func _show_input_feedback():
 	"""Provide visual feedback when input is detected"""
@@ -155,9 +155,9 @@ func _show_input_feedback():
 	feedback_tween.tween_property(press_any_button_label, "modulate", Color.WHITE * 1.5, 0.1)
 	feedback_tween.tween_property(press_any_button_label, "modulate", original_modulate, 0.1)
 
-func _transition_to_game():
-	"""Handle transition to the main game scene"""
-	print("StartScene: Transitioning to game scene: ", game_scene_path)
+func _transition_to_intro():
+	"""Handle transition to the intro scene"""
+	print("StartScene: Transitioning to intro scene: ", intro_scene_path)
 	
 	# Stop background music with fade out
 	if audio_player and audio_player.playing:
@@ -168,9 +168,9 @@ func _transition_to_game():
 	
 	# Use SceneManager for smooth transition
 	if enable_fade_transition:
-		SceneManager.change_scene(game_scene_path, "fade")
+		SceneManager.change_scene(intro_scene_path, "fade")
 	else:
-		SceneManager.change_scene(game_scene_path, "instant")
+		SceneManager.change_scene(intro_scene_path, "instant")
 
 func _set_audio_volume(volume: float):
 	"""Helper function for smooth audio volume changes"""

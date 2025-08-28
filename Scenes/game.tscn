@@ -15,7 +15,7 @@
 [ext_resource type="Script" path="res://scripts/ui_feedback.gd" id="11_ui"]
 [ext_resource type="Script" path="res://scripts/game_manager.gd" id="12_gm"]
 [ext_resource type="PackedScene" uid="uid://gdoloxvu6nf3" path="res://scenes/energy_morale_ui.tscn" id="13_energy_ui"]
-[ext_resource type="FontFile" uid="uid://kcdyir8efr7o" path="res://font/Bangers-Regular.ttf" id="14_b8rty"]
+[ext_resource type="FontFile" uid="uid://kcdyir8efr7o" path="res://fonts/Bangers-Regular.ttf" id="14_b8rty"]
 
 [node name="Game" type="Node" groups=["game_area"]]
 script = ExtResource("12_gm")
@@ -53,7 +53,7 @@ difficulty_spawn_rate_multiplier = 1.5
 eagle_reference = NodePath("../../Eagle")
 
 [node name="Eagle" parent="." instance=ExtResource("1_ek57t")]
-position = Vector2(755, 395)
+position = Vector2(667, 395)
 energy_loss_per_flap = 1.0
 disable_passive_energy_loss = true
 
@@ -100,6 +100,13 @@ mouse_filter = 2
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 layer = 20
 
+[node name="UIFeedback" type="Node" parent="CanvasLayer"]
+script = ExtResource("11_ui")
+nest_spawner_path = NodePath("../../Spawners/NestSpawner")
+eagle_path = NodePath("../../Eagle")
+nest_notice_label_path = NodePath("../NestNotice")
+morale_pop_label_path = NodePath("../MoralePopContainer")
+
 [node name="StateLabel" type="Label" parent="CanvasLayer"]
 offset_right = 40.0
 offset_bottom = 23.0
@@ -141,24 +148,35 @@ text = "Nest ahead!"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="MoralePop" type="Label" parent="CanvasLayer"]
-offset_left = 650.0
-offset_top = 30.0
-offset_right = 1270.0
-offset_bottom = 120.0
-theme_override_font_sizes/font_size = 48
-text = "Morale +10"
+[node name="EnergyMoraleUI" parent="CanvasLayer" instance=ExtResource("13_energy_ui")]
+
+[node name="MoralePopContainer" type="HBoxContainer" parent="CanvasLayer"]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -197.0
+offset_top = 72.0
+offset_right = 197.0
+offset_bottom = 124.0
+grow_horizontal = 2
+theme_override_constants/separation = 30
+
+[node name="Label" type="Label" parent="CanvasLayer/MoralePopContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("14_b8rty")
+theme_override_font_sizes/font_size = 40
+text = "Chicks gonna die"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="UIFeedback" type="Node" parent="CanvasLayer"]
-script = ExtResource("11_ui")
-nest_spawner_path = NodePath("../../Spawners/NestSpawner")
-eagle_path = NodePath("../../Eagle")
-nest_notice_label_path = NodePath("../NestNotice")
-morale_pop_label_path = NodePath("../MoralePop")
-
-[node name="EnergyMoraleUI" parent="CanvasLayer" instance=ExtResource("13_energy_ui")]
+[node name="MoralePop" type="Label" parent="CanvasLayer/MoralePopContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.827451, 0.0627451, 0.0784314, 0.74902)
+theme_override_fonts/font = ExtResource("14_b8rty")
+theme_override_font_sizes/font_size = 40
+text = "-Morale"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="Container" type="BoxContainer" parent="CanvasLayer"]
 visible = false
@@ -181,12 +199,10 @@ vertical_alignment = 1
 
 [node name="EmbientSound" type="Node2D" parent="."]
 script = ExtResource("6_gwv1y")
-additional_wind_volume = -20.0
 
 [node name="BaseWind" type="AudioStreamPlayer2D" parent="EmbientSound"]
 stream = ExtResource("6_rxhl4")
 volume_db = -15.0
-autoplay = true
 
 [node name="AdditionalWind" type="AudioStreamPlayer2D" parent="EmbientSound"]
 stream = ExtResource("8_jjn0q")

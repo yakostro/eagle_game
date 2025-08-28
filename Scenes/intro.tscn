@@ -1,0 +1,89 @@
+[gd_scene load_steps=4 format=3 uid="uid://c16kqiidsry0i"]
+
+[ext_resource type="Script" path="res://scripts/intro_scene.gd" id="1_intro_scene"]
+[ext_resource type="FontFile" uid="uid://kcdyir8efr7o" path="res://fonts/Bangers-Regular.ttf" id="2_u20na"]
+[ext_resource type="AudioStream" uid="uid://bqakjlnmlc3x4" path="res://sounds/wind/wind2.ogg" id="3_po6ox"]
+
+[node name="Intro" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_intro_scene")
+first_label_delay = 0.0
+second_label_delay = 3.0
+label_fade_duration = 1.2
+total_scene_duration = 8.0
+first_label_path = NodePath("UILayer/UIContainer/FirstLabel")
+second_label_path = NodePath("UILayer/UIContainer/SecondLabel")
+intro_music_path = NodePath("")
+
+[node name="BackgroundLayer" type="CanvasLayer" parent="."]
+layer = -10
+
+[node name="BackgroundRect" type="ColorRect" parent="BackgroundLayer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="UILayer" type="CanvasLayer" parent="."]
+layer = 10
+
+[node name="UIContainer" type="Control" parent="UILayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="FirstLabel" type="Label" parent="UILayer/UIContainer"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -400.0
+offset_top = -100.0
+offset_right = 400.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_fonts/font = ExtResource("2_u20na")
+theme_override_font_sizes/font_size = 40
+text = "Once there were many."
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SecondLabel" type="Label" parent="UILayer/UIContainer"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -400.0
+offset_top = -22.0
+offset_right = 400.0
+offset_bottom = 58.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.901961, 0.901961, 0.901961, 1)
+theme_override_fonts/font = ExtResource("2_u20na")
+theme_override_font_sizes/font_size = 40
+text = "Now the future of his kind depends on his flight."
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AudioController" type="Node" parent="."]
+
+[node name="IntroWind" type="AudioStreamPlayer" parent="AudioController"]
+stream = ExtResource("3_po6ox")
+autoplay = true

@@ -11,6 +11,11 @@ extends Node
 @export var max_interval: float = 20.0   # Maximum time between additional wind plays
 @export var fade_duration: float = 1.5   # Fade in/out time for additional wind
 
+# Scene start fade-in configuration
+@export_group("Scene Start Settings")
+@export var scene_start_fade_duration: float = 2.0  # Fade-in duration when scene starts
+@export var enable_scene_start_fade: bool = true    # Enable/disable scene start fade-in
+
 # Additional wind segment configuration  
 @export var min_segment_duration: float = 5.0   # Minimum segment length
 @export var max_segment_duration: float = 12.0   # Maximum segment length
@@ -18,6 +23,7 @@ extends Node
 # Internal variables
 var additional_wind_timer: Timer
 var fade_tween: Tween
+var scene_start_tween: Tween
 var additional_wind_audio_length: float = 0.0
 
 func _ready():
@@ -28,13 +34,14 @@ func _ready():
 		print("BaseWind node found")
 		if base_wind.stream:
 			print("BaseWind stream found: ", base_wind.stream)
-			base_wind.volume_db = -5.0  # Temporary: louder volume for testing
+			
 			# Set loop for base wind (should be AudioStreamOggVorbis which supports loop)
 			if base_wind.stream.has_method("set_loop"):
 				base_wind.stream.set_loop(true)
 				print("Set loop to true for base wind")
-			base_wind.play()
-			print("BaseWind started playing")
+			
+			# Start base wind with fade-in effect
+			_start_base_wind_with_fade_in()
 		else:
 			print("ERROR: BaseWind has no stream assigned!")
 	else:
@@ -69,6 +76,33 @@ func _ready():
 	
 	print("Wind mixer setup complete")
 
+func _start_base_wind_with_fade_in():
+	"""Start the base wind with a smooth fade-in effect"""
+	if not base_wind or not base_wind.stream:
+		return
+	
+	if enable_scene_start_fade:
+		print("Starting base wind with ", scene_start_fade_duration, "s fade-in...")
+		
+		# Start playing but at silent volume
+		base_wind.volume_db = -80.0  # Very quiet to start
+		base_wind.play()
+		
+		# Create fade-in tween
+		scene_start_tween = create_tween()
+		scene_start_tween.tween_property(base_wind, "volume_db", base_wind_volume, scene_start_fade_duration)
+		scene_start_tween.tween_callback(_on_base_wind_fade_in_complete)
+	else:
+		# Start immediately at full volume
+		print("Starting base wind immediately at full volume...")
+		base_wind.volume_db = base_wind_volume
+		base_wind.play()
+		_on_base_wind_fade_in_complete()
+
+func _on_base_wind_fade_in_complete():
+	"""Called when the base wind fade-in is complete"""
+	print("BaseWind fade-in complete. Final volume: ", base_wind.volume_db, "dB")
+
 func _play_additional_wind_segment():
 	"""Play a random segment of the additional wind sound"""
 	print("=== Additional wind segment triggered ===")
@@ -93,7 +127,7 @@ func _play_additional_wind_segment():
 		print("Playing segment from ", start_time, " to ", start_time + segment_duration, " seconds")
 	
 	# Set volume and start playing
-	additional_wind.volume_db = -5.0  # Temporary: louder volume for testing
+	additional_wind.volume_db = -80.0  # Start silent for fade-in
 	additional_wind.play()
 	
 	# Seek to position after starting playback
@@ -131,7 +165,11 @@ func set_base_wind_volume(volume: float):
 	"""Set the volume of the base wind"""
 	base_wind_volume = volume
 	if base_wind:
-		base_wind.volume_db = volume
+		# Only set immediately if not currently fading in
+		if not scene_start_tween or not scene_start_tween.is_valid():
+			base_wind.volume_db = volume
+		else:
+			print("Base wind volume change deferred - fade-in in progress")
 
 func set_additional_wind_volume(volume: float):
 	"""Set the volume of the additional wind"""
