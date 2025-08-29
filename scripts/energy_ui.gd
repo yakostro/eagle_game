@@ -1,20 +1,20 @@
 extends Control
-class_name EnergyMoraleUI
+class_name EnergyUI
 
-## Energy/Morale UI Controller
-## Manages unified progress bar showing energy (purple), energy loss feedback (white), and morale capacity lock (gray)
+## Energy UI Controller
+## Manages unified progress bar showing energy (purple), energy loss feedback (white), and energy capacity lock (gray)
 
 # Node references using NodePath (following project pattern)
 @export var energy_icon_path: NodePath = "Container/EnergyIcon"
 @export var energy_progress_bar_path: NodePath = "Container/ProgressBarContainer/EnergyProgressBar"
 @export var energy_loss_feedback_path: NodePath = "Container/ProgressBarContainer/EnergyLossFeedback"
-@export var morale_lock_path: NodePath = "Container/ProgressBarContainer/MoraleLock"
+@export var capacity_lock_path: NodePath = "Container/ProgressBarContainer/MoraleLock"
 
 # Tweakable parameters for game balancing
 @export_group("Visual Configuration")
 @export var energy_color: Color = Color(0.6, 0.3, 0.8, 1.0)  # Purple
 @export var energy_loss_feedback_color: Color = Color(1.0, 1.0, 1.0, 0.8)  # White
-@export var morale_lock_color: Color = Color(0.4, 0.4, 0.4, 0.3)  # Gray (subtle background for pattern)
+@export var capacity_lock_color: Color = Color(0.4, 0.4, 0.4, 0.3)  # Gray (subtle background for pattern)
 @export var background_color: Color = Color(0.2, 0.2, 0.2, 0.8)  # Dark gray background
 @export var diagonal_pattern_texture: Texture2D = preload("res://sprites/ui/diagonal_pattern.png")  # Disabled pattern
 @export var energy_loss_feedback_duration: float = 0.5  # How long white flash lasts
@@ -28,11 +28,11 @@ class_name EnergyMoraleUI
 @onready var energy_icon: TextureRect = get_node(energy_icon_path)
 @onready var energy_progress_bar: ProgressBar = get_node(energy_progress_bar_path)
 @onready var energy_loss_feedback: ProgressBar = get_node(energy_loss_feedback_path)
-@onready var morale_lock: ColorRect = get_node(morale_lock_path)
+@onready var capacity_lock: ColorRect = get_node(capacity_lock_path)
 
 # Current state tracking
 var current_energy_percent: float = 100.0
-var current_morale_percent: float = 100.0
+var current_capacity_percent: float = 100.0
 var max_available_energy_capacity: float = 100.0
 
 # Animation tweener
@@ -43,14 +43,19 @@ var feedback_tween: Tween
 @onready var eagle: Eagle = get_node(eagle_path)
 
 func _ready():
+	print("🎮 EnergyUI _ready() called")
 	setup_ui_elements()
 	create_lightning_icon()
 	
 	# Connect to eagle signals for real-time updates
 	connect_to_eagle_signals()
+	
+	# Debug: Print initial values
+	print("🎮 Initial energy percent: ", current_energy_percent)
+	print("🎮 Initial capacity percent: ", current_capacity_percent)
 
 func connect_to_eagle_signals():
-	"""Connect UI to eagle's energy and morale systems"""
+	"""Connect UI to eagle's energy and energy capacity systems"""
 	if eagle == null:
 		eagle = get_node_or_null(eagle_path)
 	
@@ -59,29 +64,29 @@ func connect_to_eagle_signals():
 		eagle = get_tree().current_scene.find_child("Eagle", true, false) as Eagle
 	
 	if eagle != null:
-		# Connect to morale changes
-		if not eagle.morale_changed.is_connected(_on_eagle_morale_changed):
-			eagle.morale_changed.connect(_on_eagle_morale_changed)
+		# Connect to energy capacity changes
+		if not eagle.energy_capacity_changed.is_connected(_on_eagle_energy_capacity_changed):
+			eagle.energy_capacity_changed.connect(_on_eagle_energy_capacity_changed)
 		
 		# Set initial values from eagle
 		var initial_energy = (eagle.current_energy / eagle.max_energy) * 100.0
-		var initial_morale = (eagle.current_morale / eagle.max_morale) * 100.0
+		var initial_capacity = eagle.get_energy_capacity_percentage() * 100.0
 		
 		set_energy_percent_direct(initial_energy)
-		set_morale_percent_direct(initial_morale)
+		set_capacity_percent_direct(initial_capacity)
 		
-		print("✅ EnergyMoraleUI connected to eagle signals")
+		print("✅ EnergyUI connected to eagle signals")
 		print("   Initial Energy: ", initial_energy, "%")
-		print("   Initial Morale: ", initial_morale, "%")
+		print("   Initial Capacity: ", initial_capacity, "%")
 	else:
 		print("❌ Warning: Could not find Eagle to connect UI signals")
 
 ## Signal handlers for eagle integration
 
-func _on_eagle_morale_changed(new_morale: float):
-	"""Called when eagle's morale changes"""
-	var morale_percent = (new_morale / eagle.max_morale) * 100.0
-	set_morale_percent_direct(morale_percent)
+func _on_eagle_energy_capacity_changed(_new_max_energy: float):
+	"""Called when eagle's energy capacity changes"""
+	var capacity_percent = eagle.get_energy_capacity_percentage() * 100.0
+	set_capacity_percent_direct(capacity_percent)
 
 func _physics_process(_delta):
 	"""Update energy display each frame (since energy changes continuously)"""
@@ -102,19 +107,19 @@ func set_energy_percent_direct(new_energy_percent: float):
 	
 	update_energy_display()
 
-func set_morale_percent_direct(new_morale_percent: float):
-	"""Update morale level without UI feedback, affects energy capacity"""
-	current_morale_percent = clamp(new_morale_percent, 0.0, 100.0)
+func set_capacity_percent_direct(new_capacity_percent: float):
+	"""Update energy capacity level without UI feedback, affects energy capacity"""
+	current_capacity_percent = clamp(new_capacity_percent, 0.0, 100.0)
 	
-	# Morale affects maximum available energy capacity
-	max_available_energy_capacity = current_morale_percent
+	# Capacity affects maximum available energy capacity
+	max_available_energy_capacity = current_capacity_percent
 	
 	# If current energy exceeds new capacity, clamp it
 	if current_energy_percent > max_available_energy_capacity:
 		current_energy_percent = max_available_energy_capacity
 	
 	update_energy_display()
-	update_morale_capacity_display()
+	update_capacity_display()
 
 func setup_ui_elements():
 	"""Configure the UI elements with exported parameters"""
@@ -128,21 +133,27 @@ func setup_ui_elements():
 	
 	# Initialize values
 	update_energy_display()
-	update_morale_capacity_display()
+	update_capacity_display()
 	
 	# Create diagonal pattern overlay
 	create_diagonal_pattern_overlay()
 
 func apply_progress_bar_colors():
 	"""Apply colors to progress bars using theme overrides"""
+	print("🎨 Applying progress bar colors...")
+	
 	# Energy progress bar (purple)
 	energy_progress_bar.add_theme_color_override("font_color", energy_color)
 	energy_progress_bar.add_theme_color_override("font_outline_color", Color.BLACK)
 	energy_progress_bar.add_theme_constant_override("outline_size", 1)
 	
-	# Create a StyleBoxFlat for the progress fill
+	# Create a StyleBoxFlat for the progress fill without border
 	var energy_style = StyleBoxFlat.new()
 	energy_style.bg_color = energy_color
+	energy_style.border_width_left = 0
+	energy_style.border_width_right = 0
+	energy_style.border_width_top = 0
+	energy_style.border_width_bottom = 0
 	energy_progress_bar.add_theme_stylebox_override("fill", energy_style)
 	
 	# Energy loss feedback (white)
@@ -150,17 +161,24 @@ func apply_progress_bar_colors():
 	feedback_style.bg_color = energy_loss_feedback_color
 	energy_loss_feedback.add_theme_stylebox_override("fill", feedback_style)
 	
-	# Morale lock (gray) - ColorRect just needs its color set
-	morale_lock.color = morale_lock_color
+	# Capacity lock (gray) - ColorRect just needs its color set
+	capacity_lock.color = capacity_lock_color
 	
-	# Set background for progress bars
+	# Set background for progress bars with borders
 	var bg_style = StyleBoxFlat.new()
 	bg_style.bg_color = background_color
+	bg_style.border_width_left = 1
+	bg_style.border_width_right = 1
+	bg_style.border_width_top = 1
+	bg_style.border_width_bottom = 1
+	bg_style.border_color = Color("#755F27")
 	energy_progress_bar.add_theme_stylebox_override("background", bg_style)
 	energy_loss_feedback.add_theme_stylebox_override("background", bg_style)
+	
+	print("🎨 Progress bar styling complete!")
 
 func create_diagonal_pattern_overlay():
-	"""Create a diagonal pattern overlay for the morale lock area"""
+	"""Create a diagonal pattern overlay for the energy capacity lock area"""
 	var container = get_node("Container/ProgressBarContainer") as Control
 	
 	# Remove any existing diagonal overlay
@@ -169,7 +187,7 @@ func create_diagonal_pattern_overlay():
 		existing_overlay.queue_free()
 	
 	# Only create pattern if there's actually locked capacity
-	var locked_capacity_percent = 100.0 - current_morale_percent
+	var locked_capacity_percent = 100.0 - current_capacity_percent
 	if locked_capacity_percent <= 0:
 		return
 	
@@ -179,13 +197,13 @@ func create_diagonal_pattern_overlay():
 	pattern_overlay.texture = diagonal_pattern_texture
 	pattern_overlay.stretch_mode = TextureRect.STRETCH_TILE
 	
-	# Position it exactly like the morale lock ColorRect
+	# Position it exactly like the capacity lock ColorRect
 	pattern_overlay.anchor_left = 1.0
 	pattern_overlay.anchor_right = 1.0
 	pattern_overlay.anchor_top = 0.0
 	pattern_overlay.anchor_bottom = 1.0
 	
-	# Calculate the same width as the morale lock
+	# Calculate the same width as the capacity lock
 	var locked_width = bar_width * (locked_capacity_percent / 100.0)
 	pattern_overlay.offset_left = -locked_width
 	pattern_overlay.offset_right = 0.0
@@ -240,18 +258,19 @@ func hide_energy_loss_feedback():
 func update_energy_display():
 	"""Update the main energy progress bar"""
 	energy_progress_bar.value = current_energy_percent
+	print("🔋 Energy display updated: ", current_energy_percent, "% (Progress bar value: ", energy_progress_bar.value, ")")
 
-func update_morale_capacity_display():
-	"""Update the gray morale lock area from the right side"""
-	# Calculate locked capacity percentage (100% - morale%)
-	var locked_capacity_percent = 100.0 - current_morale_percent
+func update_capacity_display():
+	"""Update the gray energy capacity lock area from the right side"""
+	# Calculate locked capacity percentage (100% - capacity%)
+	var locked_capacity_percent = 100.0 - current_capacity_percent
 	
 	# Calculate the width of the gray area in pixels
 	var locked_width = bar_width * (locked_capacity_percent / 100.0)
 	
 	# Position the ColorRect from the right side
 	# Since it's anchored to the right (anchor_left = 1.0), we use negative offset_left
-	morale_lock.offset_left = -locked_width
+	capacity_lock.offset_left = -locked_width
 	
 	# Update diagonal pattern overlay
 	create_diagonal_pattern_overlay()
@@ -261,8 +280,8 @@ func update_morale_capacity_display():
 func get_current_energy_percent() -> float:
 	return current_energy_percent
 
-func get_current_morale_percent() -> float:
-	return current_morale_percent
+func get_current_capacity_percent() -> float:
+	return current_capacity_percent
 
 func get_max_available_capacity() -> float:
 	return max_available_energy_capacity

@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://bvfc1tl8ttpuo"]
+[gd_scene load_steps=18 format=3 uid="uid://bvfc1tl8ttpuo"]
 
 [ext_resource type="PackedScene" uid="uid://cd42djg346oqy" path="res://scenes/eagle.tscn" id="1_ek57t"]
 [ext_resource type="PackedScene" uid="uid://bfhkdj8w2yaqr" path="res://scenes/parallax_background.tscn" id="1_parallax"]
@@ -15,6 +15,7 @@
 [ext_resource type="Script" path="res://scripts/ui_feedback.gd" id="11_ui"]
 [ext_resource type="Script" path="res://scripts/game_manager.gd" id="12_gm"]
 [ext_resource type="PackedScene" uid="uid://gdoloxvu6nf3" path="res://scenes/energy_morale_ui.tscn" id="13_energy_ui"]
+[ext_resource type="Texture2D" uid="uid://dpknf11oje66e" path="res://sprites/ui/diagonal_pattern_2.png" id="13_qmlep"]
 [ext_resource type="FontFile" uid="uid://kcdyir8efr7o" path="res://fonts/Bangers-Regular.ttf" id="14_b8rty"]
 
 [node name="Game" type="Node" groups=["game_area"]]
@@ -108,6 +109,7 @@ nest_notice_label_path = NodePath("../NestNotice")
 morale_pop_duration = 2.0
 
 [node name="EnergyMoraleUI" parent="CanvasLayer" instance=ExtResource("13_energy_ui")]
+diagonal_pattern_texture = ExtResource("13_qmlep")
 
 [node name="StateLabel" type="Label" parent="CanvasLayer"]
 offset_right = 40.0

@@ -18,12 +18,10 @@ const MovementState = BaseMovementController.MovementState
 @export var energy_loss_per_flap: float = 3.0  # Energy lost per flap in flappy mode
 @export var disable_passive_energy_loss: bool = false  # For flappy bird mode
 
-# Morale system variables
-@export var max_morale: float = 100.0
-@export var morale_loss_per_nest: float = 15.0  # Morale lost when nest goes off screen
-@export var morale_gain_per_fed_nest: float = 20.0  # Morale gained when nest is fed
-@export var min_energy_loss_multiplier: float = 1.0  # Energy loss multiplier at max morale
-@export var max_energy_loss_multiplier: float = 3.0  # Energy loss multiplier at 0 morale
+# Energy capacity system variables (replaces morale system)
+@export var energy_loss_per_nest_miss: float = 15.0  # Energy capacity lost when nest goes off screen
+@export var energy_gain_per_nest_fed: float = 20.0  # Energy capacity gained when nest is fed
+@export var initial_max_energy: float = 100.0  # Starting max energy capacity
 
 # Hit system variables
 @export var hit_energy_loss: float = 20.0  # Energy lost when hitting an obstacle
@@ -37,7 +35,6 @@ var animation_controller: EagleAnimationController
 
 # Energy and fish tracking
 var current_energy: float = 100.0
-var current_morale: float = 100.0  # Start with max morale
 var carried_fish: Fish = null  # Reference to the carried fish object
 
 # Hit system state tracking
@@ -54,13 +51,16 @@ var max_hit_state_duration: float = 1.0  # Maximum time allowed in hit state
 # Signals - movement_state_changed is now handled by movement controller
 signal screech_requested()
 signal fish_caught_changed(has_fish: bool)  # Signal when fish carrying state changes
-signal morale_changed(new_morale: float)  # Signal when morale changes
+signal energy_capacity_changed(new_max_energy: float)  # Signal when energy capacity changes
 signal eagle_died()  # Signal when eagle dies from energy depletion
 signal eagle_hit()  # Signal when eagle gets hit by an obstacle
 
 func _ready():
 	print("Eagle ready! Node name: ", name)
 	print("animated_sprite reference: ", animated_sprite)
+	
+	# Initialize energy capacity system
+	initial_max_energy = max_energy  # Store initial max energy
 	
 	# Add eagle to group so enemies can find it
 	add_to_group("eagle")
@@ -109,10 +109,10 @@ func _physics_process(delta):
 func _unhandled_input(event):
 	"""Handle debug input for testing"""
 	if event is InputEventKey and event.pressed:
-		# DEBUG: M key to decrease morale (for testing diagonal pattern)
+		# DEBUG: M key to decrease energy capacity (for testing diagonal pattern)
 		if event.keycode == KEY_M:
-			print("DEBUG: Manual morale decrease triggered!")
-			lose_morale(15.0)
+			print("DEBUG: Manual energy capacity decrease triggered!")
+			reduce_energy_capacity(15.0)
 			get_viewport().set_input_as_handled()
 
 # Fish management methods
@@ -134,10 +134,9 @@ func eat_fish():
 		# Use the fish's energy value instead of fixed amount
 		var energy_gained = carried_fish.energy_value
 		
-		# Respect morale-based capacity limits
-		var max_capacity = get_effective_max_energy()
-		current_energy = min(current_energy + energy_gained, max_capacity)
-		print("Energy gained from fish: ", energy_gained, " (Total energy: ", current_energy, "/", max_capacity, ")")
+		# Respect current max energy capacity limits
+		current_energy = min(current_energy + energy_gained, max_energy)
+		print("Energy gained from fish: ", energy_gained, " (Total energy: ", current_energy, "/", max_energy, ")")
 		carried_fish.queue_free()  # Remove the fish from scene
 		carried_fish = null
 		fish_caught_changed.emit(false)
@@ -158,65 +157,53 @@ func has_fish() -> bool:
 	"""Returns true if eagle is carrying a fish"""
 	return carried_fish != null
 
-# Morale management methods
-func lose_morale(amount: float):
-	"""Called when the eagle loses morale (e.g., nest goes off screen)"""
-	var old_morale = current_morale
-	current_morale = max(current_morale - amount, 0.0)  # Can't go below 0
+# Energy capacity management methods
+func reduce_energy_capacity(amount: float):
+	"""Called when the eagle loses energy capacity (e.g., nest goes off screen)"""
+	var old_max_energy = max_energy
+	max_energy = max(max_energy - amount, 0.0)  # Can't go below 0
 	
-	if old_morale != current_morale:
-		print("Eagle lost morale: ", amount, " (Current: ", current_morale, ")")
+	if old_max_energy != max_energy:
+		print("Eagle lost energy capacity: ", amount, " (Current max: ", max_energy, ")")
 		
-		# When morale decreases, energy capacity shrinks - clamp energy if needed
-		var new_max_energy = get_effective_max_energy()
-		if current_energy > new_max_energy:
-			current_energy = new_max_energy
-			print("Energy clamped to new capacity: ", current_energy, "/", new_max_energy)
+		# When max energy decreases, clamp current energy if needed
+		if current_energy > max_energy:
+			current_energy = max_energy
+			print("Energy clamped to new capacity: ", current_energy, "/", max_energy)
 		
-		morale_changed.emit(current_morale)
+		energy_capacity_changed.emit(max_energy)
 
-func gain_morale(amount: float):
-	"""Called when the eagle gains morale (e.g., feeds a nest)"""
-	var old_morale = current_morale
-	current_morale = min(current_morale + amount, max_morale)
+func restore_energy_capacity(amount: float):
+	"""Called when the eagle gains energy capacity (e.g., feeds a nest)"""
+	var old_max_energy = max_energy
+	max_energy = min(max_energy + amount, initial_max_energy)  # Can't exceed initial capacity
 	
-	if old_morale != current_morale:
-		print("Eagle gained morale: ", amount, " (Current: ", current_morale, ")")
+	if old_max_energy != max_energy:
+		print("Eagle gained energy capacity: ", amount, " (Current max: ", max_energy, ")")
 		
-		# When morale increases, energy capacity increases (but don't auto-fill energy)
-		var new_max_energy = get_effective_max_energy()
-		print("Energy capacity increased to: ", new_max_energy, " (Current energy: ", current_energy, ")")
+		# When max energy increases, current energy stays the same (don't auto-fill)
+		print("Energy capacity increased to: ", max_energy, " (Current energy: ", current_energy, ")")
 		
-		morale_changed.emit(current_morale)
+		energy_capacity_changed.emit(max_energy)
 
-func get_current_morale() -> float:
-	"""Returns current morale value"""
-	return current_morale
-
-func get_morale_percentage() -> float:
-	"""Returns morale as a percentage (0.0 to 1.0)"""
-	return current_morale / max_morale
-
-func get_effective_max_energy() -> float:
-	"""Returns maximum energy capacity based on current morale"""
-	# Morale directly affects energy capacity (100% morale = 100% capacity)
-	var morale_percentage = get_morale_percentage()
-	return max_energy * morale_percentage
+func get_energy_capacity_percentage() -> float:
+	"""Returns energy capacity as a percentage (0.0 to 1.0) relative to initial capacity"""
+	return max_energy / initial_max_energy
 
 # Nest interaction methods
 func on_nest_fed(points: int = 0):
 	"""Called when a nest is successfully fed with a fish"""
 	# Use the points from nest if provided, otherwise use eagle's default value
-	var morale_to_gain: float = float(points) if points > 0 else morale_gain_per_fed_nest
-	gain_morale(morale_to_gain)
-	print("Nest fed! Eagle gained ", morale_to_gain, " morale points.")
+	var energy_to_gain: float = float(points) if points > 0 else energy_gain_per_nest_fed
+	restore_energy_capacity(energy_to_gain)
+	print("Nest fed! Eagle gained ", energy_to_gain, " energy capacity.")
 
 func on_nest_missed(points: int = 0):
 	"""Called when a nest goes off screen without being fed"""
 	# Use the points from nest if provided, otherwise use eagle's default value
-	var morale_to_lose: float = float(points) if points > 0 else morale_loss_per_nest
-	lose_morale(morale_to_lose)
-	print("Nest missed! Eagle lost ", morale_to_lose, " morale points.")
+	var energy_to_lose: float = float(points) if points > 0 else energy_loss_per_nest_miss
+	reduce_energy_capacity(energy_to_lose)
+	print("Nest missed! Eagle lost ", energy_to_lose, " energy capacity.")
 
 # Hit system methods
 func hit_by_obstacle():
@@ -384,13 +371,8 @@ func update_energy(delta):
 	"""Update eagle's energy over time"""
 	# Only lose energy passively if not in flappy mode
 	if not disable_passive_energy_loss:
-		# Calculate energy loss multiplier based on morale (lower morale = faster energy loss)
-		var morale_percentage = get_morale_percentage()
-		var energy_loss_multiplier = lerp(max_energy_loss_multiplier, min_energy_loss_multiplier, morale_percentage)
-		
-		# Lose energy over time (faster if low morale)
-		var actual_energy_loss = energy_loss_per_second * energy_loss_multiplier * delta
-		current_energy -= actual_energy_loss
+		# Simple fixed energy loss over time
+		current_energy -= energy_loss_per_second * delta
 		current_energy = max(current_energy, 0.0)
 	
 	# Check for death condition
@@ -478,6 +460,6 @@ func update_UI():
 	if is_immune:
 		state_label.text += " [IMMUNE]"
 	
-	# Add energy and morale to UI
-	state_label.text += " Energy: " + str(int(current_energy))
-	state_label.text += " | Morale: " + str(int(current_morale))
+	# Add energy and capacity to UI
+	state_label.text += " Energy: " + str(int(current_energy)) + "/" + str(int(max_energy))
+	state_label.text += " | Capacity: " + str(int(get_energy_capacity_percentage() * 100)) + "%"

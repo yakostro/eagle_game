@@ -117,10 +117,10 @@ func spawn_nest_on_obstacle(obstacle: BaseObstacle):
 		nest.position = Vector2(0, 20)
 		print("   🏠 Warning: No NestPlaceholder found, using default position")
 	
-	# Connect nest signals to eagle's morale methods
+	# Connect nest signals to eagle's energy capacity methods
 	nest.nest_fed.connect(eagle_reference.on_nest_fed)
 	nest.nest_missed.connect(eagle_reference.on_nest_missed)
-	print("   🔗 Connected nest signals to eagle morale system")
+	print("   🔗 Connected nest signals to eagle energy capacity system")
 
 	# Notify UI or other systems that a nest has spawned
 	nest_spawned.emit(nest)

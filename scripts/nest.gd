@@ -8,8 +8,8 @@ enum NestState {
 	FED
 }
 
-@export var moral_points_gain: int = 25  # Points gained when feeding nest
-@export var moral_points_loss: int = 10   # Points lost when nest goes off-screen
+@export var energy_capacity_gain: int = 25  # Energy capacity gained when feeding nest
+@export var energy_capacity_loss: int = 10   # Energy capacity lost when nest goes off-screen
 
 var current_state: NestState = NestState.HUNGRY
 var animation_player: AnimatedSprite2D
@@ -52,7 +52,7 @@ func _process(_delta):
 		# We emit when the nest itself crosses the left edge of the screen
 		if global_position.x < 0:  # Nest has gone off the left side of screen
 			print("Nest missed - going off screen at position: ", global_position.x)
-			nest_missed.emit(moral_points_loss)
+			nest_missed.emit(energy_capacity_loss)
 			has_emitted_missed = true
 
 func set_state(new_state: NestState):
@@ -114,8 +114,8 @@ func feed_nest(fish):
 	else:
 		print("Warning: Could not find Sprite2D in fish to display in nest")
 	
-	# Emit signal for eagle to increase moral points
-	nest_fed.emit(moral_points_gain)
+	# Emit signal for eagle to increase energy capacity
+	nest_fed.emit(energy_capacity_gain)
 	
 	# Tell fish to handle its own cleanup
 	fish.feed_to_nest()
