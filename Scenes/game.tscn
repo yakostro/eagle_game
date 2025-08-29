@@ -107,6 +107,8 @@ eagle_path = NodePath("../../Eagle")
 nest_notice_label_path = NodePath("../NestNotice")
 morale_pop_duration = 2.0
 
+[node name="EnergyMoraleUI" parent="CanvasLayer" instance=ExtResource("13_energy_ui")]
+
 [node name="StateLabel" type="Label" parent="CanvasLayer"]
 offset_right = 40.0
 offset_bottom = 23.0
@@ -137,18 +139,16 @@ H- screech"
 
 [node name="NestNotice" type="Label" parent="CanvasLayer"]
 visible = false
-offset_left = 797.0
-offset_top = 63.0
-offset_right = 1123.0
-offset_bottom = 113.0
-theme_override_colors/font_color = Color(0.9976, 0.971488, 0.919254, 0.784314)
+offset_left = 822.0
+offset_top = 55.0
+offset_right = 1148.0
+offset_bottom = 105.0
+theme_override_colors/font_color = Color(0.890196, 0.866667, 0.909804, 1)
 theme_override_fonts/font = ExtResource("14_b8rty")
-theme_override_font_sizes/font_size = 40
+theme_override_font_sizes/font_size = 32
 text = "Nest ahead!"
 horizontal_alignment = 1
 vertical_alignment = 1
-
-[node name="EnergyMoraleUI" parent="CanvasLayer" instance=ExtResource("13_energy_ui")]
 
 [node name="MoralePopContainer" type="HBoxContainer" parent="CanvasLayer"]
 anchors_preset = 5

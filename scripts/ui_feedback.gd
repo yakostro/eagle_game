@@ -2,16 +2,28 @@ extends Node
 
 class_name UIFeedback
 
+# Message types for the queue system
+enum MessageType {
+	NEST_INCOMING,
+	MORALE_NEGATIVE
+}
+
 # Export NodePaths for robust wiring without relying on global class parsing
 @export var nest_spawner_path: NodePath
 @export var eagle_path: NodePath
 @export var nest_notice_label_path: NodePath
 @export var morale_pop_container_path: NodePath
+
+# Message timing configuration
 @export var nest_notice_duration: float = 1.5
 @export var morale_pop_duration: float = 1.2
+@export var inter_message_delay: float = 0.7  # Delay between messages
 
-var _nest_timer: Timer
-var _morale_timer: Timer
+# Message queue system variables
+var message_queue: Array[Dictionary] = []
+var current_message: Dictionary = {}
+var is_showing_message: bool = false
+var _message_timer: Timer
 var _previous_morale: float = -1.0
 
 var nest_spawner: Node
@@ -45,22 +57,34 @@ func _ready():
 	if morale_pop_container:
 		morale_pop_container.visible = false
 
-	_nest_timer = Timer.new()
-	_nest_timer.one_shot = true
-	add_child(_nest_timer)
-	_nest_timer.timeout.connect(_hide_nest_notice)
+	# Setup unified message timer
+	_message_timer = Timer.new()
+	_message_timer.one_shot = true
+	add_child(_message_timer)
+	_message_timer.timeout.connect(_on_message_timer_timeout)
+	
+	# Start processing message queue
+	_process_message_queue()
 
-	_morale_timer = Timer.new()
-	_morale_timer.one_shot = true
-	add_child(_morale_timer)
-	_morale_timer.timeout.connect(_hide_morale_pop)
+func _unhandled_input(event):
+	"""Handle debug input for testing message queue"""
+	if event is InputEventKey and event.pressed:
+		# DEBUG: U key to test morale UI message
+		if event.keycode == KEY_U:
+			print("DEBUG: Manual morale UI message triggered!")
+			_add_message_to_queue(MessageType.MORALE_NEGATIVE)
+			get_viewport().set_input_as_handled()
+		# DEBUG: I key to test nest UI message  
+		elif event.keycode == KEY_I:
+			print("DEBUG: Manual nest UI message triggered!")
+			_add_message_to_queue(MessageType.NEST_INCOMING)
+			get_viewport().set_input_as_handled()
 
 func _on_nest_incoming(_remaining: int):
+	"""Queue nest incoming message instead of showing directly"""
 	if not nest_notice_label:
 		return
-	nest_notice_label.text = "Nest ahead!"
-	nest_notice_label.visible = true
-	_nest_timer.start(nest_notice_duration)
+	_add_message_to_queue(MessageType.NEST_INCOMING)
 
 func _hide_nest_notice():
 	if nest_notice_label:
@@ -76,19 +100,10 @@ func _on_nest_spawned(nest: Node):
 		nest.nest_missed.connect(_on_nest_missed)
 
 func _on_nest_missed(_points: int = 0):
-	"""Called when a nest goes off screen without being fed"""
+	"""Queue morale negative message instead of showing directly"""
 	if not morale_pop_container:
 		return
-	
-	# Set text for both labels
-	if chicks_label:
-		chicks_label.text = "Chicks gonna die"
-	if morale_label:
-		morale_label.text = "-Morale"
-	
-	# Show the container
-	morale_pop_container.visible = true
-	_morale_timer.start(morale_pop_duration)
+	_add_message_to_queue(MessageType.MORALE_NEGATIVE)
 
 func _on_morale_changed(new_morale: float):
 	# Note: The MoralePopContainer is now only used for nest missed feedback
@@ -131,3 +146,88 @@ func _resolve_nodes():
 		morale_label = morale_pop_container.find_child("MoraleLabel", true, false) as Label
 		if not morale_label:
 			morale_label = morale_pop_container.find_child("MoralePop", true, false) as Label
+
+## Message Queue System Methods
+
+func _add_message_to_queue(message_type: MessageType, data: Dictionary = {}):
+	"""Add a message to the queue for sequential display"""
+	var message = {
+		"type": message_type,
+		"data": data
+	}
+	message_queue.append(message)
+	
+	# Start processing if not already busy
+	if not is_showing_message:
+		_process_message_queue()
+
+func _process_message_queue():
+	"""Process the next message in the queue"""
+	if is_showing_message or message_queue.is_empty():
+		return
+	
+	# Get next message
+	current_message = message_queue.pop_front()
+	is_showing_message = true
+	
+	# Show the message
+	_show_current_message()
+
+func _show_current_message():
+	"""Display the current message based on its type"""
+	match current_message.type:
+		MessageType.NEST_INCOMING:
+			_show_nest_notice()
+			_message_timer.start(nest_notice_duration)
+		MessageType.MORALE_NEGATIVE:
+			_show_morale_popup()
+			_message_timer.start(morale_pop_duration)
+
+func _on_message_timer_timeout():
+	"""Called when current message duration ends"""
+	# Hide current message
+	_hide_current_message()
+	
+	# Add inter-message delay before processing next
+	_message_timer.start(inter_message_delay)
+	_message_timer.timeout.disconnect(_on_message_timer_timeout)
+	_message_timer.timeout.connect(_on_delay_timeout)
+
+func _on_delay_timeout():
+	"""Called after inter-message delay ends"""
+	is_showing_message = false
+	
+	# Reconnect to main timeout handler
+	_message_timer.timeout.disconnect(_on_delay_timeout)
+	_message_timer.timeout.connect(_on_message_timer_timeout)
+	
+	# Process next message in queue
+	_process_message_queue()
+
+func _hide_current_message():
+	"""Hide the current message based on its type"""
+	match current_message.type:
+		MessageType.NEST_INCOMING:
+			_hide_nest_notice()
+		MessageType.MORALE_NEGATIVE:
+			_hide_morale_pop()
+
+func _show_nest_notice():
+	"""Show nest incoming notification"""
+	if nest_notice_label:
+		nest_notice_label.text = "Nest ahead!"
+		nest_notice_label.visible = true
+
+func _show_morale_popup():
+	"""Show morale negative feedback"""
+	if not morale_pop_container:
+		return
+	
+	# Set text for both labels
+	if chicks_label:
+		chicks_label.text = "Chicks gonna die"
+	if morale_label:
+		morale_label.text = "-Morale"
+	
+	# Show the container
+	morale_pop_container.visible = true
