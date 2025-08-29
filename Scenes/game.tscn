@@ -15,8 +15,8 @@
 [ext_resource type="Script" path="res://scripts/ui_feedback.gd" id="11_ui"]
 [ext_resource type="Script" path="res://scripts/game_manager.gd" id="12_gm"]
 [ext_resource type="PackedScene" uid="uid://gdoloxvu6nf3" path="res://scenes/energy_morale_ui.tscn" id="13_energy_ui"]
-[ext_resource type="Texture2D" uid="uid://dpknf11oje66e" path="res://sprites/ui/diagonal_pattern_2.png" id="13_qmlep"]
 [ext_resource type="FontFile" uid="uid://kcdyir8efr7o" path="res://fonts/Bangers-Regular.ttf" id="14_b8rty"]
+[ext_resource type="PackedScene" uid="uid://ca4niueilcjwp" path="res://scenes/ui_immediate_text_feedback.tscn" id="15_energy_feedback"]
 
 [node name="Game" type="Node" groups=["game_area"]]
 script = ExtResource("12_gm")
@@ -106,10 +106,13 @@ script = ExtResource("11_ui")
 nest_spawner_path = NodePath("../../Spawners/NestSpawner")
 eagle_path = NodePath("../../Eagle")
 nest_notice_label_path = NodePath("../NestNotice")
+energy_feedback_container_path = NodePath("../UiImmediateTextFeedback/EnergyFeedbackContainer")
+camera_path = NodePath("../../Camera2D")
 morale_pop_duration = 2.0
 
 [node name="EnergyMoraleUI" parent="CanvasLayer" instance=ExtResource("13_energy_ui")]
-diagonal_pattern_texture = ExtResource("13_qmlep")
+
+[node name="UiImmediateTextFeedback" parent="CanvasLayer" instance=ExtResource("15_energy_feedback")]
 
 [node name="StateLabel" type="Label" parent="CanvasLayer"]
 offset_right = 40.0

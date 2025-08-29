@@ -15,6 +15,7 @@ var current_state: NestState = NestState.HUNGRY
 var animation_player: AnimatedSprite2D
 var area_2d: Area2D
 var fish_placeholder: Sprite2D
+var sound_fed: AudioStreamPlayer2D
 var has_emitted_missed: bool = false  # Track if missed signal was already emitted
 
 # Signals
@@ -26,6 +27,7 @@ func _ready():
 	animation_player = get_node("Animation")
 	area_2d = get_node("Area2D")
 	fish_placeholder = get_node("FishPlaceholder")
+	sound_fed = get_node("SoundFed")
 	
 	# Set up collision detection for fish
 	area_2d.collision_layer = 0  # Nest doesn't need to be on a collision layer
@@ -96,6 +98,9 @@ func feed_nest(fish):
 	# Change to fed state
 	set_state(NestState.FED)
 	
+	# Play feeding sound with fade-out
+	play_feeding_sound()
+	
 	# Show fish in placeholder (preserve position, scale, rotation as per GDD)
 	fish_placeholder.visible = true
 	var fish_sprite = fish.get_node("Sprite2D")
@@ -119,3 +124,23 @@ func feed_nest(fish):
 	
 	# Tell fish to handle its own cleanup
 	fish.feed_to_nest()
+
+func play_feeding_sound():
+	"""Play the feeding sound with a 3-second fade-out"""
+	if not sound_fed:
+		print("Warning: SoundFed node not found")
+		return
+	
+	# Reset volume and play sound
+	sound_fed.volume_db = 0  # Start at full volume
+	sound_fed.play()
+	
+	# Create tween for fade-out after 3 seconds
+	var tween = create_tween()
+	tween.tween_interval(3.0)  # Wait 3 seconds
+	tween.tween_property(sound_fed, "volume_db", -80, 1.0)  # Fade to silence over 1 second
+	
+	# Stop the sound when fade completes
+	tween.tween_callback(func(): sound_fed.stop())
+	
+	print("Playing feeding sound with 3-second fade-out")
