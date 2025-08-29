@@ -8,7 +8,7 @@ signal scene_changing(from_scene: String, to_scene: String)
 signal scene_changed(new_scene: String)
 
 @export var transition_duration: float = 0.5
-@export var fade_color: Color = Color.BLACK
+@export var fade_color: Color = Color("#120F16")
 
 var is_transitioning: bool = false
 var transition_overlay: ColorRect

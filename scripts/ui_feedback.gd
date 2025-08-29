@@ -85,7 +85,6 @@ func _on_nest_missed(_points: int = 0):
 		chicks_label.text = "Chicks gonna die"
 	if morale_label:
 		morale_label.text = "-Morale"
-		morale_label.modulate = Color(1.0, 0.3, 0.3)  # Red color for negative
 	
 	# Show the container
 	morale_pop_container.visible = true
