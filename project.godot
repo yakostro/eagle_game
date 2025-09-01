@@ -20,6 +20,7 @@ config/icon="res://icon.svg"
 GameBalance="*res://scripts/game_balance.gd"
 SceneManager="*res://scripts/scene_manager.gd"
 GameStats="*res://scripts/game_stats.gd"
+StageManager="*res://scripts/systems/stage_manager.gd"
 
 [display]
 

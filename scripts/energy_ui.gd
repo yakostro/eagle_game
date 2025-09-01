@@ -258,7 +258,7 @@ func hide_energy_loss_feedback():
 func update_energy_display():
 	"""Update the main energy progress bar"""
 	energy_progress_bar.value = current_energy_percent
-	print("🔋 Energy display updated: ", current_energy_percent, "% (Progress bar value: ", energy_progress_bar.value, ")")
+	# Debug print removed to reduce console spam
 
 func update_capacity_display():
 	"""Update the gray energy capacity lock area from the right side"""

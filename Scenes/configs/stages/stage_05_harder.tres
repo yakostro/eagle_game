@@ -1,0 +1,29 @@
+[gd_resource type="StageConfiguration" script_class="StageConfiguration" format=3 uid="uid://f2h5k4q1u6bxy"]
+
+[ext_resource type="Script" path="res://scripts/systems/stage_configuration.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+stage_number = 5
+stage_name = "Increased Difficulty"
+world_speed = 350.0
+mountain_weight = 8
+stalactite_weight = 6
+floating_island_weight = 7
+mountain_min_height = 100.0
+mountain_max_height = 550.0
+stalactite_min_height = -450.0
+stalactite_max_height = -30.0
+floating_island_minimum_top_offset = 400.0
+floating_island_minimum_bottom_offset = 200.0
+min_obstacle_distance = 450.0
+max_obstacle_distance = 750.0
+same_obstacle_repeat_chance = 0.3
+fish_enabled = true
+fish_min_spawn_interval = 1.0
+fish_max_spawn_interval = 3.0
+nests_enabled = true
+nest_min_skipped_obstacles = 4
+nest_max_skipped_obstacles = 7
+completion_type = 1
+completion_value = 5.0

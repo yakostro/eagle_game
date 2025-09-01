@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://bvfc1tl8ttpuo"]
+[gd_scene load_steps=19 format=3 uid="uid://bvfc1tl8ttpuo"]
 
 [ext_resource type="PackedScene" uid="uid://cd42djg346oqy" path="res://scenes/eagle.tscn" id="1_ek57t"]
 [ext_resource type="PackedScene" uid="uid://bfhkdj8w2yaqr" path="res://scenes/parallax_background.tscn" id="1_parallax"]
@@ -17,6 +17,7 @@
 [ext_resource type="PackedScene" uid="uid://gdoloxvu6nf3" path="res://scenes/energy_morale_ui.tscn" id="13_energy_ui"]
 [ext_resource type="FontFile" uid="uid://kcdyir8efr7o" path="res://fonts/Bangers-Regular.ttf" id="14_b8rty"]
 [ext_resource type="PackedScene" uid="uid://ca4niueilcjwp" path="res://scenes/ui_immediate_text_feedback.tscn" id="15_energy_feedback"]
+[ext_resource type="Script" path="res://scripts/stage_hud.gd" id="16_stage_hud"]
 
 [node name="Game" type="Node" groups=["game_area"]]
 script = ExtResource("12_gm")
@@ -24,8 +25,6 @@ obstacle_spawner_path = NodePath("Spawners/ObstacleSpawner")
 parallax_background_path = NodePath("ParallaxBackground")
 eagle_path = NodePath("Eagle")
 nest_spawner_path = NodePath("Spawners/NestSpawner")
-game_over_transition_delay = null
-enable_game_state_logging = null
 
 [node name="ParallaxBackground" parent="." instance=ExtResource("1_parallax")]
 enable_middle_layer = false
@@ -41,14 +40,6 @@ eagle_reference = NodePath("../../Eagle")
 
 [node name="ObstacleSpawner" parent="Spawners" index="1"]
 mountain_scenes = Array[PackedScene]([ExtResource("2_1q8ty")])
-mountain_weight = 2
-stalactite_weight = 2
-floating_island_weight = 2
-spawn_interval = 3.0
-spawn_interval_variance = 1.5
-min_spawn_interval = 2.0
-difficulty_increase_interval = 10.0
-difficulty_spawn_rate_multiplier = 1.5
 
 [node name="NestSpawner" parent="Spawners" index="2" node_paths=PackedStringArray("eagle_reference")]
 eagle_reference = NodePath("../../Eagle")
@@ -115,6 +106,7 @@ morale_pop_duration = 2.0
 [node name="UiImmediateTextFeedback" parent="CanvasLayer" instance=ExtResource("15_energy_feedback")]
 
 [node name="StateLabel" type="Label" parent="CanvasLayer"]
+visible = false
 offset_right = 40.0
 offset_bottom = 23.0
 size_flags_horizontal = 0
@@ -122,6 +114,7 @@ size_flags_vertical = 0
 theme_override_font_sizes/font_size = 25
 
 [node name="FishCounterLabel" type="Label" parent="CanvasLayer"]
+visible = false
 offset_top = 51.0
 offset_right = 40.0
 offset_bottom = 78.0
@@ -130,6 +123,7 @@ size_flags_vertical = 0
 theme_override_font_sizes/font_size = 19
 
 [node name="Controls" type="Label" parent="CanvasLayer"]
+visible = false
 offset_top = 107.0
 offset_right = 127.0
 offset_bottom = 254.0
@@ -141,6 +135,17 @@ S - dive
 E - eat fish
 Space - drop fish
 H- screech"
+
+[node name="StageHUD" type="Label" parent="CanvasLayer"]
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 250.0
+offset_bottom = 50.0
+theme_override_colors/font_color = Color(1, 1, 0.8, 1)
+theme_override_fonts/font = ExtResource("14_b8rty")
+theme_override_font_sizes/font_size = 22
+text = "Stage 1: Introduction"
+script = ExtResource("16_stage_hud")
 
 [node name="NestNotice" type="Label" parent="CanvasLayer"]
 visible = false

@@ -1,0 +1,29 @@
+[gd_resource type="StageConfiguration" script_class="StageConfiguration" format=3 uid="uid://c8h2k9p1r7yxn"]
+
+[ext_resource type="Script" path="res://scripts/systems/stage_configuration.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+stage_number = 2
+stage_name = "Fish Introduction"
+world_speed = 250.0
+mountain_weight = 5
+stalactite_weight = 0
+floating_island_weight = 5
+mountain_min_height = 200.0
+mountain_max_height = 400.0
+stalactite_min_height = -300.0
+stalactite_max_height = 0.0
+floating_island_minimum_top_offset = 500.0
+floating_island_minimum_bottom_offset = 300.0
+min_obstacle_distance = 600.0
+max_obstacle_distance = 1000.0
+same_obstacle_repeat_chance = 0.2
+fish_enabled = true
+fish_min_spawn_interval = 2.0
+fish_max_spawn_interval = 5.0
+nests_enabled = false
+nest_min_skipped_obstacles = 3
+nest_max_skipped_obstacles = 6
+completion_type = 0
+completion_value = 5.0

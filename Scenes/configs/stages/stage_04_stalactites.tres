@@ -1,0 +1,29 @@
+[gd_resource type="StageConfiguration" script_class="StageConfiguration" format=3 uid="uid://e1h4k3p9t5awx"]
+
+[ext_resource type="Script" path="res://scripts/systems/stage_configuration.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+stage_number = 4
+stage_name = "Stalactite Introduction"
+world_speed = 300.0
+mountain_weight = 5
+stalactite_weight = 3
+floating_island_weight = 5
+mountain_min_height = 150.0
+mountain_max_height = 500.0
+stalactite_min_height = -400.0
+stalactite_max_height = -50.0
+floating_island_minimum_top_offset = 450.0
+floating_island_minimum_bottom_offset = 250.0
+min_obstacle_distance = 500.0
+max_obstacle_distance = 800.0
+same_obstacle_repeat_chance = 0.25
+fish_enabled = true
+fish_min_spawn_interval = 1.5
+fish_max_spawn_interval = 4.0
+nests_enabled = true
+nest_min_skipped_obstacles = 3
+nest_max_skipped_obstacles = 5
+completion_type = 1
+completion_value = 3.0

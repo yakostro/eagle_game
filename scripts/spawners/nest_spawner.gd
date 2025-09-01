@@ -1,45 +1,40 @@
 class_name NestSpawner
 extends Node
 
+## Spawns nests on obstacles based on stage configuration
+## Nest spawning is now controlled by the StageManager system
+
 @export var nest_scene: PackedScene  # Drag your Nest.tscn here
 @export var eagle_reference: Eagle  # Reference to the eagle for signal connections
 
-# Precise nest spawning system
-@export var min_skipped_obstacles: int = 3  # Minimum obstacles to skip before spawning nest
-@export var max_skipped_obstacles: int = 6  # Maximum obstacles to skip before spawning nest
-@export var warn_before_obstacles: int = 1  # How many obstacles before the nest to warn the player
-
-# Nest difficulty progression
-@export var nest_difficulty_increase_interval: int = 10  # Increase difficulty every N obstacles
-@export var nest_difficulty_increase_amount: int = 1     # How much to increase min/max by
-@export var max_nest_difficulty: int = 8                # Maximum value for max_skipped_obstacles
+# Nest spawn parameters (now controlled by StageManager)
+var min_skipped_obstacles: int = 3  # Minimum obstacles to skip before spawning nest
+var max_skipped_obstacles: int = 6  # Maximum obstacles to skip before spawning nest
+var warn_before_obstacles: int = 1  # How many obstacles before the nest to warn the player
+var nests_enabled: bool = false  # Whether nest spawning is enabled in current stage
 
 # Nest spawning system variables
 var obstacles_since_last_nest: int = 0  # Track obstacles spawned since last nest
 var next_nest_spawn_target: int = 0  # How many obstacles to skip before next nest
 var warned_this_cycle: bool = false
 
-# Difficulty progression tracking
-var initial_min_skipped: int = 0  # Store initial values
-var initial_max_skipped: int = 0
-var last_difficulty_increase_at: int = 0  # Track when we last increased difficulty
-var total_obstacles_processed: int = 0  # Total obstacles we've seen
+# Stage configuration tracking
+var current_stage_config: StageConfiguration
+var total_nests_spawned: int = 0  # Track total nests for stage progression
 
 signal nest_incoming(obstacles_remaining: int)
 signal nest_spawned(nest: Node)
 
 func _ready():
-	# Store initial nest difficulty values
-	initial_min_skipped = min_skipped_obstacles
-	initial_max_skipped = max_skipped_obstacles
-
-	# Initialize nest spawn target
+	# Initialize nest spawn target (will be updated when stage config is applied)
 	_set_next_nest_spawn_target()
 
 	print("🏠 Nest spawner initialized")
-	print("   Initial nest difficulty: min=", min_skipped_obstacles, " max=", max_skipped_obstacles)
+	print("   Current nest difficulty: min=", min_skipped_obstacles, " max=", max_skipped_obstacles)
 	print("   First nest will spawn after ", next_nest_spawn_target, " obstacles")
-	print("   Difficulty will increase every ", nest_difficulty_increase_interval, " obstacles")
+	
+	# Connect to StageManager for stage-based configuration
+	_connect_to_stage_manager()
 
 
 func on_obstacle_spawned(obstacle: BaseObstacle):
@@ -48,8 +43,11 @@ func on_obstacle_spawned(obstacle: BaseObstacle):
 		print("Warning: null obstacle passed to nest spawner")
 		return
 	
-	# Increment counters
-	total_obstacles_processed += 1
+	# Only process nests if enabled in current stage
+	if not nests_enabled:
+		return
+	
+	# Increment counter
 	obstacles_since_last_nest += 1
 
 	# Emit a heads-up when we are close to the spawn target
@@ -58,10 +56,6 @@ func on_obstacle_spawned(obstacle: BaseObstacle):
 		nest_incoming.emit(max(remaining, 0))
 		warned_this_cycle = true
 	
-	# Check if we should increase nest difficulty
-	if total_obstacles_processed - last_difficulty_increase_at >= nest_difficulty_increase_interval:
-		_increase_nest_difficulty()
-	
 	# Check if this obstacle should get a nest
 	if _should_spawn_nest_on_obstacle(obstacle):
 		spawn_nest_on_obstacle(obstacle)
@@ -69,7 +63,7 @@ func on_obstacle_spawned(obstacle: BaseObstacle):
 		obstacles_since_last_nest = 0
 		_set_next_nest_spawn_target()
 	
-	print("🏠 Nest spawner processed ", obstacle.get_obstacle_type(), " | Total: ", total_obstacles_processed, " | Since last nest: ", obstacles_since_last_nest, "/", next_nest_spawn_target)
+	print("🏠 Nest spawner processed ", obstacle.get_obstacle_type(), " | Since last nest: ", obstacles_since_last_nest, "/", next_nest_spawn_target)
 
 func _should_spawn_nest_on_obstacle(obstacle: BaseObstacle) -> bool:
 	"""Determine if this obstacle should get a nest"""
@@ -122,38 +116,66 @@ func spawn_nest_on_obstacle(obstacle: BaseObstacle):
 	nest.nest_missed.connect(eagle_reference.on_nest_missed)
 	print("   🔗 Connected nest signals to eagle energy capacity system")
 
+	# Track total nests spawned for stage progression
+	total_nests_spawned += 1
+	
+	# Notify StageManager of nest spawn (for stage progression tracking)
+	if StageManager:
+		StageManager.on_nest_spawned()
+	
 	# Notify UI or other systems that a nest has spawned
 	nest_spawned.emit(nest)
+	
+	print("🏠 Nest spawned! Total nests: ", total_nests_spawned)
 
-func _increase_nest_difficulty():
-	"""Increase nest spawning difficulty over time"""
-	# Don't increase if we've reached maximum difficulty
-	if max_skipped_obstacles >= max_nest_difficulty:
-		print("⚠️  MAXIMUM NEST DIFFICULTY REACHED! No further increases. Current: min=", min_skipped_obstacles, " max=", max_skipped_obstacles)
+# STAGE MANAGER INTEGRATION ===============================================
+
+func _connect_to_stage_manager():
+	"""Connect to StageManager for automatic stage-based parameter updates"""
+	if StageManager:
+		StageManager.stage_changed.connect(_on_stage_changed)
+		print("🔗 NestSpawner connected to StageManager")
+		
+		# Apply current stage configuration immediately
+		if StageManager.current_stage_config:
+			apply_stage_config(StageManager.current_stage_config)
+	else:
+		print("⚠️  StageManager not available - nests disabled by default")
+
+func _on_stage_changed(new_stage: int, config: StageConfiguration):
+	"""Handle stage changes from StageManager"""
+	print("🏠 NestSpawner: Updating to Stage ", new_stage)
+	apply_stage_config(config)
+
+func apply_stage_config(config: StageConfiguration):
+	"""Apply stage configuration parameters to nest spawning"""
+	if not config:
+		print("⚠️  No stage configuration provided")
 		return
+		
+	current_stage_config = config
 	
-	# Increase both min and max by the specified amount
-	min_skipped_obstacles += nest_difficulty_increase_amount
-	max_skipped_obstacles += nest_difficulty_increase_amount
+	# Update nest enabled/disabled state
+	nests_enabled = config.nests_enabled
 	
-	# Ensure max doesn't exceed the limit
-	max_skipped_obstacles = min(max_skipped_obstacles, max_nest_difficulty)
+	# Update nest spawn intervals
+	min_skipped_obstacles = config.nest_min_skipped_obstacles
+	max_skipped_obstacles = config.nest_max_skipped_obstacles
 	
-	# Ensure min doesn't exceed max
-	min_skipped_obstacles = min(min_skipped_obstacles, max_skipped_obstacles)
-	
-	# Update when we last increased difficulty
-	last_difficulty_increase_at = total_obstacles_processed
-	
-	print("🔥 NEST SPAWN INTERVALS CHANGED! 🔥")
-	print("   Obstacle count: ", total_obstacles_processed)
-	print("   Previous: min=", min_skipped_obstacles - nest_difficulty_increase_amount, " max=", max_skipped_obstacles - nest_difficulty_increase_amount)
-	print("   New values: min=", min_skipped_obstacles, " max=", max_skipped_obstacles)
-	print("   Next change at obstacle: ", total_obstacles_processed + nest_difficulty_increase_interval)
-	
-	# If we currently don't have a nest target set, update it with new difficulty
-	if obstacles_since_last_nest == 0:
+	# Reset nest spawn target with new parameters
+	if nests_enabled:
 		_set_next_nest_spawn_target()
+	
+	print("🏠 Stage config applied:")
+	print("   - Nests enabled: ", nests_enabled)
+	if nests_enabled:
+		print("   - Min skipped obstacles: ", min_skipped_obstacles)
+		print("   - Max skipped obstacles: ", max_skipped_obstacles)
+		print("   - Next nest target: ", next_nest_spawn_target)
+	else:
+		print("   - Nest spawning disabled")
+
+# TESTING AND DEBUG METHODS ===============================================
 
 func _set_next_nest_spawn_target():
 	"""Set random nest spawn target within current difficulty range"""

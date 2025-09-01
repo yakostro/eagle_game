@@ -122,13 +122,18 @@ Obstacles:
 
 # Mountain
 - When instantiated mountain should be placed at a random Y position: from SCREEN_HEIGHT-SPRITE_HEIGHT to SCREEN_HEIGHT-SPRITE_HEIGHT+offset. offset is a variable and == 500 px 
+- Uses **height parameters**: `mountain_min_height` and `mountain_max_height` (measured from screen bottom)
 
 # Stalactite
 - When instantiated stalactite should be placed at a random Y position: from -sprite_height + minimum_stalactite_height to 0
-- the nest could not be placed at the stalactite
+- The nest could not be placed at the stalactite
+- Uses **height parameters**: `stalactite_min_height` and `stalactite_max_height` (measured from screen top, negative values)
 
 # Floating Island
-- When instantiated stalactite should be placed at a random Y position: from minimum_top_offset = 500 to minimum_bottom_offset + sprite_height. minimum_bottom_offset = 300
+- When instantiated floating island should be placed at a random Y position: from `minimum_top_offset` to `minimum_bottom_offset + sprite_height`
+- Uses **offset parameters**: `floating_island_minimum_top_offset` and `floating_island_minimum_bottom_offset`
+- Default values: `minimum_top_offset = 500`, `minimum_bottom_offset = 300`
+- Offsets define safe zones from screen edges where islands can spawn
 
 # Nest
 ## Instantiation
@@ -294,4 +299,83 @@ Start Scene → Main Game → Game Over Scene → [Back to Start Scene]
 - ✅ Start Scene with proper CanvasLayer structure (Background layer -10, UI layer 10)
 - ✅ Universal input detection system responding to any key/mouse/gamepad input
 - ✅ Project configured to launch with start scene as entry point
-- ✅ Audio system integration with inspector-configurable background music 
+- ✅ Audio system integration with inspector-configurable background music
+
+# Stage-Based Balancing System
+
+## Overview
+The game implements a comprehensive stage-based difficulty progression system that controls all spawning parameters and world behavior through predefined stages, followed by an automatic difficulty scaling mechanism for infinite gameplay.
+
+## Stage System
+The game progresses through 6 manually-designed stages, each introducing new mechanics and gradually increasing difficulty:
+
+### Stage 1: Introduction (10 seconds)
+- Mountains + Islands only
+- No fish, no nests
+- Slow movement speed
+- Purpose: Basic movement and obstacle avoidance
+
+### Stage 2: Fish Introduction (5 seconds)  
+- Mountains + Islands
+- Fish spawning enabled
+- No nests
+- Purpose: Learn fish catching mechanics
+
+### Stage 3: Nest Introduction (Until 2 nests spawned)
+- Mountains + Islands
+- Fish enabled
+- Nests enabled (frequent spawning)
+- Purpose: Learn nest feeding mechanics
+
+### Stage 4: Stalactite Introduction (Until 3 nests spawned)
+- All obstacle types introduced
+- Higher mountains, closer spacing
+- Increased world speed
+- Purpose: Full obstacle variety
+
+### Stage 5: Increased Difficulty (Until 5 nests spawned)
+- Balanced obstacle weights
+- Faster fish spawning
+- Less frequent nests
+- Higher world speed
+
+### Stage 6: Final Manual Stage (Until 10 nests spawned)
+- Maximum manual difficulty
+- Transition point to automatic system
+
+## Automatic Difficulty System
+After Stage 6, an automatic progression system activates:
+- Percentage-based parameter increases every 30 seconds
+- World speed increases by 5% per interval (capped at 2x)
+- Spawn rates increase by 10% per interval
+- Obstacle distances decrease by 5% per interval
+- Stalactite weight increases over time
+- All increases have safety caps to prevent impossible difficulty
+
+## Configurable Parameters Per Stage
+- World/eagle movement speed
+- Obstacle type weights (mountain, stalactite, floating island)
+- Obstacle positioning: height ranges for mountains/stalactites, offset parameters for floating islands
+- Obstacle distance ranges (min/max)
+- Chance for same obstacle type to repeat
+- Fish spawn intervals (min/max)
+- Nest skip intervals (min/max obstacles)
+- Stage completion conditions (timer or nest count)
+
+## Technical Implementation
+- **StageManager**: Central singleton controlling stage progression
+- **StageConfiguration**: Resource files (.tres) for each stage's parameters
+- **AutoDifficultySystem**: Percentage-based parameter modification
+- **Spawner Integration**: All spawners (obstacle, fish, nest) accept stage parameters
+- **Data-Driven**: Easy tweaking through Godot editor without code changes
+
+## Benefits
+- **Progressive Learning**: Each stage introduces one new concept
+- **Smooth Difficulty Curve**: No sudden spikes or impossible sections  
+- **Infinite Gameplay**: Auto-system ensures continued challenge
+- **Designer-Friendly**: Parameters easily adjustable in editor
+- **Player Feedback**: Clear stage transitions and progress indicators
+
+**Status**: 📋 Design Complete - Implementation Tasks Ready
+
+**Implementation Guide**: See `stage_system_implementation_tasks.md` for detailed step-by-step implementation tasks (15 focused tasks, each independently testable) 

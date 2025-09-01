@@ -1,0 +1,29 @@
+[gd_resource type="StageConfiguration" script_class="StageConfiguration" format=3 uid="uid://d9h3k2p8s4zxq"]
+
+[ext_resource type="Script" path="res://scripts/systems/stage_configuration.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+stage_number = 3
+stage_name = "Nest Introduction"
+world_speed = 275.0
+mountain_weight = 5
+stalactite_weight = 0
+floating_island_weight = 5
+mountain_min_height = 200.0
+mountain_max_height = 400.0
+stalactite_min_height = -300.0
+stalactite_max_height = 0.0
+floating_island_minimum_top_offset = 500.0
+floating_island_minimum_bottom_offset = 300.0
+min_obstacle_distance = 550.0
+max_obstacle_distance = 900.0
+same_obstacle_repeat_chance = 0.2
+fish_enabled = true
+fish_min_spawn_interval = 2.0
+fish_max_spawn_interval = 5.0
+nests_enabled = true
+nest_min_skipped_obstacles = 2
+nest_max_skipped_obstacles = 4
+completion_type = 1
+completion_value = 2.0
