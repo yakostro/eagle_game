@@ -18,6 +18,7 @@ class_name GameManager
 # Tweakable parameters for game over system
 @export var game_over_transition_delay: float = 1.0  # Delay before transitioning to game over scene
 @export var enable_game_state_logging: bool = true
+@export var run_stage_system_tests: bool = false
 
 var obstacle_spawner: ObstacleSpawner
 var parallax_background: ParallaxBackgroundSystem
@@ -61,41 +62,42 @@ func _ready():
 	print("   - Nest Spawner: ", "✓" if nest_spawner else "✗")
 	print("   - Fish Spawner: ", "✓" if fish_spawner else "✗")
 	
-	# Task 8 verification: Check obstacle spawner after refactor
-	if obstacle_spawner:
-		print("🧪 Task 8 - Obstacle Spawner Refactor:")
-		print("   - Old difficulty system removed: ✓")
-		print("   - Core spawning functionality preserved: ✓")
-		print("   - Ready for stage integration in Task 9")
-	
-	# Task 9 verification: Check stage integration
-	_test_obstacle_spawner_stage_integration()
-	
-	# Task 10 verification: Check fish spawner stage integration
-	_test_fish_spawner_stage_integration()
-	
-	# Task 11 verification: Check nest spawner stage integration
-	_test_nest_spawner_stage_integration()
-	
-	# Test StageManager singleton accessibility (Task 2 verification)
-	print("🧪 Testing StageManager singleton:")
-	print("   - StageManager accessible: ", "✓" if StageManager else "✗")
-	if StageManager:
-		print("   - Current stage: ", StageManager.get_current_stage())
-		print("   - Auto-difficulty: ", "ON" if StageManager.auto_difficulty_enabled else "OFF")
-		print("   - Debug info available: ", "✓" if StageManager.has_method("get_debug_info") else "✗")
+	if run_stage_system_tests:
+		# Task 8 verification: Check obstacle spawner after refactor
+		if obstacle_spawner:
+			print("🧪 Task 8 - Obstacle Spawner Refactor:")
+			print("   - Old difficulty system removed: ✓")
+			print("   - Core spawning functionality preserved: ✓")
+			print("   - Ready for stage integration in Task 9")
 		
-		# Task 3 verification: Test stage configuration loading
-		_test_stage_config_loading()
+		# Task 9 verification: Check stage integration
+		_test_obstacle_spawner_stage_integration()
 		
-		# Task 4 verification: Test StageManager stage loading
-		_test_stage_manager_loading()
+		# Task 10 verification: Check fish spawner stage integration
+		_test_fish_spawner_stage_integration()
 		
-		# Task 5 verification: Test stage progression
-		_test_stage_progression()
+		# Task 11 verification: Check nest spawner stage integration
+		_test_nest_spawner_stage_integration()
 		
-		# Task 6 verification: Test all stage configurations
-		_test_all_stage_configs()
+		# Test StageManager singleton accessibility (Task 2 verification)
+		print("🧪 Testing StageManager singleton:")
+		print("   - StageManager accessible: ", "✓" if StageManager else "✗")
+		if StageManager:
+			print("   - Current stage: ", StageManager.get_current_stage())
+			print("   - Auto-difficulty: ", "ON" if StageManager.auto_difficulty_enabled else "OFF")
+			print("   - Debug info available: ", "✓" if StageManager.has_method("get_debug_info") else "✗")
+			
+			# Task 3 verification: Test stage configuration loading
+			_test_stage_config_loading()
+			
+			# Task 4 verification: Test StageManager stage loading
+			_test_stage_manager_loading()
+			
+			# Task 5 verification: Test stage progression
+			_test_stage_progression()
+			
+			# Task 6 verification: Test all stage configurations
+			_test_all_stage_configs()
 
 func _test_stage_config_loading():
 	"""Test loading Stage 1 configuration (Task 3 verification)"""

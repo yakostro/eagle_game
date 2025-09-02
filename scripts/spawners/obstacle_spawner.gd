@@ -68,7 +68,7 @@ func _ready():
 	print("🏔️  Obstacle spawner initialized. Screen size: ", screen_size)
 	print("   Available obstacle types: ", obstacle_types.size())
 	for obstacle_type in obstacle_types:
-		print("   - ", obstacle_type.name, " (weight: ", obstacle_type.weight, ")")
+		print("   - ", obstacle_type["name"], " (weight: ", obstacle_type["weight"], ")")
 	print("   Spawn interval: ", spawn_interval, "±", spawn_interval_variance, " seconds")
 	
 	# Connect to StageManager for stage-based configuration
@@ -123,12 +123,12 @@ func spawn_random_obstacle():
 		return
 	
 	# Instantiate the obstacle
-	var obstacle_scene = selected_type.scene
+	var obstacle_scene = selected_type["scene"]
 	var obstacle = obstacle_scene.instantiate()
 	get_tree().current_scene.add_child(obstacle)
 	
 	# Apply stage-specific height/offset parameters before setup
-	_apply_stage_height_params_to_obstacle(obstacle, selected_type.name)
+	_apply_stage_height_params_to_obstacle(obstacle, selected_type["name"])
 	
 	# Set up the obstacle with shared movement speed
 	obstacle.set_movement_speed(obstacle_movement_speed)
@@ -144,14 +144,14 @@ func spawn_random_obstacle():
 	# Emit signal for nest spawner to handle
 	obstacle_spawned.emit(obstacle)
 	
-	print("🏔️  Spawned ", selected_type.name, " | Total obstacles: ", obstacle_count)
+	print("🏔️  Spawned ", selected_type["name"], " | Total obstacles: ", obstacle_count)
 
 func _get_weighted_random_obstacle_type() -> Dictionary:
 	"""Select a random obstacle type based on weights"""
 	# Calculate total weight
 	var total_weight = 0
 	for obstacle_type in obstacle_types:
-		total_weight += obstacle_type.weight
+		total_weight += obstacle_type["weight"]
 	
 	if total_weight <= 0:
 		return {}
@@ -161,7 +161,7 @@ func _get_weighted_random_obstacle_type() -> Dictionary:
 	var current_weight = 0
 	
 	for obstacle_type in obstacle_types:
-		current_weight += obstacle_type.weight
+		current_weight += obstacle_type["weight"]
 		if random_value <= current_weight:
 			return obstacle_type
 	
@@ -255,7 +255,7 @@ func _apply_stage_height_params_to_obstacle(obstacle: Node, obstacle_type_name: 
 			obstacle.max_stalactite_height = current_stage_config.stalactite_max_height
 			print("🗻 Applied stalactite heights: ", current_stage_config.stalactite_min_height, "-", current_stage_config.stalactite_max_height)
 	
-	elif obstacle_type_name == "Floating Island" or obstacle_type_name.begins_with("Island"):
+	elif obstacle_type_name == "FloatingIsland" or obstacle_type_name.find("Island") != -1:
 		# Apply floating island offset parameters
 		if obstacle.has_method("set_offset_range"):
 			obstacle.set_offset_range(current_stage_config.floating_island_minimum_top_offset, current_stage_config.floating_island_minimum_bottom_offset)

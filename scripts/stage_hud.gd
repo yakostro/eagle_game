@@ -71,7 +71,7 @@ func _update_stage_display(stage_number: int, config: StageConfiguration):
 			var remaining_time = config.completion_value - StageManager.stage_timer
 			if remaining_time > 0:
 				display_text += " (%.1fs)" % remaining_time
-		elif config.completion_type == StageConfiguration.CompletionType.NESTS:
+		elif config.completion_type == StageConfiguration.CompletionType.NESTS_SPAWNED:
 			var nests_needed = int(config.completion_value) - StageManager.stage_nest_count
 			if nests_needed > 0:
 				display_text += " (%d left)" % nests_needed

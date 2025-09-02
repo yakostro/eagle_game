@@ -158,6 +158,11 @@ func _trigger_restart():
 		GameStats.reset_session()
 		print("📊 Game statistics reset for new session")
 	
+	# Reset stage system to stage 1
+	if StageManager:
+		StageManager.reset_to_stage_one()
+		print("🎯 Stage reset to 1 for new run")
+	
 	# Use SceneManager for smooth transition to game scene
 	if SceneManager:
 		SceneManager.change_scene("res://scenes/game.tscn")

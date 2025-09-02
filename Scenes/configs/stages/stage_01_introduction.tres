@@ -1,10 +1,8 @@
-[gd_resource type="StageConfiguration" script_class="StageConfiguration" load_steps=2 format=3 uid="uid://b4k1nap8q2vxn"]
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://b4k1nap8q2vxn"]
 
 [ext_resource type="Script" path="res://scripts/systems/stage_configuration.gd" id="1"]
 
 [resource]
-resource_local_to_scene = false
-resource_name = ""
 script = ExtResource("1")
 stage_number = 1
 stage_name = "Introduction"

@@ -1,4 +1,4 @@
-[gd_resource type="StageConfiguration" script_class="StageConfiguration" format=3 uid="uid://g3h6k5q2v7czy"]
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://g3h6k5q2v7czy"]
 
 [ext_resource type="Script" path="res://scripts/systems/stage_configuration.gd" id="1"]
 
@@ -6,24 +6,24 @@
 script = ExtResource("1")
 stage_number = 6
 stage_name = "Final Challenge"
-world_speed = 400.0
-mountain_weight = 10
-stalactite_weight = 8
-floating_island_weight = 9
-mountain_min_height = 50.0
+world_speed = 350.0
+mountain_weight = 2
+stalactite_weight = 4
+floating_island_weight = 4
+mountain_min_height = 350.0
 mountain_max_height = 600.0
-stalactite_min_height = -500.0
-stalactite_max_height = -10.0
-floating_island_minimum_top_offset = 350.0
-floating_island_minimum_bottom_offset = 150.0
+stalactite_min_height = -450.0
+stalactite_max_height = -150.0
+floating_island_minimum_top_offset = 250.0
+floating_island_minimum_bottom_offset = 100.0
 min_obstacle_distance = 400.0
-max_obstacle_distance = 700.0
-same_obstacle_repeat_chance = 0.35
+max_obstacle_distance = 800.0
+same_obstacle_repeat_chance = 0.4
 fish_enabled = true
 fish_min_spawn_interval = 0.8
-fish_max_spawn_interval = 2.5
+fish_max_spawn_interval = 3.0
 nests_enabled = true
-nest_min_skipped_obstacles = 5
-nest_max_skipped_obstacles = 9
+nest_min_skipped_obstacles = 1
+nest_max_skipped_obstacles = 2
 completion_type = 1
-completion_value = 10.0
+completion_value = 8.0

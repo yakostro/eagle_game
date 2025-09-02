@@ -75,62 +75,36 @@ func load_stage(stage_number: int) -> bool:
 	# Construct file path for stage configuration
 	var stage_file_path = _get_stage_file_path(stage_number)
 	
-	# Check if file exists
-	print("🔍 StageManager: Checking for file: ", stage_file_path)
-	if not FileAccess.file_exists(stage_file_path):
-		push_error("StageManager: Stage %d configuration file not found: %s" % [stage_number, stage_file_path])
-		print("❌ File existence check failed for: ", stage_file_path)
-		return false
-	print("✅ File exists, attempting to load...")
+	# Enhanced debugging to understand the loading issue
+	print("🔍 StageManager: Checking for resource: ", stage_file_path)
+	print("🔍 Trying ResourceLoader.exists(): ", ResourceLoader.exists(stage_file_path))
+	print("🔍 Trying FileAccess.file_exists(): ", FileAccess.file_exists(stage_file_path))
 	
-	# Load the stage configuration resource
+	# Try both loading methods to see which one works
 	print("🔄 StageManager: Loading resource from: ", stage_file_path)
-	
-	# Check if the script file exists first
-	var script_path = "res://scripts/systems/stage_configuration.gd"
-	print("🔍 Checking script exists: ", script_path)
-	if not FileAccess.file_exists(script_path):
-		push_error("StageManager: StageConfiguration script not found: " + script_path)
-		return false
-	print("✅ Script file exists")
-	
-	# Try to load the script first
-	print("🔄 Loading StageConfiguration script...")
-	var script_resource = load(script_path)
-	print("🔍 Script loaded: ", script_resource)
-	print("🔍 Script type: ", script_resource.get_class() if script_resource else "null")
-	
-	# Now try to load the .tres file
+	print("🔍 Trying basic load()...")
 	var raw_resource = load(stage_file_path)
-	print("🔍 Raw resource loaded: ", raw_resource)
-	print("🔍 Raw resource type: ", raw_resource.get_class() if raw_resource else "null")
+	print("🔍 Basic load() result: ", raw_resource)
+	print("🔍 Basic load() type: ", raw_resource.get_class() if raw_resource else "null")
+	
+	if not raw_resource:
+		print("🔍 Trying ResourceLoader.load()...")
+		raw_resource = ResourceLoader.load(stage_file_path)
+		print("🔍 ResourceLoader.load() result: ", raw_resource)
+		print("🔍 ResourceLoader.load() type: ", raw_resource.get_class() if raw_resource else "null")
 	
 	if not raw_resource:
 		push_error("StageManager: Failed to load .tres file - resource is null")
-		print("❌ This usually means the .tres file has a broken script reference")
-		print("❌ Trying fallback: creating manual StageConfiguration...")
-		
-		# Fallback: Create a manual StageConfiguration for Stage 1
-		if stage_number == 1:
-			var fallback_config = StageConfiguration.new()
-			fallback_config.stage_number = 1
-			fallback_config.stage_name = "Introduction (Fallback)"
-			fallback_config.world_speed = 250.0
-			fallback_config.mountain_weight = 5
-			fallback_config.stalactite_weight = 0
-			fallback_config.floating_island_weight = 5
-			fallback_config.fish_enabled = false
-			fallback_config.nests_enabled = false
-			fallback_config.completion_type = StageConfiguration.CompletionType.TIMER
-			fallback_config.completion_value = 10.0
-			fallback_config.min_obstacle_distance = 600.0
-			fallback_config.max_obstacle_distance = 1000.0
-			print("✅ Created fallback configuration for Stage 1")
-			current_stage_config = fallback_config
-			current_stage = stage_number
-			return true
+		print("❌ This usually means the .tres file has a broken script reference or format issue")
+		print("🧪 Testing if StageConfiguration class works manually...")
+		var test_config = StageConfiguration.new()
+		if test_config:
+			print("✅ StageConfiguration class works manually")
+			test_config.stage_name = "Manual Test"
+			print("✅ StageConfiguration properties work: ", test_config.stage_name)
 		else:
-			return false
+			print("❌ StageConfiguration class fails even manually")
+		return false
 	
 	var loaded_config = raw_resource as StageConfiguration
 	if not loaded_config:
@@ -227,7 +201,7 @@ func _check_stage_completion():
 		if stage_timer >= current_stage_config.completion_value:
 			is_complete = true
 			completion_reason = "timer reached %.1fs" % current_stage_config.completion_value
-	elif current_stage_config.completion_type == StageConfiguration.CompletionType.NESTS:
+	elif current_stage_config.completion_type == StageConfiguration.CompletionType.NESTS_SPAWNED:
 		# Nest-based completion
 		if stage_nest_count >= current_stage_config.completion_value:
 			is_complete = true
@@ -249,7 +223,7 @@ func on_nest_spawned():
 	stage_nest_count += 1
 	
 	# Debug output for nest-based stages (Task 7)
-	if current_stage_config and current_stage_config.completion_type == StageConfiguration.CompletionType.NESTS:
+	if current_stage_config and current_stage_config.completion_type == StageConfiguration.CompletionType.NESTS_SPAWNED:
 		var nests_remaining = int(current_stage_config.completion_value) - stage_nest_count
 		print("🏠 Stage %d: %d / %d nests spawned (%d remaining)" % [current_stage, stage_nest_count, int(current_stage_config.completion_value), nests_remaining])
 
@@ -263,6 +237,19 @@ func enable_auto_difficulty():
 func disable_auto_difficulty():
 	print("🛑 StageManager: Auto-difficulty DISABLED")
 	auto_difficulty_enabled = false
+
+## Reset StageManager to Stage 1 (for restarts)
+func reset_to_stage_one():
+	print("🔄 StageManager: Resetting to Stage 1 for restart")
+	# Ensure auto-difficulty is off
+	disable_auto_difficulty()
+	# Reset counters
+	total_obstacles_spawned = 0
+	total_nests_spawned = 0
+	stage_timer = 0.0
+	stage_nest_count = 0
+	# Load Stage 1 config
+	load_stage(1)
 
 ## Get debug information about current stage state
 func get_debug_info() -> String:
@@ -299,12 +286,14 @@ func force_advance_stage():
 	advance_to_next_stage()
 
 ## Skip to a specific stage (for testing)
-func skip_to_stage(stage_number: int):
+func skip_to_stage(stage_number: int) -> bool:
 	print("🧪 TESTING: Skipping to stage %d..." % stage_number)
 	if load_stage(stage_number):
 		stage_timer = 0.0
 		stage_nest_count = 0
 		print("✅ Skipped to Stage %d: %s" % [current_stage, current_stage_config.stage_name])
 		stage_changed.emit(current_stage, current_stage_config)
+		return true
 	else:
 		print("❌ Failed to skip to stage %d" % stage_number)
+		return false
