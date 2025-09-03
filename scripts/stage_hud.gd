@@ -63,18 +63,31 @@ func _update_stage_display(stage_number: int, config: StageConfiguration):
 	
 	# Stage information
 	if config:
-		# Show stage number and name
-		display_text += "Stage %d: %s" % [stage_number, config.stage_name]
-		
-		# Add stage completion info
-		if config.completion_type == StageConfiguration.CompletionType.TIMER:
-			var remaining_time = config.completion_value - StageManager.stage_timer
-			if remaining_time > 0:
-				display_text += " (%.1fs)" % remaining_time
-		elif config.completion_type == StageConfiguration.CompletionType.NESTS_SPAWNED:
-			var nests_needed = int(config.completion_value) - StageManager.stage_nest_count
-			if nests_needed > 0:
-				display_text += " (%d left)" % nests_needed
+		# Check if we're in auto-difficulty mode (stage numbers 100+)
+		if stage_number >= 100:
+			# Auto-difficulty mode display
+			var auto_level = stage_number - 100
+			display_text += "Auto-Difficulty Level %d" % auto_level
+			
+			# Show time to next level increase if StageManager has auto-difficulty
+			if StageManager.auto_difficulty_enabled and StageManager.has_method("get_auto_difficulty_stats"):
+				var stats = StageManager.get_auto_difficulty_stats()
+				if stats.has("time_to_next"):
+					var time_to_next = stats.time_to_next
+					display_text += " (%.1fs)" % time_to_next
+		else:
+			# Manual stage display
+			display_text += "Stage %d: %s" % [stage_number, config.stage_name]
+			
+			# Add stage completion info
+			if config.completion_type == StageConfiguration.CompletionType.TIMER:
+				var remaining_time = config.completion_value - StageManager.stage_timer
+				if remaining_time > 0:
+					display_text += " (%.1fs)" % remaining_time
+			elif config.completion_type == StageConfiguration.CompletionType.NESTS_SPAWNED:
+				var nests_needed = int(config.completion_value) - StageManager.stage_nest_count
+				if nests_needed > 0:
+					display_text += " (%d left)" % nests_needed
 		
 		display_text += "\n"
 	else:

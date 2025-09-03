@@ -13,4 +13,5 @@ alwaysApply: true
 - When i ask something new in chat, and there is not such an information in the GDD file - add this information to the GDD.
 - Always create variables for things that need to be tweaked during the balancing game mechanics.
 - If possible do not use direct links like '@onready var base_wind: AudioStreamPlayer2D = $BaseWind'. Use '@export var nest_notice_label_path: NodePath' instead.
-- we call node names with a camelcase and gd script files with a snake case
+- call node names with a camelcase and gd-script files with a snake case
+- do not spam debug messages if we dont have bugs yet. Add them only if you need it for debugging

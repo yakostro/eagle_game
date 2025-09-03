@@ -1,0 +1,17 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://cknw6v8q2r5dy"]
+
+[ext_resource type="Script" path="res://scripts/systems/auto_difficulty_configuration.gd" id="1_0kbqm"]
+
+[resource]
+script = ExtResource("1_0kbqm")
+progression_interval = 5.0
+speed_increase_rate = 0.05
+max_speed_multiplier = 2.0
+spawn_rate_increase = 0.1
+min_distance_multiplier = 0.5
+stalactite_weight_increase = 1
+max_stalactite_weight = 20
+fish_spawn_rate_increase = 0.1
+min_fish_interval_multiplier = 0.3
+nest_interval_decrease = 1
+min_nest_interval = 2

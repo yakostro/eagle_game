@@ -10,6 +10,9 @@ var stage_timer: float = 0.0
 var stage_nest_count: int = 0
 var auto_difficulty_enabled: bool = false
 
+# Auto-difficulty system
+var auto_difficulty_system: AutoDifficultySystem
+
 # Debug tracking
 var total_obstacles_spawned: int = 0
 var total_nests_spawned: int = 0
@@ -23,6 +26,10 @@ func _ready():
 	print("🎯 StageManager singleton initialized")
 	print("   Starting stage: ", current_stage)
 	print("   Auto-difficulty: ", "DISABLED" if not auto_difficulty_enabled else "ENABLED")
+	
+	# Connect auto-difficulty signal to handler
+	auto_difficulty_started.connect(_on_auto_difficulty_started)
+	print("🔗 Auto-difficulty signal connected")
 	
 	# Debug: Check if StageConfiguration class is available
 	print("🔍 Checking class registration...")
@@ -49,7 +56,7 @@ func _ready():
 	set_process(true)
 
 func _process(delta: float):
-	# Handle stage timer progression
+	# Handle stage timer progression for manual stages
 	if not auto_difficulty_enabled:
 		stage_timer += delta
 		_check_stage_completion()
@@ -59,6 +66,10 @@ func _process(delta: float):
 			var time_remaining = current_stage_config.completion_value - stage_timer
 			if time_remaining > 0 and int(stage_timer * 0.5) % 1 == 0 and abs(stage_timer - round(stage_timer * 2) / 2) < delta:
 				print("⏱️  Stage %d: %.1fs / %.1fs (%.1fs remaining)" % [current_stage, stage_timer, current_stage_config.completion_value, time_remaining])
+	else:
+		# Handle auto-difficulty progression
+		if auto_difficulty_system:
+			auto_difficulty_system.update(delta)
 
 ## Get current stage number
 func get_current_stage() -> int:
@@ -233,10 +244,84 @@ func enable_auto_difficulty():
 	auto_difficulty_enabled = true
 	auto_difficulty_started.emit()
 
+## Handle auto-difficulty started signal
+func _on_auto_difficulty_started():
+	print("🚀 StageManager: Initializing AutoDifficultySystem...")
+	
+	if not current_stage_config:
+		push_error("StageManager: Cannot start auto-difficulty without a current stage config!")
+		return
+	
+	# Create the auto-difficulty system
+	auto_difficulty_system = AutoDifficultySystem.new()
+	if not auto_difficulty_system:
+		push_error("StageManager: Failed to create AutoDifficultySystem!")
+		return
+	
+	# Initialize with the current stage (Stage 6) as baseline
+	auto_difficulty_system.initialize_with_base_config(current_stage_config)
+	
+	# Connect to auto-difficulty progression signals
+	auto_difficulty_system.difficulty_increased.connect(_on_auto_difficulty_increased)
+	auto_difficulty_system.parameter_capped.connect(_on_auto_difficulty_parameter_capped)
+	
+	print("✅ AutoDifficultySystem initialized and connected!")
+	print("   Baseline from Stage %d: %s" % [current_stage, current_stage_config.stage_name])
+	
+	# Generate and apply the first auto-difficulty configuration (Level 0)
+	_apply_auto_difficulty_config()
+
+## Handle auto-difficulty level increase
+func _on_auto_difficulty_increased(new_level: int):
+	print("⬆️  AutoDifficulty: Level increased to %d" % new_level)
+	_apply_auto_difficulty_config()
+
+## Handle auto-difficulty parameter capping
+func _on_auto_difficulty_parameter_capped(parameter_name: String, capped_value: float):
+	print("🧊 AutoDifficulty: Parameter '%s' capped at %.2f" % [parameter_name, capped_value])
+
+## Apply current auto-difficulty configuration to all spawners
+func _apply_auto_difficulty_config():
+	if not auto_difficulty_system:
+		push_error("StageManager: Cannot apply auto-difficulty config - system not initialized!")
+		return
+	
+	# Generate the current auto-difficulty configuration
+	var auto_config = auto_difficulty_system.get_modified_config()
+	if not auto_config:
+		push_error("StageManager: Failed to generate auto-difficulty configuration!")
+		return
+	
+	# Update current stage tracking
+	current_stage = auto_config.stage_number
+	current_stage_config = auto_config
+	
+	print("🔄 Applying auto-difficulty config: Stage %d (%s)" % [current_stage, auto_config.stage_name])
+	print("   Speed: %.1f, Distance: %.1f-%.1f, Stalactites: %d" % [
+		auto_config.world_speed,
+		auto_config.min_obstacle_distance,
+		auto_config.max_obstacle_distance,
+		auto_config.stalactite_weight
+	])
+	
+	# Emit stage_changed signal so all spawners update
+	stage_changed.emit(current_stage, current_stage_config)
+
+## Get auto-difficulty statistics for UI display
+func get_auto_difficulty_stats() -> Dictionary:
+	if auto_difficulty_system:
+		return auto_difficulty_system.get_difficulty_stats()
+	else:
+		return {}
+
 ## Disable automatic difficulty progression
 func disable_auto_difficulty():
 	print("🛑 StageManager: Auto-difficulty DISABLED")
 	auto_difficulty_enabled = false
+	
+	# Clean up auto-difficulty system
+	if auto_difficulty_system:
+		auto_difficulty_system = null
 
 ## Reset StageManager to Stage 1 (for restarts)
 func reset_to_stage_one():
@@ -297,3 +382,21 @@ func skip_to_stage(stage_number: int) -> bool:
 	else:
 		print("❌ Failed to skip to stage %d" % stage_number)
 		return false
+
+## Force trigger auto-difficulty (for testing)
+func force_trigger_auto_difficulty():
+	print("🧪 TESTING: Force triggering auto-difficulty...")
+	if auto_difficulty_enabled:
+		print("❌ Auto-difficulty already enabled")
+		return false
+	
+	# Make sure we're on Stage 6 first
+	if current_stage != 6:
+		print("🔄 Loading Stage 6 first...")
+		if not load_stage(6):
+			print("❌ Failed to load Stage 6")
+			return false
+	
+	# Trigger auto-difficulty
+	enable_auto_difficulty()
+	return true
