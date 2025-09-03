@@ -131,9 +131,22 @@ func setup_ui_elements():
 	container.custom_minimum_size = Vector2(bar_width, bar_height)
 	energy_icon.custom_minimum_size = icon_size
 	
+	# Configure energy loss feedback overlay as a sized strip we can position
+	energy_loss_feedback.anchor_left = 0.0
+	energy_loss_feedback.anchor_right = 0.0
+	energy_loss_feedback.anchor_top = 0.0
+	energy_loss_feedback.anchor_bottom = 1.0
+	energy_loss_feedback.offset_left = 0.0
+	energy_loss_feedback.offset_right = 0.0
+	energy_loss_feedback.value = 100.0
+	energy_loss_feedback.z_index = 1
+	
 	# Initialize values
 	update_energy_display()
 	update_capacity_display()
+	
+	# Ensure the energy loss feedback overlay starts hidden so it doesn't cover the main bar
+	energy_loss_feedback.visible = false
 	
 	# Create diagonal pattern overlay
 	create_diagonal_pattern_overlay()
@@ -173,7 +186,14 @@ func apply_progress_bar_colors():
 	bg_style.border_width_bottom = 1
 	bg_style.border_color = Color("#755F27")
 	energy_progress_bar.add_theme_stylebox_override("background", bg_style)
-	energy_loss_feedback.add_theme_stylebox_override("background", bg_style)
+	# Make feedback background fully transparent so only the white fill segment is visible
+	var feedback_bg_style = StyleBoxFlat.new()
+	feedback_bg_style.bg_color = Color(0, 0, 0, 0)
+	feedback_bg_style.border_width_left = 0
+	feedback_bg_style.border_width_right = 0
+	feedback_bg_style.border_width_top = 0
+	feedback_bg_style.border_width_bottom = 0
+	energy_loss_feedback.add_theme_stylebox_override("background", feedback_bg_style)
 	
 	print("🎨 Progress bar styling complete!")
 
@@ -233,18 +253,30 @@ func create_lightning_icon():
 ## Private update methods
 
 func show_energy_loss_feedback(loss_amount: float):
-	"""Show white feedback for energy loss"""
+	"""Show a white strip representing the lost energy segment on the right of the current energy."""
 	# Stop any existing feedback animation
 	if feedback_tween:
 		feedback_tween.kill()
-	
-	# Set up the feedback overlay
-	energy_loss_feedback.value = current_energy_percent + loss_amount
+
+	# Compute positions in pixels along the bar
+	var old_energy_percent = clamp(current_energy_percent + loss_amount, 0.0, 100.0)
+	var container := get_node("Container/ProgressBarContainer") as Control
+	var total_width: float = bar_width
+	if container and container.size.x > 0.0:
+		total_width = container.size.x
+	var left_px = total_width * (current_energy_percent / 100.0)
+	var right_px = total_width * (old_energy_percent / 100.0)
+	var width_px = max(right_px - left_px, 0.0)
+
+	# Configure the overlay as a segment [left_px, right_px]
+	energy_loss_feedback.value = 100.0
+	energy_loss_feedback.offset_left = left_px
+	energy_loss_feedback.offset_right = left_px + width_px
 	energy_loss_feedback.visible = true
-	
-	# Animate the feedback away
+
+	# Animate the right edge shrinking to the left edge, then hide
 	feedback_tween = create_tween()
-	feedback_tween.tween_method(animate_energy_loss_feedback, current_energy_percent + loss_amount, current_energy_percent, energy_loss_feedback_duration)
+	feedback_tween.tween_property(energy_loss_feedback, "offset_right", energy_loss_feedback.offset_left, energy_loss_feedback_duration)
 	feedback_tween.tween_callback(hide_energy_loss_feedback)
 
 func animate_energy_loss_feedback(value: float):
