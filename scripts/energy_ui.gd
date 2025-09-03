@@ -69,9 +69,10 @@ func connect_to_eagle_signals():
 			eagle.energy_capacity_changed.connect(_on_eagle_energy_capacity_changed)
 		
 		# Set initial values from eagle
-		var initial_energy = (eagle.current_energy / eagle.max_energy) * 100.0
+		# Calculate energy as percentage of ORIGINAL capacity for consistency
+		var initial_energy = (eagle.current_energy / eagle.initial_max_energy) * 100.0
 		var initial_capacity = eagle.get_energy_capacity_percentage() * 100.0
-		
+
 		set_energy_percent_direct(initial_energy)
 		set_capacity_percent_direct(initial_capacity)
 		
@@ -91,7 +92,9 @@ func _on_eagle_energy_capacity_changed(_new_max_energy: float):
 func _physics_process(_delta):
 	"""Update energy display each frame (since energy changes continuously)"""
 	if eagle != null:
-		var energy_percent = (eagle.current_energy / eagle.max_energy) * 100.0
+		# Calculate energy as percentage of ORIGINAL capacity, not current reduced capacity
+		# This ensures energy can't appear to exceed the morale lock visually
+		var energy_percent = (eagle.current_energy / eagle.initial_max_energy) * 100.0
 		set_energy_percent_direct(energy_percent)
 
 ## Direct update methods (without UI feedback loops)

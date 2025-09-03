@@ -10,12 +10,12 @@ Create a unified progress bar system where energy and morale are visualized on t
 - **Single horizontal progress bar** positioned at the top-center of the screen
 - **Lightning icon** on the left side of the bar to clearly indicate this is energy
 - **Three-state color system**:
-  - **Purple**: Available energy (current energy level)
+  - **Yellow**: Available energy (current energy level)
   - **White**: Energy being lost (temporary visual feedback)
   - **Gray**: Morale-locked capacity (unavailable energy space)
 
 ### Energy Behavior
-- Starts at 100% capacity (full purple bar)
+- Starts at 100% capacity (full yellow bar)
 - When energy decreases:
   1. Show decreasing amount in **white** for a brief period (visual feedback)
   2. Then remove the white portion from the bar
@@ -33,10 +33,10 @@ Create a unified progress bar system where energy and morale are visualized on t
 
 ### Visual States Examples
 ```
-100% Energy, 100% Morale: [████████████████████] (full purple)
-80% Energy, 100% Morale:  [████████████░░░░░░░░] (purple + empty)
-80% Energy, 60% Morale:   [████████████░░██████] (purple + empty + gray)
-40% Energy, 60% Morale:   [████████░░░░██████]     (purple fits in available space)
+100% Energy, 100% Morale: [████████████████████] (full yellow)
+80% Energy, 100% Morale:  [████████████░░░░░░░░] (yellow + empty)
+80% Energy, 60% Morale:   [████████████░░██████] (yellow + empty + red pattern)
+40% Energy, 60% Morale:   [████████░░░░██████]     (yellow fits in available space)
 ```
 
 ## Architecture Requirements
@@ -48,9 +48,9 @@ EnergyMoraleUI (Control Node)
 │   ├── EnergyIcon (TextureRect) - Lightning symbol
 │   └── ProgressBarContainer (Control)
 │       └── EnergyProgressBar (Custom ProgressBar)
-│           ├── EnergyFill (TextureProgress) - Purple energy
+│           ├── EnergyFill (TextureProgress) - Yellow energy
 │           ├── EnergyLossFeedback (TextureProgress) - White feedback
-│           └── MoraleLock (TextureProgress) - Gray locked area
+│           └── MoraleLock (TextureProgress) - red pattern locked area
 ```
 
 ### Script Architecture
@@ -59,7 +59,7 @@ EnergyMoraleUI (Control Node)
 - **Energy/Morale Manager**: Data management (separate from UI)
 
 ### Inspector Configuration
-- **Energy Colors**: Purple (full), white (feedback), gray (locked)
+- **Energy Colors**: Yellow (full), white (feedback), gray (locked)
 - **Feedback Duration**: How long white energy loss is shown
 - **Bar Dimensions**: Width, height, positioning
 - **Icon Configuration**: Lightning icon texture and size

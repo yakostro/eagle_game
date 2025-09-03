@@ -133,8 +133,8 @@ func eat_fish():
 		print("Eagle ate a fish!")
 		# Use the fish's energy value instead of fixed amount
 		var energy_gained = carried_fish.energy_value
-		
-		# Respect current max energy capacity limits
+
+		# Respect current max energy capacity limits (morale lock)
 		current_energy = min(current_energy + energy_gained, max_energy)
 		print("Energy gained from fish: ", energy_gained, " (Total energy: ", current_energy, "/", max_energy, ")")
 		carried_fish.queue_free()  # Remove the fish from scene
