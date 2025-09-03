@@ -13,7 +13,6 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_energy_ui")
-energy_color = Color(0.631373, 0.490196, 0.137255, 1)
 energy_loss_feedback_color = Color(0.890196, 0.866667, 0.909804, 1)
 background_color = Color(0.188235, 0.145098, 0.227451, 1)
 diagonal_pattern_texture = ExtResource("2_xrren")

@@ -14,9 +14,9 @@
 [ext_resource type="AudioStream" uid="uid://06s15ka1es4v" path="res://sounds/wind/additional_wind.wav" id="8_jjn0q"]
 [ext_resource type="Script" path="res://scripts/ui_feedback.gd" id="11_ui"]
 [ext_resource type="Script" path="res://scripts/game_manager.gd" id="12_gm"]
-[ext_resource type="PackedScene" uid="uid://gdoloxvu6nf3" path="res://scenes/energy_morale_ui.tscn" id="13_energy_ui"]
+[ext_resource type="PackedScene" uid="uid://gdoloxvu6nf3" path="res://scenes/ui/energy_morale_ui.tscn" id="13_energy_ui"]
 [ext_resource type="FontFile" uid="uid://kcdyir8efr7o" path="res://fonts/Bangers-Regular.ttf" id="14_b8rty"]
-[ext_resource type="PackedScene" uid="uid://ca4niueilcjwp" path="res://scenes/ui_immediate_text_feedback.tscn" id="15_energy_feedback"]
+[ext_resource type="PackedScene" uid="uid://ca4niueilcjwp" path="res://scenes/ui/ui_immediate_text_feedback.tscn" id="15_energy_feedback"]
 [ext_resource type="Script" path="res://scripts/stage_hud.gd" id="16_stage_hud"]
 
 [node name="Game" type="Node" groups=["game_area"]]
