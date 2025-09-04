@@ -15,7 +15,7 @@
 [ext_resource type="PackedScene" uid="uid://ca4niueilcjwp" path="res://scenes/ui/ui_immediate_text_feedback.tscn" id="13_2vptr"]
 [ext_resource type="FontFile" uid="uid://kcdyir8efr7o" path="res://fonts/Bangers-Regular.ttf" id="14_k8s70"]
 [ext_resource type="Script" path="res://scripts/stage_hud.gd" id="15_l4c53"]
-[ext_resource type="Script" path="res://scripts/systems/fps_counter.gd" id="16_htv5j"]
+[ext_resource type="Script" path="res://scripts/fps_counter.gd" id="16_htv5j"]
 [ext_resource type="Script" path="res://scripts/sound_wind_mixer.gd" id="17_xaldk"]
 [ext_resource type="AudioStream" uid="uid://sfagc5liqm30" path="res://sounds/wind/wind_woosh_loop.ogg" id="18_72rxq"]
 [ext_resource type="AudioStream" uid="uid://06s15ka1es4v" path="res://sounds/wind/additional_wind.wav" id="19_pia2j"]

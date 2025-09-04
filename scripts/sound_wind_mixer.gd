@@ -71,9 +71,6 @@ func _ready():
 	additional_wind_timer.start()
 	print("Additional wind timer started, first play in ", additional_wind_timer.wait_time, " seconds")
 	
-	# Create tween for fading
-	fade_tween = create_tween()
-	
 	print("Wind mixer setup complete")
 
 func _start_base_wind_with_fade_in():

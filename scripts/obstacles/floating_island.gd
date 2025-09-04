@@ -15,14 +15,19 @@ func get_spawn_y_position(screen_height: float) -> float:
 	# Get actual sprite height accounting for scaling applied in scene
 	var actual_sprite_height = get_actual_sprite_height()
 	
-	# Random Y position: from minimum_top_offset to minimum_bottom_offset + sprite_height (GDD requirement)
+	# Desired Y range where the TOP of the sprite stays >= minimum_top_offset
+	# and the BOTTOM of the sprite stays <= screen_height - minimum_bottom_offset.
+	# This produces available vertical span for the sprite's top position.
 	var min_y = minimum_top_offset
 	var max_y = screen_height - minimum_bottom_offset - actual_sprite_height
 	
-	# Ensure we have a valid range
+	# If stage settings and sprite height leave no room, clamp to a safe span.
+	# We create at least a small selectable range to avoid warnings and keep islands on-screen.
 	if max_y <= min_y:
-		push_warning("FloatingIsland: Invalid Y range, using fallback positioning")
-		max_y = min_y + 100  # Fallback to avoid errors
+		var safe_top = clamp(minimum_top_offset, 0.0, max(0.0, screen_height - actual_sprite_height))
+		var safe_bottom = max(safe_top + 1.0, screen_height - minimum_bottom_offset - actual_sprite_height)
+		min_y = safe_top
+		max_y = safe_bottom
 	
 	var spawn_y = randf_range(min_y, max_y)
 	
