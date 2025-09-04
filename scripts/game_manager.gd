@@ -393,6 +393,16 @@ func _input(event):
 			print("🧪 Skipping to stage %d!" % stage_number)
 			if StageManager:
 				StageManager.skip_to_stage(stage_number)
+		elif event.keycode == KEY_F12:
+			_toggle_fps_counter()
+
+func _toggle_fps_counter():
+	"""Toggle FPS counter visibility for debugging"""
+	var fps_counter = get_node_or_null("CanvasLayer/FPSCounter")
+	if fps_counter:
+		fps_counter.toggle_visibility()
+	else:
+		print("⚠️  FPS Counter not found in CanvasLayer")
 
 func sync_world_movement_speed():
 	"""Synchronize world movement speed between systems"""

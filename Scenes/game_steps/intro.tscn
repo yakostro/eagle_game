@@ -1,8 +1,8 @@
 [gd_scene load_steps=4 format=3 uid="uid://c16kqiidsry0i"]
 
-[ext_resource type="Script" path="res://scripts/intro_scene.gd" id="1_l4u45"]
-[ext_resource type="FontFile" uid="uid://kcdyir8efr7o" path="res://fonts/Bangers-Regular.ttf" id="2_26n7w"]
-[ext_resource type="AudioStream" uid="uid://bqakjlnmlc3x4" path="res://sounds/wind/wind2.ogg" id="3_dq7cg"]
+[ext_resource type="Script" path="res://scripts/intro_scene.gd" id="1_n4rm5"]
+[ext_resource type="FontFile" uid="uid://kcdyir8efr7o" path="res://fonts/Bangers-Regular.ttf" id="2_irv1d"]
+[ext_resource type="AudioStream" uid="uid://bqakjlnmlc3x4" path="res://sounds/wind/wind2.ogg" id="3_1il5d"]
 
 [node name="Intro" type="Control"]
 layout_mode = 3
@@ -11,7 +11,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_l4u45")
+script = ExtResource("1_n4rm5")
 first_label_delay = 0.0
 second_label_delay = 3.0
 label_fade_duration = 1.2
@@ -56,7 +56,7 @@ offset_bottom = -21.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(0.890196, 0.866667, 0.909804, 1)
-theme_override_fonts/font = ExtResource("2_26n7w")
+theme_override_fonts/font = ExtResource("2_irv1d")
 theme_override_font_sizes/font_size = 40
 text = "Once there were many."
 horizontal_alignment = 1
@@ -76,7 +76,7 @@ offset_bottom = 58.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(0.890196, 0.866667, 0.909804, 1)
-theme_override_fonts/font = ExtResource("2_26n7w")
+theme_override_fonts/font = ExtResource("2_irv1d")
 theme_override_font_sizes/font_size = 40
 text = "Now the future of his kind depends on his flight."
 horizontal_alignment = 1
@@ -85,5 +85,5 @@ vertical_alignment = 1
 [node name="AudioController" type="Node" parent="."]
 
 [node name="IntroWind" type="AudioStreamPlayer" parent="AudioController"]
-stream = ExtResource("3_dq7cg")
+stream = ExtResource("3_1il5d")
 autoplay = true

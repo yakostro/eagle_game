@@ -1,50 +1,51 @@
-[gd_scene load_steps=19 format=3 uid="uid://bvfc1tl8ttpuo"]
+[gd_scene load_steps=20 format=3 uid="uid://bvfc1tl8ttpuo"]
 
-[ext_resource type="PackedScene" uid="uid://cd42djg346oqy" path="res://scenes/eagle.tscn" id="1_ek57t"]
-[ext_resource type="PackedScene" uid="uid://bfhkdj8w2yaqr" path="res://scenes/parallax_background.tscn" id="1_parallax"]
-[ext_resource type="PackedScene" uid="uid://eu78pwwdfttt" path="res://scenes/spawners.tscn" id="1_x4p0c"]
-[ext_resource type="PackedScene" uid="uid://dc4pbamcmsruq" path="res://scenes/obstacles/mountain_a.tscn" id="2_1q8ty"]
-[ext_resource type="PackedScene" uid="uid://cet764a7faoqm" path="res://scenes/wind_particles.tscn" id="2_wind"]
-[ext_resource type="Texture2D" uid="uid://csxqdwmhhass" path="res://sprites/background/mountains_back_2.png" id="3_b7kfd"]
-[ext_resource type="Texture2D" uid="uid://bq584cyumqstu" path="res://particles/wind_particle_3.png" id="3_yd0cu"]
-[ext_resource type="Texture2D" uid="uid://cxl0u15q5c5u7" path="res://sprites/background/mid.png" id="4_36n1e"]
-[ext_resource type="Script" path="res://scripts/sound_wind_mixer.gd" id="6_gwv1y"]
-[ext_resource type="AudioStream" uid="uid://sfagc5liqm30" path="res://sounds/wind/wind_woosh_loop.ogg" id="6_rxhl4"]
-[ext_resource type="Material" uid="uid://bmc1yhctwob0n" path="res://shaders/color_palette.tres" id="8_c8hqn"]
-[ext_resource type="AudioStream" uid="uid://06s15ka1es4v" path="res://sounds/wind/additional_wind.wav" id="8_jjn0q"]
-[ext_resource type="Script" path="res://scripts/ui_feedback.gd" id="11_ui"]
-[ext_resource type="Script" path="res://scripts/game_manager.gd" id="12_gm"]
-[ext_resource type="PackedScene" uid="uid://gdoloxvu6nf3" path="res://scenes/ui/energy_morale_ui.tscn" id="13_energy_ui"]
-[ext_resource type="FontFile" uid="uid://kcdyir8efr7o" path="res://fonts/Bangers-Regular.ttf" id="14_b8rty"]
-[ext_resource type="PackedScene" uid="uid://ca4niueilcjwp" path="res://scenes/ui/ui_immediate_text_feedback.tscn" id="15_energy_feedback"]
-[ext_resource type="Script" path="res://scripts/stage_hud.gd" id="16_stage_hud"]
+[ext_resource type="Script" path="res://scripts/game_manager.gd" id="1_amiw1"]
+[ext_resource type="PackedScene" uid="uid://bfhkdj8w2yaqr" path="res://scenes/parallax_background.tscn" id="2_pabcw"]
+[ext_resource type="Texture2D" uid="uid://csxqdwmhhass" path="res://sprites/background/mountains_back_2.png" id="3_ph54t"]
+[ext_resource type="Texture2D" uid="uid://cxl0u15q5c5u7" path="res://sprites/background/mid.png" id="4_ekxhh"]
+[ext_resource type="PackedScene" uid="uid://eu78pwwdfttt" path="res://scenes/spawners.tscn" id="5_b7kqf"]
+[ext_resource type="PackedScene" uid="uid://dc4pbamcmsruq" path="res://scenes/obstacles/mountain_a.tscn" id="6_rdnpa"]
+[ext_resource type="PackedScene" uid="uid://cd42djg346oqy" path="res://scenes/eagle.tscn" id="7_w8ddd"]
+[ext_resource type="PackedScene" uid="uid://cet764a7faoqm" path="res://scenes/wind_particles.tscn" id="8_1karo"]
+[ext_resource type="Texture2D" uid="uid://bq584cyumqstu" path="res://particles/wind_particle_3.png" id="9_p0bp2"]
+[ext_resource type="Material" uid="uid://bmc1yhctwob0n" path="res://shaders/color_palette.tres" id="10_7dtjx"]
+[ext_resource type="Script" path="res://scripts/ui_feedback.gd" id="11_w3rko"]
+[ext_resource type="PackedScene" uid="uid://gdoloxvu6nf3" path="res://scenes/ui/energy_morale_ui.tscn" id="12_rye0r"]
+[ext_resource type="PackedScene" uid="uid://ca4niueilcjwp" path="res://scenes/ui/ui_immediate_text_feedback.tscn" id="13_2vptr"]
+[ext_resource type="FontFile" uid="uid://kcdyir8efr7o" path="res://fonts/Bangers-Regular.ttf" id="14_k8s70"]
+[ext_resource type="Script" path="res://scripts/stage_hud.gd" id="15_l4c53"]
+[ext_resource type="Script" path="res://scripts/systems/fps_counter.gd" id="16_htv5j"]
+[ext_resource type="Script" path="res://scripts/sound_wind_mixer.gd" id="17_xaldk"]
+[ext_resource type="AudioStream" uid="uid://sfagc5liqm30" path="res://sounds/wind/wind_woosh_loop.ogg" id="18_72rxq"]
+[ext_resource type="AudioStream" uid="uid://06s15ka1es4v" path="res://sounds/wind/additional_wind.wav" id="19_pia2j"]
 
 [node name="Game" type="Node" groups=["game_area"]]
-script = ExtResource("12_gm")
+script = ExtResource("1_amiw1")
 obstacle_spawner_path = NodePath("Spawners/ObstacleSpawner")
 parallax_background_path = NodePath("ParallaxBackground")
 eagle_path = NodePath("Eagle")
 nest_spawner_path = NodePath("Spawners/NestSpawner")
 
-[node name="ParallaxBackground" parent="." instance=ExtResource("1_parallax")]
+[node name="ParallaxBackground" parent="." instance=ExtResource("2_pabcw")]
 enable_middle_layer = false
 middle_vertical_offset = 200.0
 gradient_bottom_color = Color(0.505882, 0.345098, 0.407843, 1)
-mountain_textures = Array[Texture2D]([ExtResource("3_b7kfd")])
-middle_textures = Array[Texture2D]([ExtResource("4_36n1e")])
+mountain_textures = Array[Texture2D]([ExtResource("3_ph54t")])
+middle_textures = Array[Texture2D]([ExtResource("4_ekxhh")])
 
-[node name="Spawners" parent="." instance=ExtResource("1_x4p0c")]
+[node name="Spawners" parent="." instance=ExtResource("5_b7kqf")]
 
 [node name="FishSpawner" parent="Spawners" index="0" node_paths=PackedStringArray("eagle_reference")]
 eagle_reference = NodePath("../../Eagle")
 
 [node name="ObstacleSpawner" parent="Spawners" index="1"]
-mountain_scenes = Array[PackedScene]([ExtResource("2_1q8ty")])
+mountain_scenes = Array[PackedScene]([ExtResource("6_rdnpa")])
 
 [node name="NestSpawner" parent="Spawners" index="2" node_paths=PackedStringArray("eagle_reference")]
 eagle_reference = NodePath("../../Eagle")
 
-[node name="Eagle" parent="." instance=ExtResource("1_ek57t")]
+[node name="Eagle" parent="." instance=ExtResource("7_w8ddd")]
 position = Vector2(667, 395)
 energy_loss_per_flap = 1.0
 disable_passive_energy_loss = true
@@ -52,14 +53,14 @@ disable_passive_energy_loss = true
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(960, 540)
 
-[node name="WindParticles" parent="." instance=ExtResource("2_wind")]
+[node name="WindParticles" parent="." instance=ExtResource("8_1karo")]
 z_index = -1
 position = Vector2(2101, 552)
 amount = 20
 speed_scale = 4.0
 lifetime_randomness = 0.0
 draw_order = 1
-texture = ExtResource("3_yd0cu")
+texture = ExtResource("9_p0bp2")
 spread = 0.0
 initial_velocity_min = 100.0
 initial_velocity_max = 120.0
@@ -83,7 +84,7 @@ visible = false
 
 [node name="PaletteColorRect" type="ColorRect" parent="FinalShader"]
 visible = false
-material = ExtResource("8_c8hqn")
+material = ExtResource("10_7dtjx")
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -93,17 +94,12 @@ mouse_filter = 2
 layer = 20
 
 [node name="UIFeedback" type="Node" parent="CanvasLayer"]
-script = ExtResource("11_ui")
-nest_spawner_path = NodePath("../../Spawners/NestSpawner")
+script = ExtResource("11_w3rko")
 eagle_path = NodePath("../../Eagle")
-nest_notice_label_path = NodePath("../NestNotice")
-energy_feedback_container_path = NodePath("../UiImmediateTextFeedback/EnergyFeedbackContainer")
-camera_path = NodePath("../../Camera2D")
-morale_pop_duration = 2.0
 
-[node name="EnergyMoraleUI" parent="CanvasLayer" instance=ExtResource("13_energy_ui")]
+[node name="EnergyMoraleUI" parent="CanvasLayer" instance=ExtResource("12_rye0r")]
 
-[node name="UiImmediateTextFeedback" parent="CanvasLayer" instance=ExtResource("15_energy_feedback")]
+[node name="UiImmediateTextFeedback" parent="CanvasLayer" instance=ExtResource("13_2vptr")]
 
 [node name="StateLabel" type="Label" parent="CanvasLayer"]
 visible = false
@@ -142,10 +138,10 @@ offset_top = 20.0
 offset_right = 250.0
 offset_bottom = 50.0
 theme_override_colors/font_color = Color(1, 1, 0.8, 1)
-theme_override_fonts/font = ExtResource("14_b8rty")
+theme_override_fonts/font = ExtResource("14_k8s70")
 theme_override_font_sizes/font_size = 22
 text = "Stage 1: Introduction"
-script = ExtResource("16_stage_hud")
+script = ExtResource("15_l4c53")
 
 [node name="NestNotice" type="Label" parent="CanvasLayer"]
 visible = false
@@ -154,7 +150,7 @@ offset_top = 55.0
 offset_right = 1148.0
 offset_bottom = 105.0
 theme_override_colors/font_color = Color(0.890196, 0.866667, 0.909804, 1)
-theme_override_fonts/font = ExtResource("14_b8rty")
+theme_override_fonts/font = ExtResource("14_k8s70")
 theme_override_font_sizes/font_size = 32
 text = "Nest ahead!"
 horizontal_alignment = 1
@@ -178,7 +174,7 @@ alignment = 1
 layout_mode = 2
 size_flags_vertical = 1
 theme_override_colors/font_color = Color(0.890196, 0.866667, 0.909804, 1)
-theme_override_fonts/font = ExtResource("14_b8rty")
+theme_override_fonts/font = ExtResource("14_k8s70")
 theme_override_font_sizes/font_size = 32
 text = "Nest missed"
 vertical_alignment = 1
@@ -187,21 +183,24 @@ vertical_alignment = 1
 layout_mode = 2
 size_flags_vertical = 1
 theme_override_colors/font_color = Color(0.8, 0.282353, 0.282353, 1)
-theme_override_fonts/font = ExtResource("14_b8rty")
+theme_override_fonts/font = ExtResource("14_k8s70")
 theme_override_font_sizes/font_size = 32
 text = "-Morale"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="FPSCounter" type="Label" parent="CanvasLayer"]
+script = ExtResource("16_htv5j")
+
 [node name="EmbientSound" type="Node2D" parent="."]
-script = ExtResource("6_gwv1y")
+script = ExtResource("17_xaldk")
 
 [node name="BaseWind" type="AudioStreamPlayer2D" parent="EmbientSound"]
-stream = ExtResource("6_rxhl4")
+stream = ExtResource("18_72rxq")
 volume_db = -15.0
 
 [node name="AdditionalWind" type="AudioStreamPlayer2D" parent="EmbientSound"]
-stream = ExtResource("8_jjn0q")
+stream = ExtResource("19_pia2j")
 volume_db = -18.0
 
 [editable path="Spawners"]

@@ -166,10 +166,10 @@ func _get_stage_file_path(stage_number: int) -> String:
 	}
 	
 	if stage_number in stage_file_names:
-		return "res://scenes/configs/stages/" + stage_file_names[stage_number]
+		return "res://configs/stages/" + stage_file_names[stage_number]
 	else:
 		# Fallback for future stages
-		return "res://scenes/configs/stages/stage_%02d.tres" % stage_number
+		return "res://configs/stages/stage_%02d.tres" % stage_number
 
 ## Advance to the next stage
 func advance_to_next_stage():

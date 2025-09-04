@@ -15,11 +15,6 @@ var mountain_weight: int = 10
 var stalactite_weight: int = 0  # 0 = disabled
 var floating_island_weight: int = 5
 
-# Obstacle spawning balance (now controlled by StageManager)
-var spawn_interval: float = 5.0  # Seconds between spawns
-var spawn_interval_variance: float = 1.0  # Random variation in timing
-var min_spawn_interval: float = 3.0  # Minimum time between spawns
-
 # Movement speed (now controlled by StageManager)
 var obstacle_movement_speed: float = 300.0
 
@@ -34,9 +29,9 @@ var current_stage_config: StageConfiguration
 # Reference to nest spawner for coordination
 @export var nest_spawner: NestSpawner
 
-var spawn_timer: Timer
 var screen_size: Vector2
 var obstacle_count: int = 0  # Counter to track spawned obstacles
+var last_obstacle_x: float = 0.0  # Track X position of last spawned obstacle
 
 # Signal emitted when an obstacle is spawned
 signal obstacle_spawned(obstacle: BaseObstacle)
@@ -47,34 +42,30 @@ var obstacle_types: Array[Dictionary] = []
 func _ready():
 	# Get screen size
 	screen_size = get_viewport().get_visible_rect().size
-	
+
 	# Initialize obstacle types array
 	_setup_obstacle_types()
-	
+
 	# Connect to nest spawner if available
 	if nest_spawner:
 		obstacle_spawned.connect(nest_spawner.on_obstacle_spawned)
 		print("🔗 Connected to NestSpawner")
 	else:
 		print("⚠️  No NestSpawner connected - nests will not spawn")
-	
-	# Create and configure spawn timer
-	spawn_timer = Timer.new()
-	add_child(spawn_timer)
-	spawn_timer.wait_time = spawn_interval
-	spawn_timer.timeout.connect(_on_spawn_timer_timeout)
-	spawn_timer.start()
-	
+
 	print("🏔️  Obstacle spawner initialized. Screen size: ", screen_size)
 	print("   Available obstacle types: ", obstacle_types.size())
 	for obstacle_type in obstacle_types:
 		print("   - ", obstacle_type["name"], " (weight: ", obstacle_type["weight"], ")")
-	print("   Spawn interval: ", spawn_interval, "±", spawn_interval_variance, " seconds")
-	
+	print("   Distance range: ", min_obstacle_distance, "-", max_obstacle_distance)
+
 	# Connect to StageManager for stage-based configuration
 	_connect_to_stage_manager()
 
 func _process(_delta):
+	# Check if we need to spawn a new obstacle based on distance
+	_check_distance_based_spawning()
+
 	# Debug key to manually spawn obstacle (Enter key for testing)
 	if Input.is_action_just_pressed("ui_accept"):
 		spawn_obstacle_now()
@@ -101,50 +92,99 @@ func _setup_obstacle_types():
 	if obstacle_types.is_empty():
 		push_error("No obstacle scenes assigned to ObstacleSpawner!")
 
-func _on_spawn_timer_timeout():
-	spawn_random_obstacle()
-	
-	# Set random interval for next spawn
-	var next_interval = spawn_interval + randf_range(-spawn_interval_variance, spawn_interval_variance)
-	next_interval = max(next_interval, min_spawn_interval)
-	spawn_timer.wait_time = next_interval
-	spawn_timer.start()
+func _check_distance_based_spawning():
+	"""Check if we need to spawn a new obstacle based on distance from last obstacle"""
+	if obstacle_types.is_empty():
+		return
+
+	# If no obstacles spawned yet, spawn first one at initial distance from screen
+	if last_obstacle_x == 0.0:
+		last_obstacle_x = screen_size.x + randf_range(min_obstacle_distance, max_obstacle_distance)
+		spawn_obstacle_at_x_position(last_obstacle_x)
+		return
+
+	# Calculate distance from last obstacle to right edge of screen
+	var distance_to_screen_edge = screen_size.x - last_obstacle_x
+
+	# If we're getting close to the screen edge, spawn a new obstacle
+	if distance_to_screen_edge < min_obstacle_distance:
+		var next_spawn_x = last_obstacle_x + randf_range(min_obstacle_distance, max_obstacle_distance)
+		spawn_obstacle_at_x_position(next_spawn_x)
 
 func spawn_random_obstacle():
 	"""Spawn a random obstacle based on weights"""
 	if obstacle_types.is_empty():
 		print("Error: No obstacle types available!")
 		return
-	
+
 	# Select random obstacle type using weighted selection
 	var selected_type = _get_weighted_random_obstacle_type()
 	if not selected_type:
 		print("Error: Failed to select obstacle type!")
 		return
-	
+
 	# Instantiate the obstacle
 	var obstacle_scene = selected_type["scene"]
 	var obstacle = obstacle_scene.instantiate()
 	get_tree().current_scene.add_child(obstacle)
-	
+
 	# Apply stage-specific height/offset parameters before setup
 	_apply_stage_height_params_to_obstacle(obstacle, selected_type["name"])
-	
+
 	# Set up the obstacle with shared movement speed
 	obstacle.set_movement_speed(obstacle_movement_speed)
 	obstacle.setup_obstacle(screen_size.x, screen_size.y)
-	
+
 	# Increment obstacle counter
 	obstacle_count += 1
-	
+
 	# Notify StageManager of obstacle spawn (for stage progression tracking)
 	if StageManager:
 		StageManager.on_obstacle_spawned()
-	
+
 	# Emit signal for nest spawner to handle
 	obstacle_spawned.emit(obstacle)
-	
+
 	print("🏔️  Spawned ", selected_type["name"], " | Total obstacles: ", obstacle_count)
+
+func spawn_obstacle_at_x_position(spawn_x: float):
+	"""Spawn an obstacle at a specific X position"""
+	if obstacle_types.is_empty():
+		print("Error: No obstacle types available!")
+		return
+
+	# Select random obstacle type using weighted selection
+	var selected_type = _get_weighted_random_obstacle_type()
+	if not selected_type:
+		print("Error: Failed to select obstacle type!")
+		return
+
+	# Instantiate the obstacle
+	var obstacle_scene = selected_type["scene"]
+	var obstacle = obstacle_scene.instantiate()
+	get_tree().current_scene.add_child(obstacle)
+
+	# Apply stage-specific height/offset parameters before setup
+	_apply_stage_height_params_to_obstacle(obstacle, selected_type["name"])
+
+	# Set up the obstacle with shared movement speed
+	obstacle.set_movement_speed(obstacle_movement_speed)
+	obstacle.setup_obstacle_at_x_position(screen_size.x, screen_size.y, spawn_x)
+
+	# Update last obstacle position
+	last_obstacle_x = spawn_x
+
+	# Increment obstacle counter
+	obstacle_count += 1
+
+	# Notify StageManager of obstacle spawn (for stage progression tracking)
+	if StageManager:
+		StageManager.on_obstacle_spawned()
+
+	# Emit signal for nest spawner to handle
+	obstacle_spawned.emit(obstacle)
+
+	print("🏔️  Spawned ", selected_type["name"], " at X=", spawn_x, " | Total obstacles: ", obstacle_count)
 
 func _get_weighted_random_obstacle_type() -> Dictionary:
 	"""Select a random obstacle type based on weights"""
@@ -192,43 +232,31 @@ func apply_stage_config(config: StageConfiguration):
 	if not config:
 		print("⚠️  No stage configuration provided")
 		return
-		
+
 	current_stage_config = config
-	
+
 	# Update obstacle weights
 	mountain_weight = config.mountain_weight
 	stalactite_weight = config.stalactite_weight
 	floating_island_weight = config.floating_island_weight
-	
+
 	# Update world/movement speed
 	obstacle_movement_speed = config.world_speed
-	
+
 	# Update distance parameters
 	min_obstacle_distance = config.min_obstacle_distance
 	max_obstacle_distance = config.max_obstacle_distance
 	same_obstacle_repeat_chance = config.same_obstacle_repeat_chance
-	
-	# Calculate spawn intervals based on distance and speed
-	# Spawn interval = distance / speed (time = distance / velocity)
-	var avg_distance = (min_obstacle_distance + max_obstacle_distance) / 2.0
-	spawn_interval = avg_distance / obstacle_movement_speed
-	spawn_interval_variance = (max_obstacle_distance - min_obstacle_distance) / (2.0 * obstacle_movement_speed)
-	min_spawn_interval = min_obstacle_distance / obstacle_movement_speed
-	
-	# Update spawn timer with new interval
-	if spawn_timer:
-		spawn_timer.wait_time = spawn_interval
-	
+
 	# Refresh obstacle types with new weights
 	_setup_obstacle_types()
-	
+
 	print("🏔️  Stage config applied:")
 	print("   - World speed: ", obstacle_movement_speed)
 	print("   - Mountain weight: ", mountain_weight)
 	print("   - Stalactite weight: ", stalactite_weight)
 	print("   - Island weight: ", floating_island_weight)
 	print("   - Distance range: ", min_obstacle_distance, "-", max_obstacle_distance)
-	print("   - Spawn interval: ", spawn_interval, "±", spawn_interval_variance, "s")
 
 func _apply_stage_height_params_to_obstacle(obstacle: Node, obstacle_type_name: String):
 	"""Apply stage-specific height/offset parameters to an obstacle"""
