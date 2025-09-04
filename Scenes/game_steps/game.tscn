@@ -10,12 +10,12 @@
 [ext_resource type="PackedScene" uid="uid://cet764a7faoqm" path="res://scenes/wind_particles.tscn" id="8_1karo"]
 [ext_resource type="Texture2D" uid="uid://bq584cyumqstu" path="res://particles/wind_particle_3.png" id="9_p0bp2"]
 [ext_resource type="Material" uid="uid://bmc1yhctwob0n" path="res://shaders/color_palette.tres" id="10_7dtjx"]
-[ext_resource type="Script" path="res://scripts/ui_feedback.gd" id="11_w3rko"]
+[ext_resource type="Script" path="res://scripts/ui/ui_message.gd" id="11_w3rko"]
 [ext_resource type="PackedScene" uid="uid://gdoloxvu6nf3" path="res://scenes/ui/energy_morale_ui.tscn" id="12_rye0r"]
 [ext_resource type="PackedScene" uid="uid://ca4niueilcjwp" path="res://scenes/ui/ui_immediate_text_feedback.tscn" id="13_2vptr"]
 [ext_resource type="FontFile" uid="uid://kcdyir8efr7o" path="res://fonts/Bangers-Regular.ttf" id="14_k8s70"]
-[ext_resource type="Script" path="res://scripts/stage_hud.gd" id="15_l4c53"]
-[ext_resource type="Script" path="res://scripts/fps_counter.gd" id="16_htv5j"]
+[ext_resource type="Script" path="res://scripts/ui/ui_debug_stages.gd" id="15_l4c53"]
+[ext_resource type="Script" path="res://scripts/ui/ui_debug_fps_counter.gd" id="16_htv5j"]
 [ext_resource type="Script" path="res://scripts/sound_wind_mixer.gd" id="17_xaldk"]
 [ext_resource type="AudioStream" uid="uid://sfagc5liqm30" path="res://sounds/wind/wind_woosh_loop.ogg" id="18_72rxq"]
 [ext_resource type="AudioStream" uid="uid://06s15ka1es4v" path="res://sounds/wind/additional_wind.wav" id="19_pia2j"]
@@ -93,44 +93,13 @@ mouse_filter = 2
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 layer = 20
 
-[node name="UIFeedback" type="Node" parent="CanvasLayer"]
+[node name="UIMessage" type="Node" parent="CanvasLayer"]
 script = ExtResource("11_w3rko")
 eagle_path = NodePath("../../Eagle")
 
-[node name="EnergyMoraleUI" parent="CanvasLayer" instance=ExtResource("12_rye0r")]
+[node name="UIEnergyBar" parent="CanvasLayer" instance=ExtResource("12_rye0r")]
 
-[node name="UiImmediateTextFeedback" parent="CanvasLayer" instance=ExtResource("13_2vptr")]
-
-[node name="StateLabel" type="Label" parent="CanvasLayer"]
-visible = false
-offset_right = 40.0
-offset_bottom = 23.0
-size_flags_horizontal = 0
-size_flags_vertical = 0
-theme_override_font_sizes/font_size = 25
-
-[node name="FishCounterLabel" type="Label" parent="CanvasLayer"]
-visible = false
-offset_top = 51.0
-offset_right = 40.0
-offset_bottom = 78.0
-size_flags_horizontal = 0
-size_flags_vertical = 0
-theme_override_font_sizes/font_size = 19
-
-[node name="Controls" type="Label" parent="CanvasLayer"]
-visible = false
-offset_top = 107.0
-offset_right = 127.0
-offset_bottom = 254.0
-size_flags_horizontal = 0
-size_flags_vertical = 0
-theme_override_font_sizes/font_size = 19
-text = "W - flap wings
-S - dive
-E - eat fish
-Space - drop fish
-H- screech"
+[node name="UIInstantTextFeedback" parent="CanvasLayer" instance=ExtResource("13_2vptr")]
 
 [node name="StageHUD" type="Label" parent="CanvasLayer"]
 offset_left = 20.0
@@ -142,19 +111,6 @@ theme_override_fonts/font = ExtResource("14_k8s70")
 theme_override_font_sizes/font_size = 22
 text = "Stage 1: Introduction"
 script = ExtResource("15_l4c53")
-
-[node name="NestNotice" type="Label" parent="CanvasLayer"]
-visible = false
-offset_left = 822.0
-offset_top = 55.0
-offset_right = 1148.0
-offset_bottom = 105.0
-theme_override_colors/font_color = Color(0.890196, 0.866667, 0.909804, 1)
-theme_override_fonts/font = ExtResource("14_k8s70")
-theme_override_font_sizes/font_size = 32
-text = "Nest ahead!"
-horizontal_alignment = 1
-vertical_alignment = 1
 
 [node name="MoralePopContainer" type="HBoxContainer" parent="CanvasLayer"]
 anchors_preset = 5

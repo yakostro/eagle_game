@@ -5,7 +5,7 @@ class_name UIFeedback
 # Message types for the queue system
 enum MessageType {
 	NEST_INCOMING,
-	MORALE_NEGATIVE,
+	NEST_MISSED,	
 	ENERGY_LOSS
 }
 
@@ -87,7 +87,7 @@ func _unhandled_input(event):
 		# DEBUG: U key to test morale UI message
 		if event.keycode == KEY_U:
 			print("DEBUG: Manual morale UI message triggered!")
-			_add_message_to_queue(MessageType.MORALE_NEGATIVE)
+			_add_message_to_queue(MessageType.NEST_MISSED)
 			get_viewport().set_input_as_handled()
 		# DEBUG: I key to test nest UI message  
 		elif event.keycode == KEY_I:
@@ -123,7 +123,7 @@ func _on_nest_missed(_points: int = 0):
 	"""Queue morale negative message instead of showing directly"""
 	if not morale_pop_container:
 		return
-	_add_message_to_queue(MessageType.MORALE_NEGATIVE)
+	_add_message_to_queue(MessageType.NEST_MISSED)
 
 func _on_morale_changed(new_morale: float):
 	# Note: The MoralePopContainer is now only used for nest missed feedback
@@ -225,7 +225,7 @@ func _show_current_message():
 		MessageType.NEST_INCOMING:
 			_show_nest_notice()
 			_message_timer.start(nest_notice_duration)
-		MessageType.MORALE_NEGATIVE:
+		MessageType.NEST_MISSED:
 			_show_morale_popup()
 			_message_timer.start(morale_pop_duration)
 		MessageType.ENERGY_LOSS:
@@ -258,7 +258,7 @@ func _hide_current_message():
 	match current_message.type:
 		MessageType.NEST_INCOMING:
 			_hide_nest_notice()
-		MessageType.MORALE_NEGATIVE:
+		MessageType.NEST_MISSED:
 			_hide_morale_pop()
 		MessageType.ENERGY_LOSS:
 			_hide_energy_loss_feedback()

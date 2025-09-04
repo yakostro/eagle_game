@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://gdoloxvu6nf3"]
 
-[ext_resource type="Script" path="res://scripts/energy_ui.gd" id="1_energy_ui"]
+[ext_resource type="Script" path="res://scripts/ui/ui_energy_bar.gd" id="1_mownw"]
 [ext_resource type="Texture2D" uid="uid://dvw8gyb7bbuo8" path="res://sprites/ui/energy_icon.png" id="2_qg3rf"]
 [ext_resource type="Texture2D" uid="uid://dpknf11oje66e" path="res://sprites/ui/diagonal_pattern_2.png" id="2_xrren"]
 
@@ -12,7 +12,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-script = ExtResource("1_energy_ui")
+script = ExtResource("1_mownw")
 energy_color = Color(0.631373, 0.490196, 0.137255, 1)
 energy_loss_feedback_color = Color(0.890196, 0.866667, 0.909804, 1)
 background_color = Color(0.188235, 0.145098, 0.227451, 1)
