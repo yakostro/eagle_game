@@ -16,6 +16,7 @@ first_label_delay = 0.0
 second_label_delay = 3.0
 label_fade_duration = 1.2
 total_scene_duration = 8.0
+game_scene_path = "res://scenes/game_steps/game.tscn"
 first_label_path = NodePath("UILayer/UIContainer/FirstLabel")
 second_label_path = NodePath("UILayer/UIContainer/SecondLabel")
 intro_music_path = NodePath("")
