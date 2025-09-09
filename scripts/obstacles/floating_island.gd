@@ -1,8 +1,8 @@
 extends BaseObstacle
 class_name FloatingIsland
 
-@export var minimum_top_offset: float = 100.0  # Minimum offset from top according to GDD
-@export var minimum_bottom_offset: float = 100.0  # Minimum offset from bottom according to GDD
+var minimum_top_offset: float = 100.0  # Minimum offset from top according to GDD
+var minimum_bottom_offset: float = 100.0  # Minimum offset from bottom according to GDD
 
 func _ready():
 	# Call parent _ready first

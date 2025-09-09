@@ -33,6 +33,9 @@ var screen_size: Vector2
 var obstacle_count: int = 0  # Counter to track spawned obstacles
 var last_obstacle_x: float = 0.0  # Track X position of last spawned obstacle
 
+# Variety control
+var last_spawned_obstacle_type_name: String = ""
+
 # Distance-based spawning cursor (camera/world-speed relative)
 var distance_until_next_spawn: float = 0.0
 
@@ -141,6 +144,10 @@ func spawn_random_obstacle():
 	# Increment obstacle counter
 	obstacle_count += 1
 
+	# Track last spawned type for anti-repeat
+	if "name" in selected_type:
+		last_spawned_obstacle_type_name = selected_type["name"]
+
 	# Notify StageManager of obstacle spawn (for stage progression tracking)
 	if StageManager:
 		StageManager.on_obstacle_spawned()
@@ -150,44 +157,7 @@ func spawn_random_obstacle():
 
 	print("🏔️  Spawned ", selected_type["name"], " | Total obstacles: ", obstacle_count)
 
-func spawn_obstacle_at_x_position(spawn_x: float):
-	"""Spawn an obstacle at a specific X position"""
-	if obstacle_types.is_empty():
-		print("Error: No obstacle types available!")
-		return
 
-	# Select random obstacle type using weighted selection
-	var selected_type = _get_weighted_random_obstacle_type()
-	if not selected_type:
-		print("Error: Failed to select obstacle type!")
-		return
-
-	# Instantiate the obstacle
-	var obstacle_scene = selected_type["scene"]
-	var obstacle = obstacle_scene.instantiate()
-	get_tree().current_scene.add_child(obstacle)
-
-	# Apply stage-specific height/offset parameters before setup
-	_apply_stage_height_params_to_obstacle(obstacle, selected_type["name"])
-
-	# Set up the obstacle with shared movement speed
-	obstacle.set_movement_speed(obstacle_movement_speed)
-	obstacle.setup_obstacle_at_x_position(screen_size.x, screen_size.y, spawn_x)
-
-	# Update last obstacle position
-	last_obstacle_x = spawn_x
-
-	# Increment obstacle counter
-	obstacle_count += 1
-
-	# Notify StageManager of obstacle spawn (for stage progression tracking)
-	if StageManager:
-		StageManager.on_obstacle_spawned()
-
-	# Emit signal for nest spawner to handle
-	obstacle_spawned.emit(obstacle)
-
-	print("🏔️  Spawned ", selected_type["name"], " at X=", spawn_x, " | Total obstacles: ", obstacle_count)
 
 func _get_weighted_random_obstacle_type() -> Dictionary:
 	"""Select a random obstacle type based on weights"""
@@ -199,17 +169,28 @@ func _get_weighted_random_obstacle_type() -> Dictionary:
 	if total_weight <= 0:
 		return {}
 	
-	# Generate random number and find corresponding type
-	var random_value = randi_range(1, total_weight)
-	var current_weight = 0
-	
-	for obstacle_type in obstacle_types:
-		current_weight += obstacle_type["weight"]
-		if random_value <= current_weight:
-			return obstacle_type
-	
-	# Fallback to first type
-	return obstacle_types[0]
+	# Helper: one weighted pick
+	var function_pick_once := func() -> Dictionary:
+		var value = randi_range(1, total_weight)
+		var accum = 0
+		for obstacle_type in obstacle_types:
+			accum += obstacle_type["weight"]
+			if value <= accum:
+				return obstacle_type
+		return obstacle_types[0]
+
+	# First pick
+	var picked: Dictionary = function_pick_once.call()
+
+	# Anti-repeat: if same as last, only allow with configured probability; otherwise reroll once
+	if last_spawned_obstacle_type_name != "" and "name" in picked and picked["name"] == last_spawned_obstacle_type_name:
+		var allow_repeat = randf() < same_obstacle_repeat_chance
+		if not allow_repeat:
+			var reroll: Dictionary = function_pick_once.call()
+			# Use reroll even if it matches again (single reroll policy)
+			picked = reroll
+
+	return picked
 
 # STAGE MANAGER INTEGRATION ===============================================
 
@@ -288,9 +269,7 @@ func _apply_stage_height_params_to_obstacle(obstacle: Node, obstacle_type_name: 
 	
 	elif obstacle_type_name == "FloatingIsland" or obstacle_type_name.find("Island") != -1:
 		# Apply floating island offset parameters
-		if obstacle.has_method("set_offset_range"):
-			obstacle.set_offset_range(current_stage_config.floating_island_minimum_top_offset, current_stage_config.floating_island_minimum_bottom_offset)
-		elif "minimum_top_offset" in obstacle and "minimum_bottom_offset" in obstacle:
+		if "minimum_top_offset" in obstacle and "minimum_bottom_offset" in obstacle:
 			obstacle.minimum_top_offset = current_stage_config.floating_island_minimum_top_offset
 			obstacle.minimum_bottom_offset = current_stage_config.floating_island_minimum_bottom_offset
 			print("🏝️  Applied island offsets: ", current_stage_config.floating_island_minimum_top_offset, "-", current_stage_config.floating_island_minimum_bottom_offset)

@@ -42,16 +42,7 @@ func setup_obstacle(screen_w: float, screen_height: float):
 
 	print(get_obstacle_type(), " setup at position: ", global_position)
 
-func setup_obstacle_at_x_position(screen_w: float, screen_height: float, spawn_x: float):
-	"""Set up obstacle at a specific X position"""
-	self.screen_width = screen_w
 
-	# Child classes must implement specific Y positioning
-	var spawn_y = get_spawn_y_position(screen_height)
-
-	global_position = Vector2(spawn_x, spawn_y)
-
-	print(get_obstacle_type(), " setup at position: ", global_position)
 
 func get_spawn_y_position(_screen_height: float) -> float:
 	"""Abstract method - must be implemented by child classes"""
