@@ -33,6 +33,9 @@ var screen_size: Vector2
 var obstacle_count: int = 0  # Counter to track spawned obstacles
 var last_obstacle_x: float = 0.0  # Track X position of last spawned obstacle
 
+# Distance-based spawning cursor (camera/world-speed relative)
+var distance_until_next_spawn: float = 0.0
+
 # Signal emitted when an obstacle is spawned
 signal obstacle_spawned(obstacle: BaseObstacle)
 
@@ -45,6 +48,9 @@ func _ready():
 
 	# Initialize obstacle types array
 	_setup_obstacle_types()
+
+	# Initialize distance-based spawn budget
+	_reset_spawn_distance()
 
 	# Connect to nest spawner if available
 	if nest_spawner:
@@ -62,9 +68,9 @@ func _ready():
 	# Connect to StageManager for stage-based configuration
 	_connect_to_stage_manager()
 
-func _process(_delta):
-	# Check if we need to spawn a new obstacle based on distance
-	_check_distance_based_spawning()
+func _process(delta):
+	# Tick distance-based spawning using world speed
+	_tick_distance_based_spawning(delta)
 
 	# Debug key to manually spawn obstacle (Enter key for testing)
 	if Input.is_action_just_pressed("ui_accept"):
@@ -92,24 +98,21 @@ func _setup_obstacle_types():
 	if obstacle_types.is_empty():
 		push_error("No obstacle scenes assigned to ObstacleSpawner!")
 
-func _check_distance_based_spawning():
-	"""Check if we need to spawn a new obstacle based on distance from last obstacle"""
+func _tick_distance_based_spawning(delta: float):
+	"""Spawn new obstacles when world has advanced enough distance"""
 	if obstacle_types.is_empty():
 		return
 
-	# If no obstacles spawned yet, spawn first one at initial distance from screen
-	if last_obstacle_x == 0.0:
-		last_obstacle_x = screen_size.x + randf_range(min_obstacle_distance, max_obstacle_distance)
-		spawn_obstacle_at_x_position(last_obstacle_x)
-		return
+	# Decrease remaining distance based on world speed
+	distance_until_next_spawn -= obstacle_movement_speed * delta
 
-	# Calculate distance from last obstacle to right edge of screen
-	var distance_to_screen_edge = screen_size.x - last_obstacle_x
+	if distance_until_next_spawn <= 0.0:
+		spawn_random_obstacle()
+		_reset_spawn_distance()
 
-	# If we're getting close to the screen edge, spawn a new obstacle
-	if distance_to_screen_edge < min_obstacle_distance:
-		var next_spawn_x = last_obstacle_x + randf_range(min_obstacle_distance, max_obstacle_distance)
-		spawn_obstacle_at_x_position(next_spawn_x)
+func _reset_spawn_distance():
+	"""Reset the distance budget until the next spawn"""
+	distance_until_next_spawn = randf_range(min_obstacle_distance, max_obstacle_distance)
 
 func spawn_random_obstacle():
 	"""Spawn a random obstacle based on weights"""

@@ -103,8 +103,6 @@ func _physics_process(delta):
 	# 6. Apply movement (movement controller sets velocity, we apply it)
 	move_and_slide()
 	
-	# 7. Update UI
-	update_UI()
 
 func _unhandled_input(event):
 	"""Handle debug input for testing"""
@@ -440,26 +438,3 @@ func handle_special_inputs():
 	
 
 	
-
-
-# Movement methods removed - now handled by movement_controller
-
-func update_UI():
-	var current_movement_state = movement_controller.get_movement_state()
-	state_label.text = str(MovementState.keys()[current_movement_state])
-	
-	# Add hit state timer if in hit state
-	if current_movement_state == MovementState.HIT:
-		state_label.text += " (T:" + str("%.1f" % hit_state_timer) + ")"
-	
-	# Add fish carrying status
-	if has_fish():
-		state_label.text += " [FISH]"
-	
-	# Add immunity status
-	if is_immune:
-		state_label.text += " [IMMUNE]"
-	
-	# Add energy and capacity to UI
-	state_label.text += " Energy: " + str(int(current_energy)) + "/" + str(int(max_energy))
-	state_label.text += " | Capacity: " + str(int(get_energy_capacity_percentage() * 100)) + "%"

@@ -87,8 +87,7 @@ func _print_performance_stats():
 
 	if show_memory:
 		var static_memory = Performance.get_monitor(Performance.MEMORY_STATIC) / 1024 / 1024
-		var dynamic_memory = Performance.get_monitor(Performance.MEMORY_DYNAMIC) / 1024 / 1024
-		var total_memory = static_memory + dynamic_memory
+		var total_memory = static_memory
 
 		memory_history.append(total_memory)
 		if memory_history.size() > 10:
@@ -97,8 +96,8 @@ func _print_performance_stats():
 		if total_memory > memory_peak:
 			memory_peak = total_memory
 
-		stats_text += "\n   🧠 Memory: %.1f MB (static: %.1f, dynamic: %.1f, peak: %.1f)" % [
-			total_memory, static_memory, dynamic_memory, memory_peak
+		stats_text += "\n   🧠 Memory: %.1f MB (static: %.1f, peak: %.1f)" % [
+			total_memory, static_memory, memory_peak
 		]
 
 		# Memory warning
@@ -107,9 +106,7 @@ func _print_performance_stats():
 			push_warning("High memory usage: %.1f MB (above %d MB threshold)" % [total_memory, memory_warning_threshold_mb])
 
 	if show_object_count:
-		var objects_2d = Performance.get_monitor(Performance.OBJECT_COUNT_2D)
-		var objects_3d = Performance.get_monitor(Performance.OBJECT_COUNT_3D)
-		var total_objects = objects_2d + objects_3d
+		var total_objects = int(Performance.get_monitor(Performance.OBJECT_COUNT))
 
 		object_history.append(total_objects)
 		if object_history.size() > 10:
@@ -118,21 +115,21 @@ func _print_performance_stats():
 		if total_objects > max_objects:
 			max_objects = total_objects
 
-		stats_text += "\n   📦 Objects: %d total (2D: %d, 3D: %d, peak: %d)" % [
-			total_objects, objects_2d, objects_3d, max_objects
+		stats_text += "\n   📦 Objects: %d total (peak: %d)" % [
+			total_objects, max_objects
 		]
 
 	if show_gpu:
 		var draw_calls = Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)
-		var vertices = Performance.get_monitor(Performance.RENDER_TOTAL_VERTICES_IN_FRAME)
-		stats_text += "\n   🎨 GPU: %d draw calls, %d vertices" % [draw_calls, vertices]
+		var objects_drawn = Performance.get_monitor(Performance.RENDER_TOTAL_OBJECTS_IN_FRAME)
+		stats_text += "\n   🎨 GPU: %d draw calls, %d objects" % [draw_calls, objects_drawn]
 
 	print(stats_text)
 
 func get_performance_report() -> String:
 	"""Generate a detailed performance report"""
 	var report = "=== PERFORMANCE REPORT ===\n"
-	report += "Session Duration: %.1f seconds\n" % Time.get_ticks_msec() / 1000.0
+	report += "Session Duration: %.1f seconds\n" % (Time.get_ticks_msec() / 1000.0)
 	report += "Average FPS: %.1f\n" % avg_fps
 	report += "FPS Range: %d - %d\n" % [min_fps, max_fps]
 	report += "Peak Memory: %.1f MB\n" % memory_peak

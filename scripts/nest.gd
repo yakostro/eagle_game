@@ -49,13 +49,22 @@ func _process(_delta):
 	"""Handle missed signal when nest goes off-screen"""
 	# Only emit missed signal if nest is still hungry and hasn't emitted before
 	if current_state == NestState.HUNGRY and not has_emitted_missed:
-		# Check if the nest itself has gone off-screen by checking its actual global position
-		# The nest's global_position already accounts for its position on the obstacle
-		# We emit when the nest itself crosses the left edge of the screen
-		if global_position.x < 0:  # Nest has gone off the left side of screen
+		# Check if the nest itself has gone off-screen using the active camera's left edge
+		var left_edge_x = _get_camera_left_edge_x()
+		if global_position.x < left_edge_x:  # Nest has gone off the left side of screen
 			print("Nest missed - going off screen at position: ", global_position.x)
 			nest_missed.emit(energy_capacity_loss)
 			has_emitted_missed = true
+
+func _get_camera_left_edge_x() -> float:
+	"""Compute world X coordinate of the camera's left screen edge"""
+	var cam := get_viewport().get_camera_2d()
+	if cam:
+		var center := cam.get_screen_center_position()
+		var half_width := get_viewport().get_visible_rect().size.x * 0.5
+		return center.x - half_width
+	# Fallback: assume origin is left edge when no camera is active
+	return 0.0
 
 func set_state(new_state: NestState):
 	"""Change nest state and update animation"""

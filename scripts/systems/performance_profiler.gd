@@ -43,7 +43,7 @@ func _ready():
 	else:
 		print("   ⚠️  ObstacleSpawner not found")
 
-func _process(delta: float):
+func _process(_delta: float):
 	frame_count += 1
 
 	# Profile every 60 frames (roughly 1 second at 60 FPS)
@@ -111,20 +111,17 @@ func _profile_physics_performance():
 
 func _profile_render_performance():
 	var draw_calls = Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)
-	var vertices = Performance.get_monitor(Performance.RENDER_TOTAL_VERTICES_IN_FRAME)
 	var objects_drawn = Performance.get_monitor(Performance.RENDER_TOTAL_OBJECTS_IN_FRAME)
 
 	print("🎨 RENDER PROFILE:")
 	print("   - Draw calls: %d" % draw_calls)
-	print("   - Vertices: %d" % vertices)
 	print("   - Objects drawn: %d" % objects_drawn)
 
 	# Warnings for rendering performance
 	if draw_calls > 100:
 		push_warning("High draw calls: %d (may impact GPU performance)" % draw_calls)
 
-	if vertices > 50000:
-		push_warning("High vertex count: %d (may impact GPU performance)" % vertices)
+	# Vertex counter not available in Godot 4.2 Performance monitors
 
 func _profile_script_performance():
 	var script_time = Performance.get_monitor(Performance.TIME_PROCESS) - Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS)
@@ -143,7 +140,7 @@ func _profile_script_performance():
 	if script_time > 0.01:  # More than 10ms
 		push_warning("Script execution taking too long: %.2f ms (target: <10ms)" % (script_time * 1000))
 
-func _on_obstacle_spawned(obstacle: Node):
+func _on_obstacle_spawned(_obstacle: Node):
 	"""Called when a new obstacle is spawned - measure spawn time"""
 	if not profile_obstacle_spawning:
 		return
@@ -165,8 +162,8 @@ func get_detailed_report() -> String:
 
 	report += "🎯 PERFORMANCE SUMMARY:\n"
 	report += "- Average FPS: %.1f\n" % Performance.get_monitor(Performance.TIME_FPS)
-	report += "- Total objects: %d\n" % (Performance.get_monitor(Performance.OBJECT_COUNT_2D) + Performance.get_monitor(Performance.OBJECT_COUNT_3D))
-	report += "- Memory usage: %.1f MB\n" % ((Performance.get_monitor(Performance.MEMORY_STATIC) + Performance.get_monitor(Performance.MEMORY_DYNAMIC)) / 1024 / 1024)
+	report += "- Total objects: %d\n" % int(Performance.get_monitor(Performance.OBJECT_COUNT))
+	report += "- Memory usage: %.1f MB\n" % (Performance.get_monitor(Performance.MEMORY_STATIC) / 1024 / 1024)
 	report += "\n"
 
 	report += "🏔️  OBSTACLE SYSTEM:\n"
@@ -183,7 +180,6 @@ func get_detailed_report() -> String:
 
 	report += "\n🎨 RENDER ANALYSIS:\n"
 	report += "- Draw calls: %d\n" % Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)
-	report += "- Vertices: %d\n" % Performance.get_monitor(Performance.RENDER_TOTAL_VERTICES_IN_FRAME)
 	report += "- Objects drawn: %d\n" % Performance.get_monitor(Performance.RENDER_TOTAL_OBJECTS_IN_FRAME)
 
 	report += "\n📜 SCRIPT ANALYSIS:\n"
@@ -198,7 +194,7 @@ func _add_performance_recommendations(report: String) -> String:
 	var recommendations = ""
 
 	# Object count recommendations
-	var total_objects = Performance.get_monitor(Performance.OBJECT_COUNT_2D) + Performance.get_monitor(Performance.OBJECT_COUNT_3D)
+	var total_objects = int(Performance.get_monitor(Performance.OBJECT_COUNT))
 	if total_objects > 100:
 		recommendations += "- Consider object pooling for obstacles\n"
 	if total_objects > 200:
