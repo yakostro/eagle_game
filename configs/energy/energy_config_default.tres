@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="EnergyConfig" load_steps=2 format=3 uid="uid://b7lnhfb78obud"]
 
 [ext_resource type="Script" path="res://scripts/systems/energy_config.gd" id="1_1"]
 
@@ -9,7 +9,6 @@ energy_gain_per_nest_fed = 20.0
 energy_loss_per_nest_miss = 15.0
 energy_loss_per_second = 1.0
 energy_loss_per_flap = 3.0
+hit_energy_loss = 20.0
 fish_energy_value = 25.0
 low_energy_threshold_percent = 0.2
-
-

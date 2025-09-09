@@ -74,6 +74,7 @@ func _ready():
 		energy_loss_per_flap = cfg.energy_loss_per_flap
 		energy_gain_per_nest_fed = cfg.energy_gain_per_nest_fed
 		energy_loss_per_nest_miss = cfg.energy_loss_per_nest_miss
+		hit_energy_loss = cfg.hit_energy_loss
 	else:
 		# Fallback to current values if config not found
 		initial_max_energy = max_energy  # Store initial max energy
