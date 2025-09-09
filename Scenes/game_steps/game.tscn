@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://bvfc1tl8ttpuo"]
+[gd_scene load_steps=22 format=3 uid="uid://bvfc1tl8ttpuo"]
 
 [ext_resource type="Script" path="res://scripts/game_manager.gd" id="1_amiw1"]
 [ext_resource type="PackedScene" uid="uid://bfhkdj8w2yaqr" path="res://scenes/parallax_background.tscn" id="2_pabcw"]
@@ -19,6 +19,8 @@
 [ext_resource type="Script" path="res://scripts/sound_wind_mixer.gd" id="17_xaldk"]
 [ext_resource type="AudioStream" uid="uid://sfagc5liqm30" path="res://sounds/wind/wind_woosh_loop.ogg" id="18_72rxq"]
 [ext_resource type="AudioStream" uid="uid://06s15ka1es4v" path="res://sounds/wind/additional_wind.wav" id="19_pia2j"]
+[ext_resource type="Script" path="res://scripts/systems/balance_provider.gd" id="20_bal"]
+[ext_resource type="Resource" path="res://configs/energy/energy_config_default.tres" id="21_ecfg"]
 
 [node name="Game" type="Node" groups=["game_area"]]
 script = ExtResource("1_amiw1")
@@ -47,6 +49,7 @@ eagle_reference = NodePath("../../Eagle")
 
 [node name="Eagle" parent="." instance=ExtResource("7_w8ddd")]
 position = Vector2(667, 395)
+balance_provider_path = NodePath("../BalanceProvider")
 energy_loss_per_flap = 1.0
 disable_passive_energy_loss = true
 
@@ -158,5 +161,9 @@ volume_db = -15.0
 [node name="AdditionalWind" type="AudioStreamPlayer2D" parent="EmbientSound"]
 stream = ExtResource("19_pia2j")
 volume_db = -18.0
+
+[node name="BalanceProvider" type="Node" parent="."]
+script = ExtResource("20_bal")
+energy_config = ExtResource("21_ecfg")
 
 [editable path="Spawners"]

@@ -11,7 +11,9 @@ signal fish_fed_to_nest  # Emitted when fish is fed to a nest
 @export var jump_force_variation: float = 100.0  # Random variation in jump force
 @export var horizontal_speed: float = 150.0  # Horizontal speed towards target
 @export var lifetime: float = 5.0
-@export var energy_value: float = 25.0  # Energy this fish provides when eaten
+@export var energy_value: float = 25.0  # Energy this fish provides when eaten (fallback)
+@export var balance_provider_path: NodePath
+var balance_provider: BalanceProvider
 
 
 # Fish attachment variables
@@ -41,6 +43,14 @@ func setup_fish(eagle: Eagle, screen_height_value: float = 1080.0):
 	calculate_target_and_jump()
 
 func _ready():
+	# Resolve balance provider and set energy from config if available
+	if balance_provider_path != NodePath(""):
+		balance_provider = get_node_or_null(balance_provider_path)
+	if not balance_provider:
+		balance_provider = get_tree().current_scene.find_child("BalanceProvider", true, false)
+	if balance_provider and balance_provider.energy_config:
+		energy_value = balance_provider.energy_config.fish_energy_value
+
 	# Store original scale before any modifications
 	original_scale = scale
 	

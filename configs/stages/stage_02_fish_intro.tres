@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=2 format=3 uid="uid://c8h2k9p1r7yxn"]
+[gd_resource type="Resource" script_class="StageConfiguration" load_steps=2 format=3 uid="uid://c8h2lap1r7yxn"]
 
 [ext_resource type="Script" path="res://scripts/systems/stage_configuration.gd" id="1"]
 

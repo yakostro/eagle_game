@@ -8,8 +8,8 @@ enum NestState {
 	FED
 }
 
-@export var energy_capacity_gain: int = 25  # Energy capacity gained when feeding nest
-@export var energy_capacity_loss: int = 10   # Energy capacity lost when nest goes off-screen
+@export var balance_provider_path: NodePath
+var balance_provider: BalanceProvider
 
 var current_state: NestState = NestState.HUNGRY
 var animation_player: AnimatedSprite2D
@@ -23,6 +23,12 @@ signal nest_fed(points: int)
 signal nest_missed(points: int)
 
 func _ready():
+	# Resolve balance provider if present
+	if balance_provider_path != NodePath(""):
+		balance_provider = get_node_or_null(balance_provider_path)
+	if not balance_provider:
+		balance_provider = get_tree().current_scene.find_child("BalanceProvider", true, false)
+
 	# Get references to child nodes
 	animation_player = get_node("Animation")
 	area_2d = get_node("Area2D")
@@ -53,7 +59,7 @@ func _process(_delta):
 		var left_edge_x = _get_camera_left_edge_x()
 		if global_position.x < left_edge_x:  # Nest has gone off the left side of screen
 			print("Nest missed - going off screen at position: ", global_position.x)
-			nest_missed.emit(energy_capacity_loss)
+			nest_missed.emit(0)  # let eagle use EnergyConfig
 			has_emitted_missed = true
 
 func _get_camera_left_edge_x() -> float:
@@ -128,8 +134,8 @@ func feed_nest(fish):
 	else:
 		print("Warning: Could not find Sprite2D in fish to display in nest")
 	
-	# Emit signal for eagle to increase energy capacity
-	nest_fed.emit(energy_capacity_gain)
+	# Emit signal for eagle to increase energy capacity (use Eagle's EnergyConfig)
+	nest_fed.emit(0)
 	
 	# Tell fish to handle its own cleanup
 	fish.feed_to_nest()

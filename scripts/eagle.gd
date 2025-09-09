@@ -8,6 +8,9 @@ extends CharacterBody2D
 
 @export var animated_sprite: AnimatedSprite2D
 
+@export var balance_provider_path: NodePath
+var balance_provider: BalanceProvider
+
 # Import movement state enum from base controller
 const MovementState = BaseMovementController.MovementState
 
@@ -58,8 +61,22 @@ func _ready():
 	print("Eagle ready! Node name: ", name)
 	print("animated_sprite reference: ", animated_sprite)
 	
-	# Initialize energy capacity system
-	initial_max_energy = max_energy  # Store initial max energy
+	# Resolve balance provider and apply energy config
+	if balance_provider_path != NodePath(""):
+		balance_provider = get_node_or_null(balance_provider_path)
+	if not balance_provider:
+		balance_provider = get_tree().current_scene.find_child("BalanceProvider", true, false)
+	if balance_provider and balance_provider.energy_config:
+		var cfg := balance_provider.energy_config
+		initial_max_energy = cfg.initial_max_energy
+		max_energy = initial_max_energy
+		energy_loss_per_second = cfg.energy_loss_per_second
+		energy_loss_per_flap = cfg.energy_loss_per_flap
+		energy_gain_per_nest_fed = cfg.energy_gain_per_nest_fed
+		energy_loss_per_nest_miss = cfg.energy_loss_per_nest_miss
+	else:
+		# Fallback to current values if config not found
+		initial_max_energy = max_energy  # Store initial max energy
 	
 	# Add eagle to group so enemies can find it
 	add_to_group("eagle")

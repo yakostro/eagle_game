@@ -1,0 +1,15 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/energy_config.gd" id="1_1"]
+
+[resource]
+script = ExtResource("1_1")
+initial_max_energy = 100.0
+energy_gain_per_nest_fed = 20.0
+energy_loss_per_nest_miss = 15.0
+energy_loss_per_second = 1.0
+energy_loss_per_flap = 3.0
+fish_energy_value = 25.0
+low_energy_threshold_percent = 0.2
+
+
