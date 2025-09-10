@@ -1,5 +1,7 @@
 extends Label
 
+@export var palette: UiPalette
+
 ## Stage HUD Display
 ## Shows current stage information, game timer, and nest stats in the game UI
 
@@ -13,6 +15,10 @@ func _ready():
 	
 	# Find nest spawner for nest count info
 	_find_nest_spawner()
+	
+	# Apply palette text color if provided
+	if palette:
+		add_theme_color_override("font_color", palette.White)
 
 func _process(delta):
 	# Update game timer

@@ -2,15 +2,20 @@ extends CanvasLayer
 
 class_name UIInstantTextFeedback
 
+@export var palette: UiPalette
+@export var text_token: StringName = &"White"
+@export var gain_token: StringName = &"Yellow3"
+@export var lose_token: StringName = &"Red3"
+
 @export var label_path: NodePath
 @export var container_path: NodePath
 @export var camera_path: NodePath
 
-@export var duration: float = 0.9
-@export var rise_distance: float = 40.0
+@export var duration: float = 2.0
+@export var rise_distance: float = 80.0
 @export var start_alpha: float = 1.0
 @export var end_alpha: float = 0.0
-@export var screen_offset: Vector2 = Vector2(-80, 0)
+@export var screen_offset: Vector2 = Vector2(-130, -100)
 
 var _label: Label
 var _container: Control
@@ -20,6 +25,8 @@ func _ready():
 	_resolve_nodes()
 	if _container:
 		_container.visible = false
+	if _label:
+		_label.add_theme_color_override("font_color", _get_color(text_token))
 
 func show_feedback_at(world_position: Vector2, amount: int) -> void:
 	_show(world_position, amount, false)
@@ -44,6 +51,11 @@ func _show(world_position: Vector2, amount: int, is_gain: bool) -> void:
 	modulate_color.a = start_alpha
 	_container.modulate = modulate_color
 	_container.visible = true
+
+	# Apply color based on gain/lose
+	var token: StringName = gain_token if is_gain else lose_token
+	if _label:
+		_label.add_theme_color_override("font_color", _get_color(token))
 
 	# Animate rise and fade in parallel
 	var tween: Tween = create_tween()
@@ -74,5 +86,15 @@ func _resolve_nodes() -> void:
 
 func _ensure_ready() -> bool:
 	return _label != null and _container != null and _camera != null
+
+func _get_color(token: StringName) -> Color:
+	if palette:
+		var value = palette.get(String(token))
+		if typeof(value) == TYPE_COLOR:
+			return value
+		var fallback = palette.get(String(text_token))
+		if typeof(fallback) == TYPE_COLOR:
+			return fallback
+	return Color(0.890196, 0.866667, 0.909804, 1.0)
 
 

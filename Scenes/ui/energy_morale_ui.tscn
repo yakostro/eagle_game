@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://gdoloxvu6nf3"]
+[gd_scene load_steps=5 format=3 uid="uid://gdoloxvu6nf3"]
 
 [ext_resource type="Script" path="res://scripts/ui/ui_energy_bar.gd" id="1_mownw"]
-[ext_resource type="Texture2D" uid="uid://dvw8gyb7bbuo8" path="res://sprites/ui/energy_icon.png" id="2_qg3rf"]
 [ext_resource type="Texture2D" uid="uid://dpknf11oje66e" path="res://sprites/ui/diagonal_pattern_2.png" id="2_xrren"]
+[ext_resource type="MissingResource" uid="uid://dmyceymjcjktg" path="res://configs/ui/ui_palette_default.tres" id="3_palette"]
+[ext_resource type="Texture2D" uid="uid://cuhsxs7l06b1i" path="res://sprites/ui/energy_icon_yellow2.png" id="4_aeh5t"]
 
 [node name="EnergyMoraleUI" type="Control"]
 layout_mode = 3
@@ -13,9 +14,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_mownw")
-energy_color = Color(0.631373, 0.490196, 0.137255, 1)
-energy_loss_feedback_color = Color(0.890196, 0.866667, 0.909804, 1)
-background_color = Color(0.188235, 0.145098, 0.227451, 1)
+palette = ExtResource("3_palette")
 diagonal_pattern_texture = ExtResource("2_xrren")
 bar_width = 400.0
 icon_size = Vector2(30, 30)
@@ -36,7 +35,7 @@ custom_minimum_size = Vector2(40, 40)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
-texture = ExtResource("2_qg3rf")
+texture = ExtResource("4_aeh5t")
 expand_mode = 1
 stretch_mode = 5
 

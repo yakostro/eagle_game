@@ -1,6 +1,13 @@
 extends Control
 class_name EnergyUI
 
+@export var palette: UiPalette
+@export var energy_token: StringName = &"Yellow2"
+@export var energy_loss_feedback_token: StringName = &"White"
+@export var capacity_lock_token: StringName = &"Black"
+@export var background_token: StringName = &"Purple1"
+@export var border_token: StringName = &"Yellow1"
+
 ## Energy UI Controller
 ## Manages unified progress bar showing energy (purple), energy loss feedback (white), and energy capacity lock (gray)
 
@@ -12,10 +19,6 @@ class_name EnergyUI
 
 # Tweakable parameters for game balancing
 @export_group("Visual Configuration")
-@export var energy_color: Color = Color(0.6, 0.3, 0.8, 1.0)  # Purple
-@export var energy_loss_feedback_color: Color = Color(1.0, 1.0, 1.0, 0.8)  # White
-@export var capacity_lock_color: Color = Color(0.4, 0.4, 0.4, 0.3)  # Gray (subtle background for pattern)
-@export var background_color: Color = Color(0.2, 0.2, 0.2, 0.8)  # Dark gray background
 @export var diagonal_pattern_texture: Texture2D = preload("res://sprites/ui/diagonal_pattern.png")  # Disabled pattern
 @export var energy_loss_feedback_duration: float = 0.5  # How long white flash lasts
 
@@ -158,14 +161,20 @@ func apply_progress_bar_colors():
 	"""Apply colors to progress bars using theme overrides"""
 	print("🎨 Applying progress bar colors...")
 	
-	# Energy progress bar (purple)
-	energy_progress_bar.add_theme_color_override("font_color", energy_color)
+	var _energy_color: Color = _get_color(energy_token)
+	var _energy_loss_feedback_color: Color = _get_color(energy_loss_feedback_token)
+	var _background_color: Color = _get_color(background_token)
+	var _border_color: Color = _get_color(border_token)
+	var _capacity_lock_color: Color = _get_color(capacity_lock_token)
+	
+	# Energy progress bar (from palette or fallback)
+	energy_progress_bar.add_theme_color_override("font_color", _energy_color)
 	energy_progress_bar.add_theme_color_override("font_outline_color", Color.BLACK)
 	energy_progress_bar.add_theme_constant_override("outline_size", 1)
 	
 	# Create a StyleBoxFlat for the progress fill without border
 	var energy_style = StyleBoxFlat.new()
-	energy_style.bg_color = energy_color
+	energy_style.bg_color = _energy_color
 	energy_style.border_width_left = 0
 	energy_style.border_width_right = 0
 	energy_style.border_width_top = 0
@@ -174,20 +183,20 @@ func apply_progress_bar_colors():
 	
 	# Energy loss feedback (white)
 	var feedback_style = StyleBoxFlat.new()
-	feedback_style.bg_color = energy_loss_feedback_color
+	feedback_style.bg_color = _energy_loss_feedback_color
 	energy_loss_feedback.add_theme_stylebox_override("fill", feedback_style)
 	
 	# Capacity lock (gray) - ColorRect just needs its color set
-	capacity_lock.color = capacity_lock_color
+	capacity_lock.color = _capacity_lock_color
 	
 	# Set background for progress bars with borders
 	var bg_style = StyleBoxFlat.new()
-	bg_style.bg_color = background_color
+	bg_style.bg_color = _background_color
 	bg_style.border_width_left = 1
 	bg_style.border_width_right = 1
 	bg_style.border_width_top = 1
 	bg_style.border_width_bottom = 1
-	bg_style.border_color = Color("#755F27")
+	bg_style.border_color = _border_color
 	energy_progress_bar.add_theme_stylebox_override("background", bg_style)
 	# Make feedback background fully transparent so only the white fill segment is visible
 	var feedback_bg_style = StyleBoxFlat.new()
@@ -199,6 +208,31 @@ func apply_progress_bar_colors():
 	energy_loss_feedback.add_theme_stylebox_override("background", feedback_bg_style)
 	
 	print("🎨 Progress bar styling complete!")
+
+func _get_color(token: StringName) -> Color:
+	if palette:
+		var value = palette.get(String(token))
+		if typeof(value) == TYPE_COLOR:
+			return value
+	match String(token):
+		"Yellow1":
+			return Color(0.458824, 0.372549, 0.152941, 1.0)
+		"Yellow2":
+			return Color(0.772549, 0.615686, 0.223529, 1.0)
+		"Yellow3":
+			return Color(0.909804, 0.72549, 0.258824, 1.0)
+		"Red2":
+			return Color(0.8, 0.282353, 0.282353, 1.0)
+		"Red3":
+			return Color(0.956863, 0.32549, 0.32549, 1.0)
+		"Purple1":
+			return Color(0.219608, 0.14902, 0.243137, 1.0)
+		"Black":
+			return Color(0.070588, 0.058824, 0.086275, 1.0)
+		"White":
+			return Color(0.890196, 0.866667, 0.909804, 1.0)
+		_:
+			return Color(1, 1, 1, 1)
 
 func create_diagonal_pattern_overlay():
 	"""Create a diagonal pattern overlay for the energy capacity lock area"""
