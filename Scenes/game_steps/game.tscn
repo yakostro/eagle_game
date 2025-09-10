@@ -12,7 +12,7 @@
 [ext_resource type="Material" uid="uid://bmc1yhctwob0n" path="res://shaders/color_palette.tres" id="10_7dtjx"]
 [ext_resource type="Script" path="res://scripts/ui/ui_message.gd" id="11_w3rko"]
 [ext_resource type="PackedScene" uid="uid://gdoloxvu6nf3" path="res://scenes/ui/energy_morale_ui.tscn" id="12_rye0r"]
-[ext_resource type="PackedScene" uid="uid://ca4niueilcjwp" path="res://scenes/ui/ui_immediate_text_feedback.tscn" id="13_2vptr"]
+[ext_resource type="PackedScene" path="res://scenes/ui/ui_instant_text_feedback.tscn" id="13_2vptr"]
 [ext_resource type="FontFile" uid="uid://kcdyir8efr7o" path="res://fonts/Bangers-Regular.ttf" id="14_k8s70"]
 [ext_resource type="Script" path="res://scripts/ui/ui_debug_stages.gd" id="15_l4c53"]
 [ext_resource type="Script" path="res://scripts/ui/ui_debug_fps_counter.gd" id="16_htv5j"]
@@ -20,7 +20,7 @@
 [ext_resource type="AudioStream" uid="uid://sfagc5liqm30" path="res://sounds/wind/wind_woosh_loop.ogg" id="18_72rxq"]
 [ext_resource type="AudioStream" uid="uid://06s15ka1es4v" path="res://sounds/wind/additional_wind.wav" id="19_pia2j"]
 [ext_resource type="Script" path="res://scripts/systems/balance_provider.gd" id="20_bal"]
-[ext_resource type="Resource" path="res://configs/energy/energy_config_default.tres" id="21_ecfg"]
+[ext_resource type="Resource" uid="uid://b7lnhfb78obud" path="res://configs/energy/energy_config_default.tres" id="21_ecfg"]
 
 [node name="Game" type="Node" groups=["game_area"]]
 script = ExtResource("1_amiw1")
@@ -28,6 +28,7 @@ obstacle_spawner_path = NodePath("Spawners/ObstacleSpawner")
 parallax_background_path = NodePath("ParallaxBackground")
 eagle_path = NodePath("Eagle")
 nest_spawner_path = NodePath("Spawners/NestSpawner")
+fish_spawner_path = NodePath("Spawners/FishSpawner")
 
 [node name="ParallaxBackground" parent="." instance=ExtResource("2_pabcw")]
 enable_middle_layer = false
@@ -96,10 +97,6 @@ mouse_filter = 2
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 layer = 20
 
-[node name="UIMessage" type="Node" parent="CanvasLayer"]
-script = ExtResource("11_w3rko")
-eagle_path = NodePath("../../Eagle")
-
 [node name="UIEnergyBar" parent="CanvasLayer" instance=ExtResource("12_rye0r")]
 
 [node name="UIInstantTextFeedback" parent="CanvasLayer" instance=ExtResource("13_2vptr")]
@@ -114,6 +111,10 @@ theme_override_fonts/font = ExtResource("14_k8s70")
 theme_override_font_sizes/font_size = 22
 text = "Stage 1: Introduction"
 script = ExtResource("15_l4c53")
+
+[node name="UIMessage" type="Node" parent="CanvasLayer"]
+script = ExtResource("11_w3rko")
+eagle_path = NodePath("../../Eagle")
 
 [node name="MoralePopContainer" type="HBoxContainer" parent="CanvasLayer"]
 anchors_preset = 5

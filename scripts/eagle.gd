@@ -57,6 +57,9 @@ signal energy_capacity_changed(new_max_energy: float)  # Signal when energy capa
 signal eagle_died()  # Signal when eagle dies from energy depletion
 signal eagle_hit()  # Signal when eagle gets hit by an obstacle
 
+@export var instant_text_feedback_path: NodePath
+var _instant_text_feedback: UIInstantTextFeedback
+
 func _ready():
 	print("Eagle ready! Node name: ", name)
 	print("animated_sprite reference: ", animated_sprite)
@@ -91,6 +94,12 @@ func _ready():
 	animation_controller = EagleAnimationController.new(animated_sprite)
 	add_child(animation_controller)
 	print("Animation controller created and added as child")
+
+	# Resolve instant text feedback node
+	if instant_text_feedback_path != NodePath(""):
+		_instant_text_feedback = get_node_or_null(instant_text_feedback_path)
+	if _instant_text_feedback == null:
+		_instant_text_feedback = get_tree().current_scene.find_child("UIInstantTextFeedback", true, false)
 	
 	# Connect signals
 	movement_controller.movement_state_changed.connect(animation_controller.handle_movement_state_change)
@@ -253,6 +262,9 @@ func hit_by_obstacle():
 		
 		# Emit hit signal
 		eagle_hit.emit()
+		# Show instant text feedback
+		if _instant_text_feedback:
+			_instant_text_feedback.show_feedback_at(global_position, int(hit_energy_loss))
 		
 		# Check for death
 		if current_energy <= 0.0:
@@ -297,6 +309,9 @@ func hit_by_enemy(enemy_body):
 	
 	# Emit hit signal
 	eagle_hit.emit()
+	# Show instant text feedback
+	if _instant_text_feedback:
+		_instant_text_feedback.show_feedback_at(global_position, int(hit_energy_loss))
 	
 	# Check for death
 	if current_energy <= 0.0:
