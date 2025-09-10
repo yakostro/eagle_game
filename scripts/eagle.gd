@@ -66,6 +66,7 @@ signal eagle_hit()  # Signal when eagle gets hit by an obstacle
 
 @export var instant_text_feedback_path: NodePath
 var _instant_text_feedback: UIInstantTextFeedback
+var is_dead: bool = false
 var _offscreen_accum_timer: float = 0.0
 var _offscreen_accum_amount: float = 0.0
 
@@ -130,6 +131,9 @@ func _ready():
 
 
 func _physics_process(delta):
+	# Stop all runtime logic once dead
+	if is_dead:
+		return
 	# 1. Handle special input actions
 	handle_special_inputs()
 	
@@ -420,6 +424,8 @@ func handle_fish_actions():
 
 func update_energy(delta):
 	"""Update eagle's energy over time"""
+	if is_dead:
+		return
 	# Only lose energy passively if not in flappy mode
 	if not disable_passive_energy_loss:
 		# Simple fixed energy loss over time
@@ -485,6 +491,9 @@ func play_flap_sound():
 
 func die():
 	"""Called when the eagle dies from energy depletion"""
+	if is_dead:
+		return
+	is_dead = true
 	print("Eagle died! Energy depleted.")
 	eagle_died.emit()
 	# TODO: Handle death state - disable controls, play death animation, etc.
