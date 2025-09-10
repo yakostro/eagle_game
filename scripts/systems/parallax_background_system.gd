@@ -72,22 +72,6 @@ func _ready():
 	if enable_middle_layer:
 		setup_middle_layer()
 	
-	print("🏔️  Parallax Background System initialized")
-	print("   - Screen size: ", screen_width, "x", screen_height)
-	print("   - World movement speed: ", world_movement_speed)
-	print("   - Gradient layer enabled: ", enable_gradient_layer)
-	if enable_gradient_layer:
-		print("   - Gradient scroll speed: ", world_movement_speed * gradient_scroll_speed)
-	print("   - Mountain layer enabled: ", enable_mountain_layer)
-	if enable_mountain_layer:
-		print("   - Mountain scroll speed: ", world_movement_speed * mountain_scroll_speed)
-		print("   - Mountain vertical offset: ", mountain_vertical_offset)
-		print("   - Mountain transparency: ", mountain_transparency)
-	print("   - Middle layer enabled: ", enable_middle_layer)
-	if enable_middle_layer:
-		print("   - Middle scroll speed: ", world_movement_speed * middle_scroll_speed)
-		print("   - Middle vertical offset: ", middle_vertical_offset)
-		print("   - Middle transparency: ", middle_transparency)
 
 func setup_gradient_layer():
 	"""Create and configure the gradient layer (furthest background)"""
@@ -116,8 +100,7 @@ func setup_gradient_layer():
 	
 	# Store reference for later updates
 	gradient_rect = gradient_texture_rect
-	
-	print("   Created gradient layer with colors: ", gradient_top_color, " to ", gradient_bottom_color)
+
 
 func setup_mountain_layer():
 	"""Create and configure the mountain layer (distant mountains/terrain)"""
@@ -176,8 +159,7 @@ func create_mountain_sprites():
 		
 		mountain_layer.add_child(sprite)
 		mountain_sprites.append(sprite)
-	
-	print("   Created ", sprites_needed, " mountain sprites")
+
 
 func create_middle_sprites():
 	"""Create sprite nodes for middle layer textures"""
@@ -206,8 +188,7 @@ func create_middle_sprites():
 		
 		middle_layer.add_child(sprite)
 		middle_sprites.append(sprite)
-	
-	print("   Created ", sprites_needed, " middle layer sprites")
+
 
 func create_placeholder_mountains():
 	"""Create placeholder mountains for testing when no textures are provided"""
@@ -219,7 +200,7 @@ func create_placeholder_mountains():
 		mountain.color = Color(0.1, 0.1, 0.15, 0.8)  # Dark mountain silhouettes
 		mountain_layer.add_child(mountain)
 	
-	print("   Created placeholder mountain elements")
+
 
 func create_placeholder_middle():
 	"""Create placeholder middle layer for testing when no textures are provided"""
@@ -234,7 +215,7 @@ func create_placeholder_middle():
 		rock.color = Color(0.3, 0.25, 0.2, 0.6)
 		middle_layer.add_child(rock)
 	
-	print("   Created placeholder middle layer elements")
+
 
 func _process(delta):
 	"""Update parallax scrolling based on world movement"""
@@ -248,10 +229,7 @@ func _process(delta):
 	mountain_scroll_position -= mountain_move_distance
 	middle_scroll_position -= middle_move_distance
 	
-	# Debug output (remove after testing)
-	if Engine.get_process_frames() % 60 == 0:  # Print once per second
-		print("🏔️ Parallax Debug - Gradient: ", int(gradient_scroll_position), " | Mountain: ", int(mountain_scroll_position), " | Mid: ", int(middle_scroll_position))
-	
+
 	# Move gradient layer (usually static, but can scroll very slowly)
 	if gradient_layer and enable_gradient_layer:
 		gradient_layer.position.x = gradient_scroll_position
@@ -291,28 +269,28 @@ func _process(delta):
 func set_world_movement_speed(new_speed: float):
 	"""Update world movement speed (called from game when speed changes)"""
 	world_movement_speed = new_speed
-	print("🏔️  Parallax: Updated world movement speed to ", world_movement_speed)
+
 
 func toggle_gradient_layer(enabled: bool):
 	"""Enable or disable gradient layer"""
 	enable_gradient_layer = enabled
 	if gradient_layer:
 		gradient_layer.visible = enabled
-	print("🏔️  Parallax: Gradient layer ", "enabled" if enabled else "disabled")
+
 
 func toggle_mountain_layer(enabled: bool):
 	"""Enable or disable mountain layer for performance/artistic reasons"""
 	enable_mountain_layer = enabled
 	if mountain_layer:
 		mountain_layer.visible = enabled
-	print("🏔️  Parallax: Mountain layer ", "enabled" if enabled else "disabled")
+
 
 func toggle_middle_layer(enabled: bool):
 	"""Enable or disable middle layer for performance/artistic reasons"""
 	enable_middle_layer = enabled
 	if middle_layer:
 		middle_layer.visible = enabled
-	print("🏔️  Parallax: Middle layer ", "enabled" if enabled else "disabled")
+
 
 func get_gradient_scroll_speed() -> float:
 	"""Get current gradient scroll speed in pixels per second"""
@@ -331,7 +309,7 @@ func set_gradient_vertical_offset(offset: float):
 	gradient_vertical_offset = offset
 	if gradient_rect:
 		gradient_rect.position.y = gradient_vertical_offset
-	print("🏔️  Gradient vertical offset set to: ", offset)
+
 
 func set_mountain_vertical_offset(offset: float):
 	"""Update mountain layer vertical offset"""
@@ -341,7 +319,7 @@ func set_mountain_vertical_offset(offset: float):
 		if sprite.texture:
 			var scaled_height = sprite.texture.get_height() * mountain_scale
 			sprite.position.y = screen_height - (scaled_height / 2) + mountain_vertical_offset
-	print("🏔️  Mountain vertical offset set to: ", offset)
+
 
 func set_middle_vertical_offset(offset: float):
 	"""Update middle layer vertical offset"""
@@ -349,7 +327,7 @@ func set_middle_vertical_offset(offset: float):
 	# Update existing middle layer sprites
 	for sprite in middle_sprites:
 		sprite.position.y = screen_height / 2 + middle_vertical_offset
-	print("🏔️  Middle layer vertical offset set to: ", offset)
+
 
 func update_gradient_colors(top_color: Color, bottom_color: Color):
 	"""Update gradient colors dynamically"""
@@ -360,8 +338,7 @@ func update_gradient_colors(top_color: Color, bottom_color: Color):
 		var gradient_texture = gradient_rect.texture as GradientTexture2D
 		gradient_texture.gradient.set_color(0, gradient_top_color)
 		gradient_texture.gradient.set_color(1, gradient_bottom_color)
-	
-	print("🏔️  Gradient colors updated: ", gradient_top_color, " to ", gradient_bottom_color)
+
 
 # Backward compatibility functions for existing code
 func get_background_scroll_speed() -> float:
@@ -377,14 +354,14 @@ func set_mountain_transparency(transparency: float):
 	mountain_transparency = clamp(transparency, 0.0, 1.0)
 	if mountain_layer:
 		mountain_layer.modulate.a = mountain_transparency
-	print("🏔️  Mountain transparency set to: ", mountain_transparency)
+
 
 func set_middle_transparency(transparency: float):
 	"""Set middle layer transparency (0.0 = invisible, 1.0 = opaque)"""
 	middle_transparency = clamp(transparency, 0.0, 1.0)
 	if middle_layer:
 		middle_layer.modulate.a = middle_transparency
-	print("🏔️  Middle layer transparency set to: ", middle_transparency)
+
 
 func set_mountain_scale(new_scale: float):
 	"""Update mountain layer scale and reposition sprites to maintain bottom-edge alignment"""
@@ -396,8 +373,7 @@ func set_mountain_scale(new_scale: float):
 			sprite.scale = Vector2(mountain_scale, mountain_scale)
 			var scaled_height = sprite.texture.get_height() * mountain_scale
 			sprite.position.y = screen_height - (scaled_height / 2) + mountain_vertical_offset
-	
-	print("🏔️  Mountain scale set to: ", mountain_scale)
+
 
 func fade_mountain_layer(target_transparency: float, duration: float):
 	"""Smoothly fade mountain layer to target transparency over specified duration"""
@@ -406,7 +382,7 @@ func fade_mountain_layer(target_transparency: float, duration: float):
 	
 	var tween = create_tween()
 	tween.tween_method(set_mountain_transparency, mountain_transparency, target_transparency, duration)
-	print("🏔️  Fading mountain layer to transparency: ", target_transparency, " over ", duration, "s")
+
 
 func fade_middle_layer(target_transparency: float, duration: float):
 	"""Smoothly fade middle layer to target transparency over specified duration"""
@@ -415,4 +391,4 @@ func fade_middle_layer(target_transparency: float, duration: float):
 	
 	var tween = create_tween()
 	tween.tween_method(set_middle_transparency, middle_transparency, target_transparency, duration)
-	print("🏔️  Fading middle layer to transparency: ", target_transparency, " over ", duration, "s")
+

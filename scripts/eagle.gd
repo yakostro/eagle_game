@@ -20,6 +20,13 @@ const MovementState = BaseMovementController.MovementState
 @export var energy_loss_per_flap: float = 3.0  # Energy lost per flap in flappy mode
 @export var disable_passive_energy_loss: bool = false  # For flappy bird mode
 
+# Off-screen drain (overwritten from EnergyConfig in _ready())
+@export var enable_offscreen_energy_loss: bool = true
+@export var offscreen_energy_loss_per_second: float = 5.0
+@export var offscreen_bounds_margin: float = 32.0
+@export var camera_path: NodePath
+var _camera: Camera2D
+
 # Energy capacity system variables (replaces morale system)
 @export var energy_loss_per_nest_miss: float = 15.0  # Energy capacity lost when nest goes off screen
 @export var energy_gain_per_nest_fed: float = 20.0  # Energy capacity gained when nest is fed
@@ -59,6 +66,8 @@ signal eagle_hit()  # Signal when eagle gets hit by an obstacle
 
 @export var instant_text_feedback_path: NodePath
 var _instant_text_feedback: UIInstantTextFeedback
+var _offscreen_accum_timer: float = 0.0
+var _offscreen_accum_amount: float = 0.0
 
 func _ready():
 	print("Eagle ready! Node name: ", name)
@@ -78,9 +87,12 @@ func _ready():
 		energy_gain_per_nest_fed = cfg.energy_gain_per_nest_fed
 		energy_loss_per_nest_miss = cfg.energy_loss_per_nest_miss
 		hit_energy_loss = cfg.hit_energy_loss
+		enable_offscreen_energy_loss = cfg.enable_offscreen_energy_loss
+		offscreen_energy_loss_per_second = cfg.offscreen_energy_loss_per_second
+		offscreen_bounds_margin = cfg.offscreen_bounds_margin
 	else:
-		# Fallback to current values if config not found
-		initial_max_energy = max_energy  # Store initial max energy
+		push_error("Eagle: Missing BalanceProvider.energy_config. Off-screen drain requires EnergyConfig.")
+		return
 	
 	# Add eagle to group so enemies can find it
 	add_to_group("eagle")
@@ -94,6 +106,12 @@ func _ready():
 	animation_controller = EagleAnimationController.new(animated_sprite)
 	add_child(animation_controller)
 	print("Animation controller created and added as child")
+
+	# Resolve camera reference
+	if camera_path != NodePath(""):
+		_camera = get_node_or_null(camera_path)
+	if _camera == null:
+		_camera = get_viewport().get_camera_2d()
 
 	# Resolve instant text feedback node
 	if instant_text_feedback_path != NodePath(""):
@@ -407,10 +425,51 @@ func update_energy(delta):
 		# Simple fixed energy loss over time
 		current_energy -= energy_loss_per_second * delta
 		current_energy = max(current_energy, 0.0)
+
+	# Additional off-screen drain (always applies when enabled)
+	if enable_offscreen_energy_loss and _is_off_screen():
+		var loss = offscreen_energy_loss_per_second * delta
+		current_energy -= loss
+		current_energy = max(current_energy, 0.0)
+		# Accumulate display amount and flush every second
+		_offscreen_accum_timer += delta
+		_offscreen_accum_amount += loss
+		while _offscreen_accum_timer >= 1.0:
+			# Calculate a 1-second chunk; ensure at least 1 if there was any loss
+			var chunk := int(round(min(_offscreen_accum_amount, offscreen_energy_loss_per_second)))
+			if chunk <= 0 and _offscreen_accum_amount > 0.0:
+				chunk = 1
+			print("DEBUG: Offscreen feedback - chunk: ", chunk, " timer: ", _offscreen_accum_timer, " amount: ", _offscreen_accum_amount)
+			if _instant_text_feedback and chunk > 0:
+				var edge := 0 if global_position.y < _camera.global_position.y else 1
+				print("DEBUG: Showing edge feedback - edge: ", edge, " chunk: ", chunk)
+				_instant_text_feedback.show_feedback_at_edge(edge, chunk, global_position)
+			# Decrease accumulators by 1 second worth
+			_offscreen_accum_timer -= 1.0
+			_offscreen_accum_amount = max(0.0, _offscreen_accum_amount - offscreen_energy_loss_per_second)
+	else:
+		# Reset accumulation when back on-screen so next offscreen starts fresh
+		_offscreen_accum_timer = 0.0
+		_offscreen_accum_amount = 0.0
 	
 	# Check for death condition
 	if current_energy <= 0.0:
 		die()
+
+func _is_off_screen() -> bool:
+	var cam := _camera if _camera != null else get_viewport().get_camera_2d()
+	if cam == null:
+		return false
+	var center := cam.get_screen_center_position()
+	var viewport_size := get_viewport().get_visible_rect().size
+	var half_width := viewport_size.x * 0.5
+	var half_height := viewport_size.y * 0.5
+	var min_x := center.x - half_width - offscreen_bounds_margin
+	var max_x := center.x + half_width + offscreen_bounds_margin
+	var min_y := center.y - half_height - offscreen_bounds_margin
+	var max_y := center.y + half_height + offscreen_bounds_margin
+	var pos := global_position
+	return pos.x < min_x or pos.x > max_x or pos.y < min_y or pos.y > max_y
 
 func consume_flap_energy():
 	"""Called by flappy movement controller when eagle flaps"""

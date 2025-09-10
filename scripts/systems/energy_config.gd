@@ -15,6 +15,11 @@ class_name EnergyConfig
 @export var energy_loss_per_flap: float = 3.0
 @export var hit_energy_loss: float = 20.0
 
+@export_group("Off-Screen Drain (Required)")
+@export var enable_offscreen_energy_loss: bool = true
+@export var offscreen_energy_loss_per_second: float = 5.0
+@export var offscreen_bounds_margin: float = 32.0
+
 @export_group("Fish")
 @export var fish_energy_value: float = 25.0
 

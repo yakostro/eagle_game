@@ -17,6 +17,11 @@ class_name UIInstantTextFeedback
 @export var end_alpha: float = 0.0
 @export var screen_offset: Vector2 = Vector2(-130, -100)
 
+# Edge display tuning
+@export var edge_vertical_margin: float = 40.0
+@export var edge_horizontal_padding: float = 60.0
+@export var edge_default_x_anchor: float = 0.5
+
 var _label: Label
 var _container: Control
 var _camera: Camera2D
@@ -33,6 +38,60 @@ func show_feedback_at(world_position: Vector2, amount: int) -> void:
 
 func show_feedback_at_gain(world_position: Vector2, amount: int) -> void:
 	_show(world_position, amount, true)
+
+func show_feedback_at_edge(edge: int, amount: int, world_position: Vector2) -> void:
+	print("DEBUG: show_feedback_at_edge called - edge: ", edge, " amount: ", amount, " pos: ", world_position)
+	if not _ensure_ready():
+		print("DEBUG: show_feedback_at_edge - not ready!")
+		return
+
+	# Stop any existing tween to avoid conflicts
+	var existing_tweens = get_tree().get_processed_tweens()
+	for tween in existing_tweens:
+		if tween.is_valid():
+			tween.kill()
+
+	# Update text color and sign for loss at screen edge
+	_label.text = "-" + str(amount)
+	if _label:
+		_label.add_theme_color_override("font_color", _get_color(lose_token))
+
+	# Compute screen placement relative to camera viewport, using world X like on-screen mode
+	var viewport_size: Vector2 = get_viewport().get_visible_rect().size
+	var width: float = viewport_size.x
+	var height: float = viewport_size.y
+	var screen_center: Vector2 = _camera.get_screen_center_position()
+	var half_width: float = width * 0.5
+	var half_height: float = height * 0.5
+
+	# Project world X to screen X and clamp to safe area, apply the same horizontal screen_offset
+	var projected_x: float = screen_center.x + (world_position.x - _camera.global_position.x)
+	var min_x: float = screen_center.x - half_width + edge_horizontal_padding
+	var max_x: float = screen_center.x + half_width - edge_horizontal_padding
+	var screen_x: float = clamp(projected_x + screen_offset.x, min_x, max_x)
+	var screen_y: float = screen_center.y - half_height + edge_vertical_margin if edge == 0 else screen_center.y + half_height - edge_vertical_margin
+
+	_container.position = Vector2(screen_x, screen_y)
+	print("DEBUG: Container positioned at: ", _container.position)
+
+	# Prepare visuals
+	var modulate_color: Color = _container.modulate
+	modulate_color.a = start_alpha
+	_container.modulate = modulate_color
+	_container.visible = true
+	print("DEBUG: Container made visible with alpha: ", start_alpha)
+
+	# Animate rise and fade in parallel
+	var tween: Tween = create_tween()
+	tween.set_trans(Tween.TRANS_SINE)
+	tween.set_ease(Tween.EASE_OUT)
+	tween.parallel().tween_property(_container, "position", _container.position + Vector2(0, -rise_distance), duration)
+	tween.parallel().tween_property(_container, "modulate:a", end_alpha, duration)
+	tween.finished.connect(func():
+		print("DEBUG: Tween finished, hiding container")
+		if _container:
+			_container.visible = false
+	)
 
 func _show(world_position: Vector2, amount: int, is_gain: bool) -> void:
 	if not _ensure_ready():

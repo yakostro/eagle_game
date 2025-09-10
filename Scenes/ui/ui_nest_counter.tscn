@@ -1,0 +1,29 @@
+[gd_scene load_steps=3 format=3 uid="uid://fpw1yur0sw3c"]
+
+[ext_resource type="Texture2D" uid="uid://ccafpc87hk0tx" path="res://sprites/ui/nest_icon.png" id="1_4jic3"]
+[ext_resource type="FontFile" uid="uid://kcdyir8efr7o" path="res://fonts/Bangers-Regular.ttf" id="2_302kh"]
+
+[node name="UiNestCounter" type="Node2D"]
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Control"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+theme_override_constants/separation = 10
+
+[node name="NestIcon" type="TextureRect" parent="Control/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("1_4jic3")
+
+[node name="NestAmountLabel" type="Label" parent="Control/HBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_302kh")
+theme_override_font_sizes/font_size = 33
+text = "30
+"

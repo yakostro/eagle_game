@@ -12,5 +12,3 @@ class_name UiPalette
 @export var Purple1: Color = Color(0.219608, 0.149020, 0.243137, 1.0)
 @export var Black: Color = Color(0.070588, 0.058824, 0.086275, 1.0)
 @export var White: Color = Color(0.890196, 0.866667, 0.909804, 1.0)
-
-

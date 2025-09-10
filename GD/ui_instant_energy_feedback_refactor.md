@@ -40,17 +40,17 @@
     - `label_path: NodePath` and `container_path: NodePath` (explicit wiring option)
   - Public method:
     - `show_feedback_at(world_position: Vector2, amount: int) -> void`
-      - Updates label to `"-<amount>"`.
-      - Converts `world_position` to screen and applies `screen_offset`.
-      - Makes container visible, creates a Tween, animates position Y up and modulate.a to `end_alpha` over `duration`.
-      - Hides on complete.
+    - `show_feedback_at_gain(world_position: Vector2, amount: int) -> void`
+    - `show_feedback_at_edge(edge: int, amount: int, x_anchor: float = 0.5) -> void`
 
 ### Editor Wiring / Usage
 - Keep `UIInstantTextFeedback` node under the main `CanvasLayer` in `game.tscn`.
 - Attach `ui_instant_text_feedback.gd` to the scene root if not already.
 - In `UIMessage` remove any calls/exports related to energy feedback.
-- From gameplay code (e.g., `Eagle` on hit) call:
-  - Get node: `UIInstantTextFeedback` → script method `show_feedback_at(eagle.global_position, amount)`.
+- From gameplay code:
+  - On hit: `show_feedback_at(eagle.global_position, amount)`.
+  - On fish eaten: `show_feedback_at_gain(eagle.global_position, amount)`.
+  - On offscreen drain start: `show_feedback_at_edge(EDGE_TOP/EDGE_BOTTOM, amount, x_anchor)`.
 
 ### Parameter Defaults (initial tuning)
 - `duration = 0.9`
@@ -59,6 +59,7 @@
 - `end_alpha = 0.0`
 - `screen_offset = Vector2(-80, 0)`
 - `easing`: smooth out (use `TRANS_SINE`, `EASE_OUT`)
+ 
 
 ### Migration Steps
 1) Add new script `ui_instant_text_feedback.gd` and attach to `UiImmediateTextFeedback` scene (and rename the scene file to `ui_instant_text_feedback.tscn`).
