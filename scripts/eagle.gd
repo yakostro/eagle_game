@@ -164,6 +164,9 @@ func eat_fish():
 		carried_fish.queue_free()  # Remove the fish from scene
 		carried_fish = null
 		fish_caught_changed.emit(false)
+		# Show instant gain feedback
+		if _instant_text_feedback:
+			_instant_text_feedback.show_feedback_at_gain(global_position, int(energy_gained))
 		return true
 	return false
 

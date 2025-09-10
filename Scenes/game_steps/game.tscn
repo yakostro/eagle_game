@@ -12,7 +12,7 @@
 [ext_resource type="Material" uid="uid://bmc1yhctwob0n" path="res://shaders/color_palette.tres" id="10_7dtjx"]
 [ext_resource type="Script" path="res://scripts/ui/ui_message.gd" id="11_w3rko"]
 [ext_resource type="PackedScene" uid="uid://gdoloxvu6nf3" path="res://scenes/ui/energy_morale_ui.tscn" id="12_rye0r"]
-[ext_resource type="PackedScene" path="res://scenes/ui/ui_instant_text_feedback.tscn" id="13_2vptr"]
+[ext_resource type="PackedScene" uid="uid://cmby6d2loyox6" path="res://scenes/ui/ui_instant_text_feedback.tscn" id="13_2vptr"]
 [ext_resource type="FontFile" uid="uid://kcdyir8efr7o" path="res://fonts/Bangers-Regular.ttf" id="14_k8s70"]
 [ext_resource type="Script" path="res://scripts/ui/ui_debug_stages.gd" id="15_l4c53"]
 [ext_resource type="Script" path="res://scripts/ui/ui_debug_fps_counter.gd" id="16_htv5j"]

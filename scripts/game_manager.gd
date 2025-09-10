@@ -500,11 +500,11 @@ func _trigger_game_over_scene():
 	
 	# Use SceneManager for smooth transition
 	if SceneManager:
-		SceneManager.change_scene("res://scenes/game_over_scene.tscn")
+		SceneManager.change_scene("res://scenes/game_steps/game_over_scene.tscn")
 	else:
 		# Fallback if SceneManager not available
 		print("⚠️  SceneManager not available, using direct scene change")
-		get_tree().change_scene_to_file("res://scenes/game_over_scene.tscn")
+		get_tree().change_scene_to_file("res://scenes/game_steps/game_over_scene.tscn")
 
 # === DEBUG AND DEVELOPMENT HELPERS ===
 

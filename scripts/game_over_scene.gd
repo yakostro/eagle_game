@@ -165,12 +165,12 @@ func _trigger_restart():
 	
 	# Use SceneManager for smooth transition to game scene
 	if SceneManager:
-		SceneManager.change_scene("res://scenes/game.tscn")
+		SceneManager.change_scene("res://scenes/game_steps/game.tscn")
 		print("🎬 Transitioning to game scene")
 	else:
 		# Fallback if SceneManager not available
 		print("⚠️  SceneManager not available, using direct scene change")
-		get_tree().change_scene_to_file("res://scenes/game.tscn")
+		get_tree().change_scene_to_file("res://scenes/game_steps/game.tscn")
 
 # === SIGNAL HANDLERS ===
 

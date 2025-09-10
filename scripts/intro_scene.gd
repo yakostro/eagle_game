@@ -15,7 +15,7 @@ signal intro_completed
 
 # Scene configuration
 @export_group("Scene Settings")
-@export var game_scene_path: String = "res://scenes/game.tscn"
+@export var game_scene_path: String = "res://scenes/game_steps/game.tscn"
 @export var enable_skip_input: bool = true  # Allow skipping with any input
 
 # Audio configuration - exposed to inspector for easy tweaking

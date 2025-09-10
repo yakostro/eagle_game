@@ -22,11 +22,17 @@ func _ready():
 		_container.visible = false
 
 func show_feedback_at(world_position: Vector2, amount: int) -> void:
+	_show(world_position, amount, false)
+
+func show_feedback_at_gain(world_position: Vector2, amount: int) -> void:
+	_show(world_position, amount, true)
+
+func _show(world_position: Vector2, amount: int, is_gain: bool) -> void:
 	if not _ensure_ready():
 		return
 
-	# Update text
-	_label.text = "-" + str(amount)
+	# Update text with sign
+	_label.text = ("+" if is_gain else "-") + str(amount)
 
 	# Convert world to screen position using camera
 	var screen_center: Vector2 = _camera.get_screen_center_position()

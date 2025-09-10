@@ -19,7 +19,7 @@ signal start_game_requested
 
 # Scene configuration
 @export_group("Scene Settings")
-@export var intro_scene_path: String = "res://scenes/intro.tscn"
+@export var intro_scene_path: String = "res://scenes/game_steps/intro.tscn"
 @export var enable_fade_transition: bool = true
 
 # UI configuration - using NodePath for flexible connection
