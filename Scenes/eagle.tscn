@@ -1,10 +1,11 @@
-[gd_scene load_steps=77 format=3 uid="uid://cd42djg346oqy"]
+[gd_scene load_steps=78 format=3 uid="uid://cd42djg346oqy"]
 
 [ext_resource type="Texture2D" uid="uid://bx2kqxbypi61f" path="res://sprites/bald_eagle/Flying/__eagle_flying_000.png" id="1_7vcbr"]
 [ext_resource type="Script" path="res://scripts/eagle.gd" id="1_pt68i"]
 [ext_resource type="Texture2D" uid="uid://7ytkeqrqdwb" path="res://sprites/bald_eagle/__eagle diving_1.png" id="2_3fjag"]
 [ext_resource type="Texture2D" uid="uid://74410xiobhg0" path="res://sprites/bald_eagle/Flying/__eagle_flying_001.png" id="2_hto6r"]
 [ext_resource type="Texture2D" uid="uid://cgqqn1ucgjtdw" path="res://sprites/bald_eagle/Flying/__eagle_flying_002.png" id="3_hrt4n"]
+[ext_resource type="Texture2D" uid="uid://gmh72sx8xk58" path="res://sprites/bald_eagle/Transition to dead/updated/Frame 50.png" id="3_pk13l"]
 [ext_resource type="Texture2D" uid="uid://cjg35so46w2rb" path="res://sprites/bald_eagle/Flying/__eagle_flying_003.png" id="4_lfcxg"]
 [ext_resource type="Texture2D" uid="uid://ceuwe1dmaoqea" path="res://sprites/bald_eagle/Flying/__eagle_flying_004.png" id="5_mu0ci"]
 [ext_resource type="Texture2D" uid="uid://c4bc1ftb17rrr" path="res://sprites/bald_eagle/Flying/__eagle_flying_005.png" id="6_7ejlq"]
@@ -83,6 +84,14 @@ animations = [{
 "loop": false,
 "name": &"dive",
 "speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_pk13l")
+}],
+"loop": false,
+"name": &"dying",
+"speed": 1.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -362,7 +371,7 @@ animated_sprite = NodePath("Animation")
 [node name="Animation" type="AnimatedSprite2D" parent="."]
 position = Vector2(-331, 1)
 sprite_frames = SubResource("SpriteFrames_kheon")
-animation = &"flap"
+animation = &"dying"
 autoplay = "glide"
 offset = Vector2(4, -37)
 flip_h = true

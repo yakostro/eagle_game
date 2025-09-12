@@ -38,6 +38,13 @@ var _camera: Camera2D
 @export var hit_blink_duration: float = 3.0  # Seconds of blinking effect (can be longer than immunity)
 @export var hit_blink_interval: float = 0.1  # How fast the blinking occurs
 
+# Death/Dying system variables
+@export var death_boundary_margin: float = 100.0  # Pixels below screen to trigger game over
+@export var min_death_fall_duration: float = 2.0  # Minimum fall time before game over
+@export var death_animation_name: String = "dying"  # Animation to play when dying
+@export var play_screech_on_zero_energy: bool = true  # Play screech once when entering dying
+@export var failed_flap_feedback_cooldown: float = 0.5  # Seconds between "No [energy icon]" messages
+
 # Components
 var movement_controller: BaseMovementController
 var animation_controller: EagleAnimationController
@@ -67,6 +74,9 @@ signal eagle_hit()  # Signal when eagle gets hit by an obstacle
 @export var instant_text_feedback_path: NodePath
 var _instant_text_feedback: UIInstantTextFeedback
 var is_dead: bool = false
+var is_dying: bool = false  # Whether eagle is in dying state (can't flap, falling)
+var death_fall_timer: float = 0.0  # Timer for minimum fall duration
+var failed_flap_feedback_timer: float = 0.0  # Cooldown timer for "No [energy icon]" messages
 var _offscreen_accum_timer: float = 0.0
 var _offscreen_accum_amount: float = 0.0
 
@@ -101,8 +111,11 @@ func _ready():
 	add_child(movement_controller)
 
 	# Initialize animation controller
-	animation_controller = EagleAnimationController.new(animated_sprite)
-	add_child(animation_controller)
+	if animated_sprite:
+		animation_controller = EagleAnimationController.new(animated_sprite)
+		add_child(animation_controller)
+	else:
+		print("❌ ERROR: No animated sprite found for animation controller!")
 
 	# Resolve camera reference
 	if camera_path != NodePath(""):
@@ -141,9 +154,12 @@ func _physics_process(delta):
 	# 4. Update hit system (immunity and blinking)
 	update_hit_system(delta)
 	
-	# 5. Movement is now handled by movement_controller in its _physics_process
+	# 5. Update death/dying system timers
+	update_dying_system(delta)
 	
-	# 6. Apply movement (movement controller sets velocity, we apply it)
+	# 6. Movement is now handled by movement_controller in its _physics_process
+	
+	# 7. Apply movement (movement controller sets velocity, we apply it)
 	move_and_slide()
 	
 
@@ -154,10 +170,20 @@ func _unhandled_input(event):
 		if event.keycode == KEY_M:
 			reduce_energy_capacity(15.0)
 			get_viewport().set_input_as_handled()
+		# DEBUG: K key to test dying animation
+		elif event.keycode == KEY_K:
+			print("🔧 DEBUG: Manually triggering dying state")
+			current_energy = 0.0
+			die()
+			get_viewport().set_input_as_handled()
 
 # Fish management methods
 func catch_fish(fish: Fish) -> bool:
 	"""Called when the eagle catches a fish. Returns true if successful."""
+	# Can't catch fish while dying
+	if is_dying:
+		return false
+		
 	if carried_fish == null:  # Only catch if not already carrying
 		carried_fish = fish
 		fish_caught_changed.emit(true)
@@ -167,6 +193,9 @@ func catch_fish(fish: Fish) -> bool:
 
 func eat_fish():
 	"""Called when the eagle eats a caught fish to restore energy"""
+	# Can't eat fish while dying
+	if is_dying:
+		return
 	if carried_fish != null:
 		# Use the fish's energy value instead of fixed amount
 		var energy_gained = carried_fish.energy_value
@@ -184,6 +213,9 @@ func eat_fish():
 
 func drop_fish():
 	"""Called when the eagle drops a fish to feed chicks"""
+	# Can't actively drop fish while dying (but should drop when entering dying state)
+	if is_dying:
+		return false
 	if carried_fish != null:
 		carried_fish.release_fish()  # Release the fish back to the world
 		carried_fish = null
@@ -225,12 +257,18 @@ func get_energy_capacity_percentage() -> float:
 # Nest interaction methods
 func on_nest_fed(points: int = 0):
 	"""Called when a nest is successfully fed with a fish"""
+	# Can't gain energy while dying
+	if is_dying:
+		return
 	# Use the points from nest if provided, otherwise use eagle's default value
 	var energy_to_gain: float = float(points) if points > 0 else energy_gain_per_nest_fed
 	restore_energy_capacity(energy_to_gain)
 
 func on_nest_missed(points: int = 0):
 	"""Called when a nest goes off screen without being fed"""
+	# Can't lose energy capacity while dying (already at 0 energy)
+	if is_dying:
+		return
 	# Use the points from nest if provided, otherwise use eagle's default value
 	var energy_to_lose: float = float(points) if points > 0 else energy_loss_per_nest_miss
 	reduce_energy_capacity(energy_to_lose)
@@ -238,6 +276,9 @@ func on_nest_missed(points: int = 0):
 # Hit system methods
 func hit_by_obstacle():
 	"""Called when eagle collides with an obstacle"""
+	# Can't be hit while dying
+	if is_dying:
+		return
 	# Only take damage if not immune
 	if not is_immune:
 		# Lose energy
@@ -272,6 +313,9 @@ func hit_by_obstacle():
 
 func hit_by_enemy(enemy_body):
 	"""Called when eagle is hit by an enemy bird"""
+	# Can't be hit while dying
+	if is_dying:
+		return
 	# Prevent multiple hits while immune
 	if is_immune:
 		return
@@ -341,6 +385,17 @@ func update_hit_system(delta):
 			animated_sprite.visible = true  # Make sure eagle is visible
 			blink_visible = true
 
+func update_dying_system(delta):
+	"""Update dying system timers"""
+	# Update feedback cooldown timer
+	if failed_flap_feedback_timer > 0.0:
+		failed_flap_feedback_timer -= delta
+		failed_flap_feedback_timer = max(failed_flap_feedback_timer, 0.0)
+	
+	# Update death fall timer for minimum duration
+	if is_dying:
+		death_fall_timer += delta
+
 func is_eagle_immune() -> bool:
 	"""Returns true if eagle is currently immune to hits"""
 	return is_immune
@@ -353,6 +408,10 @@ func end_hit_state():
 
 func _on_hit_detection_area_body_entered(body):
 	"""Called when the HitDetectionArea overlaps with a body (obstacle or enemy)"""
+	# No interactions while dying
+	if is_dying:
+		return
+		
 	var current_movement_state = movement_controller.get_movement_state()
 	var is_obstacle = body.is_in_group("obstacles")
 	var is_enemy = body.is_in_group("enemies")
@@ -366,6 +425,10 @@ func _on_hit_detection_area_body_entered(body):
 
 func handle_fish_actions():
 	"""Handle input for eating or dropping fish"""
+	# Can't perform fish actions while dying
+	if is_dying:
+		return
+		
 	if carried_fish != null:
 		if Input.is_action_just_pressed("eat_fish"):
 			eat_fish()
@@ -435,13 +498,49 @@ func play_flap_sound():
 	if flap_audio != null:
 		flap_audio.play()
 
+func show_no_energy_feedback():
+	"""Show 'No [energy icon]' feedback when trying to flap while dying"""
+	if not is_dying:
+		return  # Only show when dying
+	
+	# Check cooldown to prevent spam
+	if failed_flap_feedback_timer > 0.0:
+		return
+	
+	# Show the feedback using instant text system
+	if _instant_text_feedback:
+		# For now, use 0 as amount - we'll enhance the UI system to show "No Energy" text
+		# The UI system will need to be modified to show custom text for 0 amount when dying
+		_instant_text_feedback.show_feedback_at(global_position, 0)
+		
+	# Set cooldown timer
+	failed_flap_feedback_timer = failed_flap_feedback_cooldown
+
 func die():
 	"""Called when the eagle dies from energy depletion"""
-	if is_dead:
+	if is_dead or is_dying:
 		return
-	is_dead = true
-	eagle_died.emit()
-	# TODO: Handle death state - disable controls, play death animation, etc.
+	is_dying = true
+	death_fall_timer = 0.0  # Start timing the fall
+	
+	# Drop any carried fish when entering dying state
+	if carried_fish != null:
+		carried_fish.release_fish()  # Release the fish back to the world
+		carried_fish = null
+		fish_caught_changed.emit(false)
+	
+	# Trigger dying animation
+	if animation_controller:
+		animation_controller.handle_dying_state()
+	else:
+		print("❌ No animation controller found when trying to trigger dying animation")
+	
+	# Play screech sound once
+	if play_screech_on_zero_energy and screech_audio:
+		screech_audio.play()
+	
+	# Game over will be triggered by GameManager when eagle exits screen bottom
+	# Don't emit eagle_died signal here anymore
 
 # ===== MOVEMENT CONTROLLER MANAGEMENT =====
 

@@ -29,6 +29,9 @@ var fish_spawner: FishSpawner
 # Game state tracking
 var is_game_over: bool = false
 
+# Screen boundary monitoring for dying eagle
+var camera: Camera2D
+
 func _ready():
 	# Get references to game systems
 	obstacle_spawner = get_node(obstacle_spawner_path) if obstacle_spawner_path else null
@@ -51,6 +54,11 @@ func _ready():
 	
 	# Sync movement speeds
 	sync_world_movement_speed()
+	
+	# Find camera for screen boundary detection
+	camera = get_viewport().get_camera_2d()
+	if not camera:
+		camera = find_child("Camera2D", true, false)
 	
 	# Connect game state signals
 	_connect_game_state_signals()
@@ -505,6 +513,33 @@ func _trigger_game_over_scene():
 		# Fallback if SceneManager not available
 		print("⚠️  SceneManager not available, using direct scene change")
 		get_tree().change_scene_to_file("res://scenes/game_steps/game_over_scene.tscn")
+
+func _physics_process(_delta):
+	"""Monitor eagle position for dying state boundary detection"""
+	# Only monitor if game is not over and eagle is dying
+	if is_game_over or not eagle or not camera:
+		return
+	
+	# Check if eagle is dying and has fallen below screen
+	if eagle.is_dying and _is_eagle_below_screen():
+		# Check minimum fall duration if specified
+		if eagle.min_death_fall_duration > 0.0 and eagle.death_fall_timer < eagle.min_death_fall_duration:
+			return  # Not enough time has passed
+		
+		# Trigger game over
+		_on_eagle_died()
+
+func _is_eagle_below_screen() -> bool:
+	"""Check if eagle has fallen below the visible screen area"""
+	if not eagle or not camera:
+		return false
+	
+	var center = camera.get_screen_center_position()
+	var viewport_size = get_viewport().get_visible_rect().size
+	var screen_bottom = center.y + (viewport_size.y * 0.5)
+	var death_boundary = screen_bottom + eagle.death_boundary_margin
+	
+	return eagle.global_position.y > death_boundary
 
 # === DEBUG AND DEVELOPMENT HELPERS ===
 

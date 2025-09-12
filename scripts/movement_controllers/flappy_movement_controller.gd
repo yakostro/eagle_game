@@ -34,7 +34,20 @@ func _init(body: CharacterBody2D):
 
 func handle_input_and_update_state():
 	"""Handle input and determine movement state for Flappy Bird mechanics"""
-	# Track input states
+	# Check if eagle is dying - if so, ignore all input and stay in gliding state
+	if eagle_body and "is_dying" in eagle_body and eagle_body.is_dying:
+		# Track attempted flap for feedback
+		if Input.is_action_just_pressed("move_up"):
+			# Show "No [energy icon]" feedback
+			if eagle_body and eagle_body.has_method("show_no_energy_feedback"):
+				eagle_body.show_no_energy_feedback()
+		flap_pressed_this_frame = false
+		dive_pressed = false
+		# Force gliding state when dying (gravity will naturally pull down)
+		set_movement_state(MovementState.GLIDING)
+		return
+	
+	# Track input states (only when not dying)
 	flap_pressed_this_frame = Input.is_action_just_pressed("move_up")
 	dive_pressed = Input.is_action_pressed("move_down")
 	
