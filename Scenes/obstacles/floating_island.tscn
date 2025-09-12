@@ -1,11 +1,15 @@
-[gd_scene load_steps=4 format=3 uid="uid://cmo168tpbivbp"]
+[gd_scene load_steps=5 format=3 uid="uid://cmo168tpbivbp"]
 
 [ext_resource type="Script" path="res://scripts/obstacles/floating_island.gd" id="1_5kew7"]
 [ext_resource type="Texture2D" uid="uid://do4p0p3gurrvs" path="res://sprites/obstacles/island1.png" id="2_tpv2d"]
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_8egms"]
-radius = 132.0
-height = 288.0
+[sub_resource type="SegmentShape2D" id="SegmentShape2D_5vwve"]
+a = Vector2(25, 148)
+b = Vector2(297, 10)
+
+[sub_resource type="SegmentShape2D" id="SegmentShape2D_r0o6c"]
+a = Vector2(8, 149)
+b = Vector2(232, 362)
 
 [node name="FloatingIsland" type="StaticBody2D"]
 z_index = -3
@@ -18,14 +22,14 @@ scale = Vector2(0.5, 0.477)
 texture = ExtResource("2_tpv2d")
 centered = false
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(228, 181)
-rotation = 1.5708
-shape = SubResource("CapsuleShape2D_8egms")
-debug_color = Color(0.337255, 0.188235, 0.721569, 0.8)
-
 [node name="NestPlaceholder" type="Marker2D" parent="."]
 position = Vector2(411, 125)
 
 [node name="NestPlaceholder2" type="Marker2D" parent="."]
 position = Vector2(93, 129)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("SegmentShape2D_5vwve")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="."]
+shape = SubResource("SegmentShape2D_r0o6c")

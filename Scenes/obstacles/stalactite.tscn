@@ -1,11 +1,23 @@
-[gd_scene load_steps=4 format=3 uid="uid://bwuudj6p2q8yl"]
+[gd_scene load_steps=7 format=3 uid="uid://bwuudj6p2q8yl"]
 
 [ext_resource type="Script" path="res://scripts/obstacles/stalactite.gd" id="1_rwlqb"]
 [ext_resource type="Texture2D" uid="uid://drxlcxdn6g0qe" path="res://sprites/obstacles/stalactite1.png" id="2_q6fo1"]
 
 [sub_resource type="SegmentShape2D" id="SegmentShape2D_cwc11"]
-a = Vector2(-394, 3)
-b = Vector2(-219, 674)
+a = Vector2(-275, 114)
+b = Vector2(-219, 669)
+
+[sub_resource type="SegmentShape2D" id="SegmentShape2D_lvtu6"]
+a = Vector2(211, 83)
+b = Vector2(242, 451)
+
+[sub_resource type="SegmentShape2D" id="SegmentShape2D_i3382"]
+a = Vector2(98, 207)
+b = Vector2(69, 0)
+
+[sub_resource type="SegmentShape2D" id="SegmentShape2D_3w3mr"]
+a = Vector2(646, 285)
+b = Vector2(628, 47)
 
 [node name="Stalactite" type="StaticBody2D"]
 z_index = -3
@@ -15,12 +27,21 @@ script = ExtResource("1_rwlqb")
 min_stalactite_height = 250.0
 max_stalactite_height = 600.0
 
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("2_q6fo1")
+centered = false
+
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(575, 3)
 shape = SubResource("SegmentShape2D_cwc11")
 debug_color = Color(0.337255, 0.188235, 0.721569, 0.8)
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
-scale = Vector2(0.5, 0.5)
-texture = ExtResource("2_q6fo1")
-centered = false
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="."]
+shape = SubResource("SegmentShape2D_lvtu6")
+
+[node name="CollisionShape2D3" type="CollisionShape2D" parent="."]
+shape = SubResource("SegmentShape2D_i3382")
+
+[node name="CollisionShape2D4" type="CollisionShape2D" parent="."]
+shape = SubResource("SegmentShape2D_3w3mr")

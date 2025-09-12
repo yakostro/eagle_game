@@ -1,11 +1,15 @@
-[gd_scene load_steps=4 format=3 uid="uid://dc4pbamcmsruq"]
+[gd_scene load_steps=5 format=3 uid="uid://dc4pbamcmsruq"]
 
 [ext_resource type="Script" path="res://scripts/obstacles/mountain.gd" id="1_ibdu6"]
 [ext_resource type="Texture2D" uid="uid://fit0fmrtna16" path="res://sprites/obstacles/rock1.png" id="2_scpf2"]
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_06802"]
-radius = 36.0
-height = 842.992
+[sub_resource type="SegmentShape2D" id="SegmentShape2D_rox63"]
+a = Vector2(-29.2475, -392.135)
+b = Vector2(-112.708, 272.415)
+
+[sub_resource type="SegmentShape2D" id="SegmentShape2D_xhb0e"]
+a = Vector2(10, 918)
+b = Vector2(61, 678)
 
 [node name="MountainA" type="StaticBody2D"]
 z_index = -3
@@ -37,7 +41,10 @@ position = Vector2(397, 198)
 position = Vector2(255, 127)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(245, 475)
+position = Vector2(266, 416)
 rotation = 0.153365
-shape = SubResource("CapsuleShape2D_06802")
+shape = SubResource("SegmentShape2D_rox63")
 debug_color = Color(0.337255, 0.188235, 0.721569, 0.8)
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="."]
+shape = SubResource("SegmentShape2D_xhb0e")
