@@ -1,11 +1,14 @@
-[gd_scene load_steps=3 format=3 uid="uid://fpw1yur0sw3c"]
+[gd_scene load_steps=4 format=3 uid="uid://fpw1yur0sw3c"]
 
 [ext_resource type="Texture2D" uid="uid://ccafpc87hk0tx" path="res://sprites/ui/nest_icon.png" id="1_4jic3"]
 [ext_resource type="FontFile" uid="uid://kcdyir8efr7o" path="res://fonts/Bangers-Regular.ttf" id="2_302kh"]
+[ext_resource type="Script" path="res://scripts/ui/ui_nest_counter.gd" id="3_0qs1e"]
 
 [node name="UiNestCounter" type="Control"]
 layout_mode = 3
 anchors_preset = 0
+script = ExtResource("3_0qs1e")
+nest_amount_label_path = NodePath("HBoxContainer/NestAmountLabel")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 layout_mode = 0
