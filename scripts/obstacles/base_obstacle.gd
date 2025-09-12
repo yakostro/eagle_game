@@ -89,6 +89,38 @@ func has_nest_placeholder() -> bool:
 	"""Check if this obstacle can actually place a nest"""
 	return can_carry_nest and get_nest_placeholder() != null
 
+func get_all_nest_placeholders() -> Array[Marker2D]:
+	"""Get all nest placeholder nodes in this obstacle"""
+	var placeholders: Array[Marker2D] = []
+
+	# Find all nodes that start with "NestPlaceholder"
+	for child in get_children():
+		if child is Marker2D and child.name.begins_with("NestPlaceholder"):
+			placeholders.append(child)
+
+	return placeholders
+
+func get_visible_nest_placeholders(screen_height: float, bottom_offset: float) -> Array[Marker2D]:
+	"""Get nest placeholders that would place nests within visible screen area"""
+	var all_placeholders = get_all_nest_placeholders()
+	var visible_placeholders: Array[Marker2D] = []
+
+	# Calculate obstacle's current global position
+	# Note: This assumes the obstacle is already positioned when called
+	for placeholder in all_placeholders:
+		# Get placeholder's global Y position
+		var placeholder_global_y = global_position.y + placeholder.position.y
+
+		# Check if placeholder would put nest above the visibility threshold
+		if placeholder_global_y < screen_height - bottom_offset:
+			visible_placeholders.append(placeholder)
+
+	return visible_placeholders
+
+func has_visible_nest_placeholders(screen_height: float, bottom_offset: float) -> bool:
+	"""Check if this obstacle has any nest placeholders that would be visible"""
+	return can_carry_nest and not get_visible_nest_placeholders(screen_height, bottom_offset).is_empty()
+
 func get_actual_sprite_height() -> float:
 	"""Get the actual sprite height accounting for scaling applied in the scene"""
 	if not sprite_node or not sprite_node.texture:

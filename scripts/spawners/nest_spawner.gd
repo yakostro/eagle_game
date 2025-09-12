@@ -13,6 +13,10 @@ var max_skipped_obstacles: int = 6  # Maximum obstacles to skip before spawning 
 var warn_before_obstacles: int = 1  # How many obstacles before the nest to warn the player
 var nests_enabled: bool = false  # Whether nest spawning is enabled in current stage
 
+# Multi-placeholder system parameters
+@export var nest_visibility_offset: float = 50.0  # Pixels from screen bottom to keep nests visible
+@export var debug_placeholder_selection: bool = false  # Show placeholder selection process
+
 # Nest spawning system variables
 var obstacles_since_last_nest: int = 0  # Track obstacles spawned since last nest
 var next_nest_spawn_target: int = 0  # How many obstacles to skip before next nest
@@ -75,10 +79,13 @@ func _should_spawn_nest_on_obstacle(obstacle: BaseObstacle) -> bool:
 	if not obstacle.can_carry_nest:
 		print("   ❌ ", obstacle.get_obstacle_type(), " cannot carry nests")
 		return false
-	
-	# Check if obstacle actually has a nest placeholder
-	if not obstacle.has_nest_placeholder():
-		print("   ❌ ", obstacle.get_obstacle_type(), " has no NestPlaceholder node")
+
+	# Get screen dimensions for visibility checking
+	var screen_size = get_viewport().get_visible_rect().size
+
+	# Check if obstacle has any visible nest placeholders
+	if not obstacle.has_visible_nest_placeholders(screen_size.y, nest_visibility_offset):
+		print("   ❌ ", obstacle.get_obstacle_type(), " has no visible NestPlaceholder nodes (screen_height=", screen_size.y, ", offset=", nest_visibility_offset, ")")
 		return false
 	
 	print("   ✅ ", obstacle.get_obstacle_type(), " will get a nest!")
@@ -100,16 +107,25 @@ func spawn_nest_on_obstacle(obstacle: BaseObstacle):
 	# Add nest as child of obstacle so it moves with the obstacle
 	obstacle.add_child(nest)
 	
-	# Position nest using the placeholder
-	var nest_placeholder = obstacle.get_nest_placeholder()
-	if nest_placeholder:
-		# Use the placeholder's position
-		nest.position = nest_placeholder.position
-		print("   🏠 Spawned nest using placeholder at position: ", nest.position)
+	# Position nest using random visible placeholder
+	var screen_size = get_viewport().get_visible_rect().size
+	var visible_placeholders = obstacle.get_visible_nest_placeholders(screen_size.y, nest_visibility_offset)
+
+	if not visible_placeholders.is_empty():
+		# Randomly select one of the visible placeholders
+		var selected_placeholder = visible_placeholders[randi() % visible_placeholders.size()]
+
+		# Use the selected placeholder's position
+		nest.position = selected_placeholder.position
+
+		if debug_placeholder_selection:
+			print("   🏠 Selected placeholder: ", selected_placeholder.name, " from ", visible_placeholders.size(), " visible options")
+			print("   🏠 Placeholder local pos: ", selected_placeholder.position, " | Global Y: ", obstacle.global_position.y + selected_placeholder.position.y)
+		print("   🏠 Spawned nest using random placeholder at position: ", nest.position)
 	else:
-		# This shouldn't happen due to has_nest_placeholder() check, but just in case
+		# This shouldn't happen due to visibility check, but just in case
 		nest.position = Vector2(0, 20)
-		print("   🏠 Warning: No NestPlaceholder found, using default position")
+		print("   🏠 Warning: No visible NestPlaceholder found, using default position")
 	
 	# Connect nest signals to eagle's energy capacity methods
 	nest.nest_fed.connect(eagle_reference.on_nest_fed)
@@ -161,6 +177,9 @@ func apply_stage_config(config: StageConfiguration):
 	# Update nest spawn intervals
 	min_skipped_obstacles = config.nest_min_skipped_obstacles
 	max_skipped_obstacles = config.nest_max_skipped_obstacles
+
+	# Update visibility offset for multi-placeholder system
+	nest_visibility_offset = config.nest_visibility_offset
 	
 	# Reset nest spawn target with new parameters
 	if nests_enabled:

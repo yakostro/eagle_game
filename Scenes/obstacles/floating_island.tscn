@@ -26,3 +26,6 @@ debug_color = Color(0.337255, 0.188235, 0.721569, 0.8)
 
 [node name="NestPlaceholder" type="Marker2D" parent="."]
 position = Vector2(411, 125)
+
+[node name="NestPlaceholder2" type="Marker2D" parent="."]
+position = Vector2(93, 129)

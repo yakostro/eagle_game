@@ -38,6 +38,7 @@ extends Resource
 @export var nests_enabled: bool = false
 @export var nest_min_skipped_obstacles: int = 3
 @export var nest_max_skipped_obstacles: int = 6
+@export var nest_visibility_offset: float = 50.0  # Pixels from screen bottom to keep nests visible
 
 # Stage Completion Parameters
 enum CompletionType { TIMER, NESTS_SPAWNED }
