@@ -16,23 +16,11 @@ var initial_direction: Vector2
 
 func _ready():
 	# This function runs automatically when the node enters the scene tree
-	print("Wind particles script started")
-	
 	# Store the initial values from the inspector (don't override them!)
 	initial_velocity_min_base = initial_velocity_min
 	initial_velocity_max_base = initial_velocity_max
 	initial_direction = direction
 	
-	# Debug info - show current inspector values
-	print("Emitting: ", emitting)
-	print("Amount: ", amount)
-	print("Color: ", color)
-	print("Position: ", position)
-	print("Initial Velocity Min: ", initial_velocity_min)
-	print("Initial Velocity Max: ", initial_velocity_max)
-	print("Direction: ", direction)
-	
-	print("Wind particles initialized (inspector values preserved)")
 
 func _process(delta):
 	# This function runs every frame

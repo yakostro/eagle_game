@@ -66,7 +66,6 @@ func set_movement_state(new_state: MovementState):
 		var old_state = movement_state
 		movement_state = new_state
 		movement_state_changed.emit(old_state, new_state)
-		print("Movement Controller: State changed from ", MovementState.keys()[old_state], " to ", MovementState.keys()[new_state])
 
 func get_movement_state() -> MovementState:
 	"""Get current movement state"""

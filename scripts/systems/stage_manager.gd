@@ -23,35 +23,13 @@ signal auto_difficulty_started()
 signal stage_completed(completed_stage: int)
 
 func _ready():
-	print("🎯 StageManager singleton initialized")
-	print("   Starting stage: ", current_stage)
-	print("   Auto-difficulty: ", "DISABLED" if not auto_difficulty_enabled else "ENABLED")
-	
 	# Connect auto-difficulty signal to handler
 	auto_difficulty_started.connect(_on_auto_difficulty_started)
-	print("🔗 Auto-difficulty signal connected")
-	
-	# Debug: Check if StageConfiguration class is available
-	print("🔍 Checking class registration...")
-	var test_config = StageConfiguration.new()
-	if test_config:
-		print("✅ StageConfiguration class is accessible")
-		# Test basic properties
-		test_config.stage_name = "Test"
-		test_config.world_speed = 250.0
-		print("✅ StageConfiguration properties work: ", test_config.stage_name, " @ ", test_config.world_speed)
-		# Resources are automatically garbage collected, no queue_free() needed
-	else:
-		print("❌ StageConfiguration class not accessible")
-	
+
 	# Load the initial stage (Stage 1)
-	print("🔄 Loading initial stage...")
 	if not load_stage(1):
 		push_error("StageManager: Failed to load initial stage 1!")
-		print("🆘 CRITICAL: Initial stage loading failed - system will be non-functional")
-	else:
-		print("✅ Initial stage loaded successfully")
-	
+
 	# Set process to handle stage timing
 	set_process(true)
 
@@ -60,12 +38,6 @@ func _process(delta: float):
 	if not auto_difficulty_enabled:
 		stage_timer += delta
 		_check_stage_completion()
-		
-		# Debug output every 2 seconds during timer-based stages (Task 7)
-		if current_stage_config and current_stage_config.completion_type == StageConfiguration.CompletionType.TIMER:
-			var time_remaining = current_stage_config.completion_value - stage_timer
-			if time_remaining > 0 and int(stage_timer * 0.5) % 1 == 0 and abs(stage_timer - round(stage_timer * 2) / 2) < delta:
-				print("⏱️  Stage %d: %.1fs / %.1fs (%.1fs remaining)" % [current_stage, stage_timer, current_stage_config.completion_value, time_remaining])
 	else:
 		# Handle auto-difficulty progression
 		if auto_difficulty_system:
@@ -81,76 +53,36 @@ func get_current_stage_config() -> StageConfiguration:
 
 ## Load a specific stage configuration
 func load_stage(stage_number: int) -> bool:
-	print("📋 StageManager: Loading stage %d..." % stage_number)
-	
 	# Construct file path for stage configuration
 	var stage_file_path = _get_stage_file_path(stage_number)
-	
-	# Enhanced debugging to understand the loading issue
-	print("🔍 StageManager: Checking for resource: ", stage_file_path)
-	print("🔍 Trying ResourceLoader.exists(): ", ResourceLoader.exists(stage_file_path))
-	print("🔍 Trying FileAccess.file_exists(): ", FileAccess.file_exists(stage_file_path))
-	
-	# Try both loading methods to see which one works
-	print("🔄 StageManager: Loading resource from: ", stage_file_path)
-	print("🔍 Trying basic load()...")
+
 	var raw_resource = load(stage_file_path)
-	print("🔍 Basic load() result: ", raw_resource)
-	print("🔍 Basic load() type: ", raw_resource.get_class() if raw_resource else "null")
-	
 	if not raw_resource:
-		print("🔍 Trying ResourceLoader.load()...")
 		raw_resource = ResourceLoader.load(stage_file_path)
-		print("🔍 ResourceLoader.load() result: ", raw_resource)
-		print("🔍 ResourceLoader.load() type: ", raw_resource.get_class() if raw_resource else "null")
-	
+
 	if not raw_resource:
 		push_error("StageManager: Failed to load .tres file - resource is null")
-		print("❌ This usually means the .tres file has a broken script reference or format issue")
-		print("🧪 Testing if StageConfiguration class works manually...")
-		var test_config = StageConfiguration.new()
-		if test_config:
-			print("✅ StageConfiguration class works manually")
-			test_config.stage_name = "Manual Test"
-			print("✅ StageConfiguration properties work: ", test_config.stage_name)
-		else:
-			print("❌ StageConfiguration class fails even manually")
 		return false
-	
+
 	var loaded_config = raw_resource as StageConfiguration
 	if not loaded_config:
 		push_error("StageManager: Failed to cast resource to StageConfiguration")
-		print("❌ Resource casting failed - raw resource: ", raw_resource)
-		print("❌ Expected StageConfiguration, got: ", raw_resource.get_class() if raw_resource else "null")
 		return false
-	print("✅ Resource loaded and cast successfully, validating...")
-	
+
 	# Validate the loaded configuration
-	print("🔍 Validating configuration...")
 	var validation_result = loaded_config.validate_parameters()
-	print("🔍 Validation result: ", validation_result)
 	if not validation_result:
 		push_error("StageManager: Stage %d configuration failed validation" % stage_number)
 		return false
-	print("✅ Configuration validated successfully")
-	
+
 	# Check that stage numbers match (consistency check)
 	if loaded_config.stage_number != stage_number:
 		push_warning("StageManager: Stage file number mismatch. Expected: %d, Got: %d" % [stage_number, loaded_config.stage_number])
-	
+
 	# Apply the loaded configuration
 	current_stage_config = loaded_config
 	current_stage = stage_number
-	
-	print("✅ StageManager: Successfully loaded stage %d - %s" % [stage_number, loaded_config.stage_name])
-	print("   World Speed: %.1f" % loaded_config.world_speed)
-	print("   Fish Enabled: %s" % str(loaded_config.fish_enabled))
-	print("   Nests Enabled: %s" % str(loaded_config.nests_enabled))
-	print("   Completion: %s (%.1f)" % [
-		"TIMER" if loaded_config.completion_type == StageConfiguration.CompletionType.TIMER else "NESTS",
-		loaded_config.completion_value
-	])
-	
+
 	return true
 
 ## Get the file path for a stage configuration
@@ -174,29 +106,23 @@ func _get_stage_file_path(stage_number: int) -> String:
 ## Advance to the next stage
 func advance_to_next_stage():
 	var next_stage = current_stage + 1
-	
-	print("⬆️  StageManager: Advancing from stage %d to stage %d" % [current_stage, next_stage])
-	
+
 	# Check if we've reached the final manual stage
 	if next_stage > 6:
-		print("🎉 All manual stages completed! Enabling auto-difficulty system...")
 		enable_auto_difficulty()
 		return
-	
+
 	# Try to load the next stage
 	if load_stage(next_stage):
 		# Reset stage progress counters
 		stage_timer = 0.0
 		stage_nest_count = 0
-		
-		print("✨ Successfully advanced to Stage %d: %s" % [current_stage, current_stage_config.stage_name])
-		
+
 		# Emit stage changed signal for other systems to react
 		stage_changed.emit(current_stage, current_stage_config)
-		
+
 	else:
 		push_error("StageManager: Failed to advance to stage %d!" % next_stage)
-		print("🛑 Stage progression halted due to loading failure")
 
 ## Check if current stage is complete
 func _check_stage_completion():
@@ -220,7 +146,6 @@ func _check_stage_completion():
 	
 	# Advance to next stage if complete
 	if is_complete:
-		print("🎯 Stage %d COMPLETED: %s" % [current_stage, completion_reason])
 		stage_completed.emit(current_stage)
 		advance_to_next_stage()
 
@@ -232,53 +157,41 @@ func on_obstacle_spawned():
 func on_nest_spawned():
 	total_nests_spawned += 1
 	stage_nest_count += 1
-	
-	# Debug output for nest-based stages (Task 7)
-	if current_stage_config and current_stage_config.completion_type == StageConfiguration.CompletionType.NESTS_SPAWNED:
-		var nests_remaining = int(current_stage_config.completion_value) - stage_nest_count
-		print("🏠 Stage %d: %d / %d nests spawned (%d remaining)" % [current_stage, stage_nest_count, int(current_stage_config.completion_value), nests_remaining])
 
 ## Enable automatic difficulty progression
 func enable_auto_difficulty():
-	print("🔥 StageManager: Auto-difficulty ENABLED")
 	auto_difficulty_enabled = true
 	auto_difficulty_started.emit()
 
 ## Handle auto-difficulty started signal
 func _on_auto_difficulty_started():
-	print("🚀 StageManager: Initializing AutoDifficultySystem...")
-	
 	if not current_stage_config:
 		push_error("StageManager: Cannot start auto-difficulty without a current stage config!")
 		return
-	
+
 	# Create the auto-difficulty system
 	auto_difficulty_system = AutoDifficultySystem.new()
 	if not auto_difficulty_system:
 		push_error("StageManager: Failed to create AutoDifficultySystem!")
 		return
-	
+
 	# Initialize with the current stage (Stage 6) as baseline
 	auto_difficulty_system.initialize_with_base_config(current_stage_config)
-	
+
 	# Connect to auto-difficulty progression signals
 	auto_difficulty_system.difficulty_increased.connect(_on_auto_difficulty_increased)
 	auto_difficulty_system.parameter_capped.connect(_on_auto_difficulty_parameter_capped)
-	
-	print("✅ AutoDifficultySystem initialized and connected!")
-	print("   Baseline from Stage %d: %s" % [current_stage, current_stage_config.stage_name])
-	
+
 	# Generate and apply the first auto-difficulty configuration (Level 0)
 	_apply_auto_difficulty_config()
 
 ## Handle auto-difficulty level increase
 func _on_auto_difficulty_increased(new_level: int):
-	print("⬆️  AutoDifficulty: Level increased to %d" % new_level)
 	_apply_auto_difficulty_config()
 
 ## Handle auto-difficulty parameter capping
 func _on_auto_difficulty_parameter_capped(parameter_name: String, capped_value: float):
-	print("🧊 AutoDifficulty: Parameter '%s' capped at %.2f" % [parameter_name, capped_value])
+	pass
 
 ## Apply current auto-difficulty configuration to all spawners
 func _apply_auto_difficulty_config():
@@ -295,15 +208,7 @@ func _apply_auto_difficulty_config():
 	# Update current stage tracking
 	current_stage = auto_config.stage_number
 	current_stage_config = auto_config
-	
-	print("🔄 Applying auto-difficulty config: Stage %d (%s)" % [current_stage, auto_config.stage_name])
-	print("   Speed: %.1f, Distance: %.1f-%.1f, Stalactites: %d" % [
-		auto_config.world_speed,
-		auto_config.min_obstacle_distance,
-		auto_config.max_obstacle_distance,
-		auto_config.stalactite_weight
-	])
-	
+
 	# Emit stage_changed signal so all spawners update
 	stage_changed.emit(current_stage, current_stage_config)
 
@@ -316,16 +221,14 @@ func get_auto_difficulty_stats() -> Dictionary:
 
 ## Disable automatic difficulty progression
 func disable_auto_difficulty():
-	print("🛑 StageManager: Auto-difficulty DISABLED")
 	auto_difficulty_enabled = false
-	
+
 	# Clean up auto-difficulty system
 	if auto_difficulty_system:
 		auto_difficulty_system = null
 
 ## Reset StageManager to Stage 1 (for restarts)
 func reset_to_stage_one():
-	print("🔄 StageManager: Resetting to Stage 1 for restart")
 	# Ensure auto-difficulty is off
 	disable_auto_difficulty()
 	# Reset counters
@@ -363,40 +266,31 @@ func get_debug_info() -> String:
 func reset_stage_progress():
 	stage_timer = 0.0
 	stage_nest_count = 0
-	print("🔄 StageManager: Stage progress reset")
 
 ## Force advance to next stage (for testing)
 func force_advance_stage():
-	print("🧪 TESTING: Forcing stage advancement...")
 	advance_to_next_stage()
 
 ## Skip to a specific stage (for testing)
 func skip_to_stage(stage_number: int) -> bool:
-	print("🧪 TESTING: Skipping to stage %d..." % stage_number)
 	if load_stage(stage_number):
 		stage_timer = 0.0
 		stage_nest_count = 0
-		print("✅ Skipped to Stage %d: %s" % [current_stage, current_stage_config.stage_name])
 		stage_changed.emit(current_stage, current_stage_config)
 		return true
 	else:
-		print("❌ Failed to skip to stage %d" % stage_number)
 		return false
 
 ## Force trigger auto-difficulty (for testing)
 func force_trigger_auto_difficulty():
-	print("🧪 TESTING: Force triggering auto-difficulty...")
 	if auto_difficulty_enabled:
-		print("❌ Auto-difficulty already enabled")
 		return false
-	
+
 	# Make sure we're on Stage 6 first
 	if current_stage != 6:
-		print("🔄 Loading Stage 6 first...")
 		if not load_stage(6):
-			print("❌ Failed to load Stage 6")
 			return false
-	
+
 	# Trigger auto-difficulty
 	enable_auto_difficulty()
 	return true
