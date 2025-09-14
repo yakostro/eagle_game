@@ -26,4 +26,4 @@ nests_enabled = false
 nest_min_skipped_obstacles = 3
 nest_max_skipped_obstacles = 6
 completion_type = 0
-completion_value = 1.0
+completion_value = 10.0

@@ -75,11 +75,6 @@ func _process(delta):
 	# Tick distance-based spawning using world speed
 	_tick_distance_based_spawning(delta)
 
-	# Debug key to manually spawn obstacle (Enter key for testing)
-	if Input.is_action_just_pressed("ui_accept"):
-		spawn_obstacle_now()
-		print("🎮 Manual obstacle spawn triggered!")
-
 func _setup_obstacle_types():
 	"""Initialize the obstacle types array with scenes and weights"""
 	obstacle_types.clear()
@@ -121,6 +116,11 @@ func spawn_random_obstacle():
 	"""Spawn a random obstacle based on weights"""
 	if obstacle_types.is_empty():
 		print("Error: No obstacle types available!")
+		return
+		
+	# Safety check: ensure minimum distance is respected
+	if distance_until_next_spawn > 0.0:
+		print("⚠️ Warning: Attempted to spawn obstacle before minimum distance was reached")
 		return
 
 	# Select random obstacle type using weighted selection
@@ -273,12 +273,6 @@ func _apply_stage_height_params_to_obstacle(obstacle: Node, obstacle_type_name: 
 			obstacle.minimum_top_offset = current_stage_config.floating_island_minimum_top_offset
 			obstacle.minimum_bottom_offset = current_stage_config.floating_island_minimum_bottom_offset
 			print("🏝️  Applied island offsets: ", current_stage_config.floating_island_minimum_top_offset, "-", current_stage_config.floating_island_minimum_bottom_offset)
-
-# TESTING AND DEBUG METHODS ===============================================
-
-# Method to manually spawn obstacle (for testing)
-func spawn_obstacle_now():
-	spawn_random_obstacle()
 
 # NOTE: Difficulty level now managed by StageManager
 

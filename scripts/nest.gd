@@ -141,21 +141,9 @@ func feed_nest(fish):
 	fish.feed_to_nest()
 
 func play_feeding_sound():
-	"""Play the feeding sound with a 3-second fade-out"""
+	"""Play the feeding sound"""
 	if not sound_fed:
 		print("Warning: SoundFed node not found")
 		return
 	
-	# Reset volume and play sound
-	sound_fed.volume_db = 0  # Start at full volume
 	sound_fed.play()
-	
-	# Create tween for fade-out after 3 seconds
-	var tween = create_tween()
-	tween.tween_interval(3.0)  # Wait 3 seconds
-	tween.tween_property(sound_fed, "volume_db", -80, 1.0)  # Fade to silence over 1 second
-	
-	# Stop the sound when fade completes
-	tween.tween_callback(func(): sound_fed.stop())
-	
-	print("Playing feeding sound with 3-second fade-out")

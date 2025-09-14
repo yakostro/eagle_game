@@ -158,8 +158,8 @@ func catch_fish(eagle):
 		# Make fish smaller and attach to eagle
 		scale = Vector2(fish_scale_when_caught, fish_scale_when_caught)
 		
-		# Disable physics
-		freeze = true
+		# Disable physics (using set_deferred to avoid physics state changes during callbacks)
+		set_deferred("freeze", true)
 		
 		# Disable collision detection for caught fish
 		var catch_area = $CatchArea
@@ -171,7 +171,7 @@ func release_fish():
 	"""Called when eagle releases/drops the fish"""
 	is_caught = false
 	is_dropped = true  # Mark as dropped for cleanup tracking
-	freeze = false
+	set_deferred("freeze", false)
 	
 	# Temporarily disable catching to prevent immediate re-catch
 	can_be_caught = false
