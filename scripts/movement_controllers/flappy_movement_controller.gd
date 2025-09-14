@@ -6,7 +6,7 @@ extends BaseMovementController
 
 # Physics constants for Flappy Bird mechanics
 @export var gravity: float = 50.0  # Constant downward force
-@export var flap_force: float = -300.0  # Upward force when flapping (negative = up)
+@export var flap_force: float = -400.0  # Upward force when flapping (negative = up)
 @export var max_fall_velocity: float = 400.0  # Maximum downward velocity
 @export var max_rise_velocity: float = -300.0  # Maximum upward velocity (negative = up)
 @export var ascent_drag: float = 400.0  # Extra drag applied to upward movement when not flapping

@@ -12,7 +12,6 @@ enum AnimationState {
 	GLIDE,
 	FLAP_CONTINUOUS,  # Looping flap for active input
 	FLAP_FINISHING,   # Finishing current flap before returning to glide
-	GLIDE_FLAP,       # Non-looping flap for idle sequences
 	SCREECH,          # Screech animation
 	FLAP_TALONS_OUT,  # Flapping while carrying fish (talons extended)
 	HIT,              # Hit animation when eagle collides with obstacle
@@ -20,10 +19,7 @@ enum AnimationState {
 }
 
 # Animation constants
-const GLIDE_FLAP_CYCLES_MIN = 1
-const GLIDE_FLAP_CYCLES_MAX = 3
-const GLIDE_FLAP_INTERVAL_MIN = 3.0
-const GLIDE_FLAP_INTERVAL_MAX = 7.0
+# (GLIDE_FLAP constants removed - no more automatic flapping during glide)
 
 # Animation state
 var animation_state: AnimationState = AnimationState.GLIDE
@@ -32,10 +28,7 @@ var animated_sprite: AnimatedSprite2D
 # Fish carrying state
 var is_carrying_fish: bool = false
 
-# Glide flap system
-var glide_flap_timer: float = 0.0
-var glide_flap_interval: float = 5.0
-var glide_flap_cycles_remaining: int = 0
+# Glide flap system removed - no more automatic flapping during glide
 
 # Screech system
 var previous_state_before_screech: AnimationState = AnimationState.GLIDE
@@ -49,13 +42,14 @@ func _init(sprite: AnimatedSprite2D):
 		animated_sprite.animation_finished.connect(_on_animation_finished)
 	else:
 		print("❌ ERROR: Animation controller initialized with null sprite!")
-	reset_glide_flap_timer()
+	# No more glide flap timer initialization needed
 
 func _ready():
 	set_physics_process(true)
 
-func _physics_process(delta):
-	update_glide_flap_timer(delta)
+func _physics_process(_delta):
+	# No more glide flap timer updates needed
+	pass
 
 func handle_fish_carrying_change(has_fish: bool):
 	"""Handle when eagle starts or stops carrying fish"""
@@ -93,7 +87,7 @@ func handle_movement_state_change(_old_state: BaseMovementController.MovementSta
 			if animation_state == AnimationState.FLAP_CONTINUOUS:
 				# Don't interrupt mid-flap - let it finish first
 				animation_state = AnimationState.FLAP_FINISHING
-			elif animation_state != AnimationState.GLIDE_FLAP:
+			else:
 				# Safe to switch immediately (not mid-flap)
 				play_animation(AnimationState.GLIDE)
 		BaseMovementController.MovementState.LIFTING, BaseMovementController.MovementState.DIVING:
@@ -120,18 +114,7 @@ func handle_dying_state():
 	"""Called when eagle enters dying state - plays dying animation"""
 	play_animation(AnimationState.DYING)
 
-func update_glide_flap_timer(delta):
-	# Only update timer during normal gliding (not during screech or carrying fish)
-	if animation_state == AnimationState.GLIDE and not is_carrying_fish:
-		glide_flap_timer += delta
-		
-		if glide_flap_timer >= glide_flap_interval:
-			start_glide_flap_sequence()
-
-func start_glide_flap_sequence():
-	glide_flap_cycles_remaining = randi_range(GLIDE_FLAP_CYCLES_MIN, GLIDE_FLAP_CYCLES_MAX)
-	play_animation(AnimationState.GLIDE_FLAP)
-	reset_glide_flap_timer()
+# Glide flap functions removed - no more automatic flapping during glide
 
 func play_animation(new_animation_state: AnimationState):
 	if new_animation_state == animation_state:
@@ -148,9 +131,7 @@ func play_animation(new_animation_state: AnimationState):
 		AnimationState.FLAP_FINISHING:
 			# Don't change animation - let current flap finish
 			pass
-		AnimationState.GLIDE_FLAP:
-			animated_sprite.play("flap")
-			flap_animation_started.emit()  # Emit flap sound signal
+		# GLIDE_FLAP state removed - no more automatic flapping
 		AnimationState.SCREECH:
 			animated_sprite.play("screech")
 		AnimationState.FLAP_TALONS_OUT:
@@ -161,9 +142,7 @@ func play_animation(new_animation_state: AnimationState):
 		AnimationState.DYING:
 			animated_sprite.play("dying")
 
-func reset_glide_flap_timer():
-	glide_flap_timer = 0.0
-	glide_flap_interval = randf_range(GLIDE_FLAP_INTERVAL_MIN, GLIDE_FLAP_INTERVAL_MAX)
+# reset_glide_flap_timer function removed - no longer needed
 
 func _on_animation_finished():
 	# Handle animation sequence completion
@@ -195,22 +174,7 @@ func _on_animation_finished():
 				play_animation(AnimationState.FLAP_TALONS_OUT)
 			else:
 				play_animation(AnimationState.GLIDE)
-		AnimationState.GLIDE_FLAP:
-			glide_flap_cycles_remaining -= 1
-			if glide_flap_cycles_remaining <= 0:
-				# Return to appropriate state
-				if is_carrying_fish:
-					play_animation(AnimationState.FLAP_TALONS_OUT)
-				else:
-					play_animation(AnimationState.GLIDE)
-			else:
-				# Continue flapping
-				if is_carrying_fish:
-					animated_sprite.play("talons_out")
-					flap_animation_started.emit()  # Emit flap sound signal
-				else:
-					animated_sprite.play("flap")
-					flap_animation_started.emit()  # Emit flap sound signal
+		# GLIDE_FLAP case removed - no more automatic flapping sequences
 		AnimationState.SCREECH:
 			# Screech finished, return to previous state
 			if is_carrying_fish:
