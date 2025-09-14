@@ -1,0 +1,59 @@
+[gd_scene load_steps=3 format=3 uid="uid://c13a6t4dwe07s"]
+
+[ext_resource type="FontFile" uid="uid://kcdyir8efr7o" path="res://fonts/Bangers-Regular.ttf" id="1_font"]
+[ext_resource type="Script" path="res://scripts/ui/ui_message.gd" id="2_script"]
+
+[node name="UIMessage" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("2_script")
+
+[node name="MessageContainer" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -488.0
+offset_right = 200.0
+offset_bottom = -436.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ContentLayout" type="HBoxContainer" parent="MessageContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="PrimaryLabel" type="Label" parent="MessageContainer/ContentLayout"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.890196, 0.866667, 0.909804, 1)
+theme_override_fonts/font = ExtResource("1_font")
+theme_override_font_sizes/font_size = 32
+text = "Primary Text"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SecondaryLabel" type="Label" parent="MessageContainer/ContentLayout"]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.956863, 0.32549, 0.32549, 1)
+theme_override_fonts/font = ExtResource("1_font")
+theme_override_font_sizes/font_size = 32
+text = "Secondary Text"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MessageIcon" type="TextureRect" parent="MessageContainer/ContentLayout"]
+visible = false
+custom_minimum_size = Vector2(30, 30)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5

@@ -5,11 +5,11 @@ class_name Fish
 # Signals
 signal fish_fed_to_nest  # Emitted when fish is fed to a nest
 
-@export var spawn_x_offset: float = 200.0  # How far to the right of eagle to spawn
+@export var spawn_x_offset: float = 250.0  # How far to the right of eagle to spawn
 @export var spawn_x_variance: float = 100.0  # Random spawn position variance
 @export var jump_force: float = 500.0
 @export var jump_force_variation: float = 100.0  # Random variation in jump force
-@export var horizontal_speed: float = 150.0  # Horizontal speed towards target
+@export var horizontal_speed: float = 120.0  # Horizontal speed towards target
 @export var lifetime: float = 5.0
 @export var energy_value: float = 25.0  # Energy this fish provides when eaten (fallback)
 @export var balance_provider_path: NodePath
