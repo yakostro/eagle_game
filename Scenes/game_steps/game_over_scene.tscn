@@ -1,6 +1,9 @@
-[gd_scene load_steps=2 format=3 uid="uid://3usm60dc4lwk"]
+[gd_scene load_steps=5 format=3 uid="uid://3usm60dc4lwk"]
 
+[ext_resource type="Texture2D" uid="uid://bom7op54lqb8o" path="res://sprites/background/back_game_over_scene.png" id="2_iej18"]
 [ext_resource type="Script" path="res://scripts/game_over_scene.gd" id="2_script"]
+[ext_resource type="Texture2D" uid="uid://ccafpc87hk0tx" path="res://sprites/ui/nest_icon.png" id="4_1f5iq"]
+[ext_resource type="FontFile" uid="uid://kcdyir8efr7o" path="res://fonts/Bangers-Regular.ttf" id="4_83n7h"]
 
 [node name="GameOverScene" type="Control"]
 layout_mode = 3
@@ -18,7 +21,9 @@ layer = -10
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-expand_mode = 1
+offset_bottom = 17.1429
+texture = ExtResource("2_iej18")
+expand_mode = 5
 stretch_mode = 5
 
 [node name="UILayer" type="CanvasLayer" parent="."]
@@ -32,20 +37,47 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="Control" type="HBoxContainer" parent="UILayer/UIContainer"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -240.0
+offset_top = 93.0
+offset_right = 260.0
+offset_bottom = 128.0
+grow_horizontal = 2
+theme_override_constants/separation = 10
+
+[node name="Saved" type="Label" parent="UILayer/UIContainer/Control"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_83n7h")
+theme_override_font_sizes/font_size = 32
+text = "Saved:"
+
+[node name="Amount" type="Label" parent="UILayer/UIContainer/Control"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_83n7h")
+theme_override_font_sizes/font_size = 32
+text = "30"
+
+[node name="TextureRect" type="TextureRect" parent="UILayer/UIContainer/Control"]
+layout_mode = 2
+texture = ExtResource("4_1f5iq")
+expand_mode = 3
+
 [node name="GameOverLabel" type="Label" parent="UILayer/UIContainer"]
 layout_mode = 1
-anchors_preset = 8
+anchors_preset = 5
 anchor_left = 0.5
-anchor_top = 0.5
 anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -200.0
-offset_top = -200.0
-offset_right = 200.0
-offset_bottom = -120.0
+offset_left = -120.0
+offset_top = 223.0
+offset_right = 120.0
+offset_bottom = 292.0
 grow_horizontal = 2
-grow_vertical = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("4_83n7h")
 theme_override_font_sizes/font_size = 64
 text = "Game Over"
 horizontal_alignment = 1
@@ -59,13 +91,14 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -250.0
-offset_top = -50.0
+offset_top = -23.0
 offset_right = 250.0
-offset_bottom = 50.0
+offset_bottom = 77.0
 grow_horizontal = 2
 grow_vertical = 2
 
 [node name="SavedNestsLabel" type="Label" parent="UILayer/UIContainer/StatsContainer"]
+visible = false
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.8, 0.4, 1)
 theme_override_font_sizes/font_size = 32
@@ -85,9 +118,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -100.0
-offset_top = 120.0
+offset_top = -96.0
 offset_right = 100.0
-offset_bottom = 180.0
+offset_bottom = -36.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)

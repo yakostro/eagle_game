@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=3 uid="uid://bvfc1tl8ttpuo"]
+[gd_scene load_steps=30 format=3 uid="uid://bvfc1tl8ttpuo"]
 
 [ext_resource type="Script" path="res://scripts/game_manager.gd" id="1_amiw1"]
 [ext_resource type="PackedScene" uid="uid://bfhkdj8w2yaqr" path="res://scenes/parallax_background.tscn" id="2_pabcw"]
@@ -23,6 +23,9 @@
 [ext_resource type="AudioStream" uid="uid://06s15ka1es4v" path="res://sounds/wind/additional_wind.wav" id="19_pia2j"]
 [ext_resource type="Script" path="res://scripts/systems/balance_provider.gd" id="20_bal"]
 [ext_resource type="Resource" uid="uid://b7lnhfb78obud" path="res://configs/energy/energy_config_default.tres" id="21_ecfg"]
+[ext_resource type="PackedScene" uid="uid://byvhfmkh0uj1d" path="res://scenes/ui/ui_tutorial_overlay.tscn" id="22_tutor"]
+[ext_resource type="Texture2D" uid="uid://bc8mpkr5psodf" path="res://sprites/ui/keys_movement_2.png" id="23_keys_move"]
+[ext_resource type="Texture2D" uid="uid://bf5y3dl66rclc" path="res://sprites/ui/keys_fish_2.png" id="24_keys_fish"]
 
 [sub_resource type="Resource" id="Resource_2vmig"]
 script = ExtResource("12_3ekbw")
@@ -164,6 +167,13 @@ grow_vertical = 2
 nest_spawner_path = NodePath("../../Spawners/NestSpawner")
 eagle_path = NodePath("../../Eagle")
 palette = SubResource("Resource_edrd6")
+
+[node name="UITutorialOverlay" parent="CanvasLayer" instance=ExtResource("22_tutor")]
+tutorial_image_path = NodePath("TutorialImage")
+stage_to_texture = {
+1: ExtResource("23_keys_move"),
+2: ExtResource("24_keys_fish")
+}
 
 [node name="FPSCounter" type="Label" parent="CanvasLayer"]
 script = ExtResource("16_htv5j")

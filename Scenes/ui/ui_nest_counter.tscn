@@ -7,18 +7,22 @@
 [node name="UiNestCounter" type="Control"]
 layout_mode = 3
 anchors_preset = 0
+size_flags_horizontal = 0
 script = ExtResource("3_0qs1e")
 nest_amount_label_path = NodePath("HBoxContainer/NestAmountLabel")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 layout_mode = 0
-offset_right = 96.0
-offset_bottom = 45.0
+offset_top = -1.0
+offset_right = 162.0
+offset_bottom = 49.0
 theme_override_constants/separation = 10
 
 [node name="NestIcon" type="TextureRect" parent="HBoxContainer"]
 layout_mode = 2
 texture = ExtResource("1_4jic3")
+expand_mode = 3
+stretch_mode = 5
 
 [node name="NestAmountLabel" type="Label" parent="HBoxContainer"]
 layout_mode = 2
