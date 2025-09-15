@@ -11,6 +11,8 @@ For reference, the normal gameplay controls are:
 - **`Space`**: Drop fish (at nest)
 - **`H`**: Screech
 
+
+
 ---
 
 ## Tips for Testing
@@ -22,6 +24,9 @@ For reference, the normal gameplay controls are:
 - **`I` Key**: Test Single Text mode ("Nest ahead!" in cyan)
 - **`U` Key**: Test Double Text mode ("Nest missed" + "-Morale")
 - **`O` Key**: Test Text + Icon mode ("+20" with energy icon)
+- K - kill the eagle
+- R - restart game
+
 
 
 

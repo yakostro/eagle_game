@@ -62,22 +62,9 @@ func _ready():
 	
 	# Connect game state signals
 	_connect_game_state_signals()
-	
-	print("🎮 Game Manager initialized")
-	print("   - Obstacle Spawner: ", "✓" if obstacle_spawner else "✗")
-	print("   - Parallax Background: ", "✓" if parallax_background else "✗")
-	print("   - Eagle: ", "✓" if eagle else "✗")
-	print("   - Nest Spawner: ", "✓" if nest_spawner else "✗")
-	print("   - Fish Spawner: ", "✓" if fish_spawner else "✗")
-	
-	if run_stage_system_tests:
-		# Task 8 verification: Check obstacle spawner after refactor
-		if obstacle_spawner:
-			print("🧪 Task 8 - Obstacle Spawner Refactor:")
-			print("   - Old difficulty system removed: ✓")
-			print("   - Core spawning functionality preserved: ✓")
-			print("   - Ready for stage integration in Task 9")
 		
+	if run_stage_system_tests:
+	
 		# Task 9 verification: Check stage integration
 		_test_obstacle_spawner_stage_integration()
 		
@@ -87,14 +74,9 @@ func _ready():
 		# Task 11 verification: Check nest spawner stage integration
 		_test_nest_spawner_stage_integration()
 		
-		# Test StageManager singleton accessibility (Task 2 verification)
-		print("🧪 Testing StageManager singleton:")
-		print("   - StageManager accessible: ", "✓" if StageManager else "✗")
+
 		if StageManager:
-			print("   - Current stage: ", StageManager.get_current_stage())
-			print("   - Auto-difficulty: ", "ON" if StageManager.auto_difficulty_enabled else "OFF")
-			print("   - Debug info available: ", "✓" if StageManager.has_method("get_debug_info") else "✗")
-			
+						
 			# Task 3 verification: Test stage configuration loading
 			_test_stage_config_loading()
 			
@@ -392,6 +374,16 @@ func _input(event):
 			print("🧪 Manual stage advance triggered!")
 			if StageManager:
 				StageManager.force_advance_stage()
+		elif event.keycode == KEY_R and not event.ctrl_pressed:
+			print("🧪 Restart game triggered!")
+			if SceneManager:
+				SceneManager.reload_current_scene()
+			else:
+				var error = get_tree().reload_current_scene()
+				if error != OK:
+					var path = get_tree().current_scene.scene_file_path
+					if path != "":
+						get_tree().change_scene_to_file(path)
 		elif event.keycode == KEY_R and event.ctrl_pressed:
 			print("🧪 Reset stage progress triggered!")
 			if StageManager:
