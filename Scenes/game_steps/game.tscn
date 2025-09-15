@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=3 uid="uid://bvfc1tl8ttpuo"]
+[gd_scene load_steps=31 format=3 uid="uid://bvfc1tl8ttpuo"]
 
 [ext_resource type="Script" path="res://scripts/game_manager.gd" id="1_amiw1"]
 [ext_resource type="PackedScene" uid="uid://bfhkdj8w2yaqr" path="res://scenes/parallax_background.tscn" id="2_pabcw"]
@@ -26,6 +26,7 @@
 [ext_resource type="PackedScene" uid="uid://byvhfmkh0uj1d" path="res://scenes/ui/ui_tutorial_overlay.tscn" id="22_tutor"]
 [ext_resource type="Texture2D" uid="uid://bc8mpkr5psodf" path="res://sprites/ui/keys_movement_2.png" id="23_keys_move"]
 [ext_resource type="Texture2D" uid="uid://bf5y3dl66rclc" path="res://sprites/ui/keys_fish_2.png" id="24_keys_fish"]
+[ext_resource type="PackedScene" uid="uid://dr3nks8eycs8m" path="res://scenes/ui/ui_offscreen_nest_indicator.tscn" id="25_nest_indicator"]
 
 [sub_resource type="Resource" id="Resource_2vmig"]
 script = ExtResource("12_3ekbw")
@@ -174,6 +175,19 @@ stage_to_texture = {
 1: ExtResource("23_keys_move"),
 2: ExtResource("24_keys_fish")
 }
+stage_to_duration = {
+1: 5.0,
+2: 4.0
+}
+stage_to_delay = {
+1: 3,
+2: 6
+}
+
+[node name="UIOffscreenNestIndicator" parent="CanvasLayer" instance=ExtResource("25_nest_indicator")]
+camera_path = NodePath("../../Camera2D")
+nest_spawner_path = NodePath("../../Spawners/NestSpawner")
+palette_resource = SubResource("Resource_edrd6")
 
 [node name="FPSCounter" type="Label" parent="CanvasLayer"]
 script = ExtResource("16_htv5j")
