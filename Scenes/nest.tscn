@@ -66,7 +66,7 @@ scale = Vector2(0.6, 0.6)
 script = ExtResource("1_u358j")
 
 [node name="FishPlaceholder" type="Sprite2D" parent="."]
-modulate = Color(0.74108, 0.741081, 0.74432, 1)
+modulate = Color(0.901297, 0.901298, 0.902687, 1)
 position = Vector2(1, -84)
 rotation = -1.63998
 scale = Vector2(0.3, 0.3)

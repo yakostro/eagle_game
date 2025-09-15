@@ -22,11 +22,11 @@
 [ext_resource type="AudioStream" uid="uid://sfagc5liqm30" path="res://sounds/wind/wind_woosh_loop.ogg" id="18_72rxq"]
 [ext_resource type="AudioStream" uid="uid://06s15ka1es4v" path="res://sounds/wind/additional_wind.wav" id="19_pia2j"]
 [ext_resource type="Script" path="res://scripts/systems/balance_provider.gd" id="20_bal"]
-[ext_resource type="Resource" uid="uid://b7lnhfb78obud" path="res://configs/energy/energy_config_default.tres" id="21_ecfg"]
-[ext_resource type="PackedScene" uid="uid://byvhfmkh0uj1d" path="res://scenes/ui/ui_tutorial_overlay.tscn" id="22_tutor"]
-[ext_resource type="Texture2D" uid="uid://bc8mpkr5psodf" path="res://sprites/ui/keys_movement_2.png" id="23_keys_move"]
-[ext_resource type="Texture2D" uid="uid://bf5y3dl66rclc" path="res://sprites/ui/keys_fish_2.png" id="24_keys_fish"]
-[ext_resource type="PackedScene" uid="uid://dr3nks8eycs8m" path="res://scenes/ui/ui_offscreen_nest_indicator.tscn" id="25_nest_indicator"]
+[ext_resource type="Resource" uid="uid://b7lnhfb78obud" path="res://configs/energy/energy_config_default.tres" id="22_ecfg"]
+[ext_resource type="PackedScene" uid="uid://byvhfmkh0uj1d" path="res://scenes/ui/ui_tutorial_overlay.tscn" id="23_tutor"]
+[ext_resource type="Texture2D" uid="uid://bc8mpkr5psodf" path="res://sprites/ui/keys_movement_2.png" id="24_keys_move"]
+[ext_resource type="Texture2D" uid="uid://bf5y3dl66rclc" path="res://sprites/ui/keys_fish_2.png" id="25_keys_fish"]
+[ext_resource type="PackedScene" uid="uid://dr3nks8eycs8m" path="res://scenes/ui/ui_offscreen_nest_indicator.tscn" id="26_nest_indicator"]
 
 [sub_resource type="Resource" id="Resource_2vmig"]
 script = ExtResource("12_3ekbw")
@@ -169,11 +169,11 @@ nest_spawner_path = NodePath("../../Spawners/NestSpawner")
 eagle_path = NodePath("../../Eagle")
 palette = SubResource("Resource_edrd6")
 
-[node name="UITutorialOverlay" parent="CanvasLayer" instance=ExtResource("22_tutor")]
+[node name="UITutorialOverlay" parent="CanvasLayer" instance=ExtResource("23_tutor")]
 tutorial_image_path = NodePath("TutorialImage")
 stage_to_texture = {
-1: ExtResource("23_keys_move"),
-2: ExtResource("24_keys_fish")
+1: ExtResource("24_keys_move"),
+2: ExtResource("25_keys_fish")
 }
 stage_to_duration = {
 1: 5.0,
@@ -184,7 +184,7 @@ stage_to_delay = {
 2: 6
 }
 
-[node name="UIOffscreenNestIndicator" parent="CanvasLayer" instance=ExtResource("25_nest_indicator")]
+[node name="UIOffscreenNestIndicator" parent="CanvasLayer" instance=ExtResource("26_nest_indicator")]
 camera_path = NodePath("../../Camera2D")
 nest_spawner_path = NodePath("../../Spawners/NestSpawner")
 palette_resource = SubResource("Resource_edrd6")
@@ -203,8 +203,11 @@ volume_db = -15.0
 stream = ExtResource("19_pia2j")
 volume_db = -18.0
 
+[node name="BackgroundMusic" type="AudioStreamPlayer" parent="EmbientSound"]
+volume_db = -30.0
+
 [node name="BalanceProvider" type="Node" parent="."]
 script = ExtResource("20_bal")
-energy_config = ExtResource("21_ecfg")
+energy_config = ExtResource("22_ecfg")
 
 [editable path="Spawners"]

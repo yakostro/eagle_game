@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://cxouy6sqvmqgf"]
+[gd_scene load_steps=4 format=3 uid="uid://cxouy6sqvmqgf"]
 
 [ext_resource type="Script" path="res://scripts/start_scene.gd" id="1_start_scene"]
 [ext_resource type="Texture2D" uid="uid://cdj6srlerwki2" path="res://sprites/background/back_start_scene.png" id="2_vo4sb"]
+[ext_resource type="AudioStream" uid="uid://c1ntcdn6rhd4t" path="res://sounds/music/shadows_over_peaks.mp3" id="3_shadows_music"]
 
 [node name="StartScene" type="Control"]
 layout_mode = 3
@@ -11,7 +12,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_start_scene")
-intro_scene_path = "res://scenes/game_steps/intro.tscn"
 press_any_button_label_path = NodePath("UILayer/UIContainer/PressAnyButtonLabel")
 background_image_path = NodePath("BackgroundLayer/BackgroundImage")
 
@@ -61,3 +61,5 @@ vertical_alignment = 1
 [node name="AudioController" type="Node" parent="."]
 
 [node name="BackgroundMusic" type="AudioStreamPlayer" parent="AudioController"]
+stream = ExtResource("3_shadows_music")
+volume_db = -10.0
