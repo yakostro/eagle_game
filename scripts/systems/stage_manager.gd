@@ -10,6 +10,9 @@ var stage_timer: float = 0.0
 var stage_nest_count: int = 0
 var auto_difficulty_enabled: bool = false
 
+# Stage system activation
+var stage_system_active: bool = false
+
 # Auto-difficulty system
 var auto_difficulty_system: AutoDifficultySystem
 
@@ -26,14 +29,18 @@ func _ready():
 	# Connect auto-difficulty signal to handler
 	auto_difficulty_started.connect(_on_auto_difficulty_started)
 
-	# Load the initial stage (Stage 1)
+	# Load the initial stage (Stage 1) but don't start timing yet
 	if not load_stage(1):
 		push_error("StageManager: Failed to load initial stage 1!")
 
-	# Set process to handle stage timing
-	set_process(true)
+	# Don't start processing until stage system is activated
+	set_process(false)
 
 func _process(delta: float):
+	# Only process if stage system is active
+	if not stage_system_active:
+		return
+		
 	# Handle stage timer progression for manual stages
 	if not auto_difficulty_enabled:
 		stage_timer += delta
@@ -50,6 +57,31 @@ func get_current_stage() -> int:
 ## Get current stage configuration
 func get_current_stage_config() -> StageConfiguration:
 	return current_stage_config
+
+## Activate the stage progression system (called by game scene when it starts)
+func activate_stage_system():
+	if stage_system_active:
+		print("StageManager: Stage system already active")
+		return
+	
+	stage_system_active = true
+	print("StageManager: Stage system activated - Stage progression started")
+	
+	# Reset timers to ensure clean start
+	stage_timer = 0.0
+	stage_nest_count = 0
+	
+	# Start processing for stage timing
+	set_process(true)
+	
+	# Emit initial stage signal to inform all spawners about current configuration
+	stage_changed.emit(current_stage, current_stage_config)
+
+## Deactivate the stage progression system (for pausing or game over)
+func deactivate_stage_system():
+	stage_system_active = false
+	set_process(false)
+	print("StageManager: Stage system deactivated")
 
 ## Load a specific stage configuration
 func load_stage(stage_number: int) -> bool:
@@ -130,19 +162,19 @@ func _check_stage_completion():
 		return
 	
 	var is_complete = false
-	var completion_reason = ""
+	var _completion_reason = ""
 	
 	# Check completion based on stage type
 	if current_stage_config.completion_type == StageConfiguration.CompletionType.TIMER:
 		# Timer-based completion
 		if stage_timer >= current_stage_config.completion_value:
 			is_complete = true
-			completion_reason = "timer reached %.1fs" % current_stage_config.completion_value
+			_completion_reason = "timer reached %.1fs" % current_stage_config.completion_value
 	elif current_stage_config.completion_type == StageConfiguration.CompletionType.NESTS_SPAWNED:
 		# Nest-based completion
 		if stage_nest_count >= current_stage_config.completion_value:
 			is_complete = true
-			completion_reason = "spawned %d nests" % int(current_stage_config.completion_value)
+			_completion_reason = "spawned %d nests" % int(current_stage_config.completion_value)
 	
 	# Advance to next stage if complete
 	if is_complete:
@@ -186,11 +218,11 @@ func _on_auto_difficulty_started():
 	_apply_auto_difficulty_config()
 
 ## Handle auto-difficulty level increase
-func _on_auto_difficulty_increased(new_level: int):
+func _on_auto_difficulty_increased(_new_level: int):
 	_apply_auto_difficulty_config()
 
 ## Handle auto-difficulty parameter capping
-func _on_auto_difficulty_parameter_capped(parameter_name: String, capped_value: float):
+func _on_auto_difficulty_parameter_capped(_parameter_name: String, _capped_value: float):
 	pass
 
 ## Apply current auto-difficulty configuration to all spawners
@@ -229,6 +261,8 @@ func disable_auto_difficulty():
 
 ## Reset StageManager to Stage 1 (for restarts)
 func reset_to_stage_one():
+	# Deactivate stage system first
+	deactivate_stage_system()
 	# Ensure auto-difficulty is off
 	disable_auto_difficulty()
 	# Reset counters
@@ -243,6 +277,7 @@ func reset_to_stage_one():
 func get_debug_info() -> String:
 	var info = "StageManager Debug Info:\n"
 	info += "  Current Stage: %d\n" % current_stage
+	info += "  Stage System: %s\n" % ("ACTIVE" if stage_system_active else "INACTIVE")
 	info += "  Stage Timer: %.1fs\n" % stage_timer
 	info += "  Stage Nests: %d\n" % stage_nest_count
 	info += "  Total Obstacles: %d\n" % total_obstacles_spawned

@@ -62,6 +62,9 @@ func _ready():
 	
 	# Connect game state signals
 	_connect_game_state_signals()
+	
+	# Activate the stage progression system now that game is ready
+	_activate_stage_system()
 		
 	if run_stage_system_tests:
 	
@@ -431,6 +434,17 @@ func get_world_movement_speed() -> float:
 	"""Get current world movement speed"""
 	return obstacle_spawner.obstacle_movement_speed if obstacle_spawner else 300.0
 
+# === STAGE SYSTEM MANAGEMENT ===
+
+func _activate_stage_system():
+	"""Activate the stage progression system when game scene starts"""
+	if not StageManager:
+		push_error("GameManager: StageManager singleton not available!")
+		return
+	
+	print("🚀 GameManager: Activating stage progression system...")
+	StageManager.activate_stage_system()
+
 # === GAME STATE MANAGEMENT ===
 
 func _connect_game_state_signals():
@@ -478,6 +492,10 @@ func _on_eagle_died():
 		return  # Prevent multiple game over triggers
 	
 	is_game_over = true
+	
+	# Deactivate stage progression when game ends
+	if StageManager:
+		StageManager.deactivate_stage_system()
 	
 	if enable_game_state_logging:
 		print("💀 Eagle died! Triggering game over sequence...")
