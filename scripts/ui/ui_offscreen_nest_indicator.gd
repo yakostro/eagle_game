@@ -47,7 +47,6 @@ func _ready():
 	# Connect to nest spawner signals
 	nest_spawner.nest_spawned.connect(_on_nest_spawned)
 	
-	print("🏠 Off-screen nest indicator initialized")
 
 func _setup_ui():
 	"""Create the UI structure for the indicator"""
@@ -70,7 +69,6 @@ func _setup_ui():
 	
 	add_child(icon_rect)
 	
-	print("🏠 UI structure created for off-screen nest indicator")
 
 func _process(_delta):
 	"""Update indicator position and visibility each frame"""
@@ -98,7 +96,6 @@ func _on_nest_spawned(nest: Node):
 	# Show indicator immediately when nest spawns (regardless of initial position)
 	_show_indicator()
 	
-	print("🏠 Nest spawned at world position: ", current_nest_world_position, " - Indicator shown immediately")
 
 func _is_nest_visible() -> bool:
 	"""Check if the current nest is visible on screen"""
@@ -130,7 +127,6 @@ func _show_indicator():
 	_update_indicator_position()
 	_start_blinking()
 	
-	print("🏠 Showing off-screen nest indicator")
 
 func _hide_indicator():
 	"""Hide the indicator and stop blinking"""
@@ -144,7 +140,6 @@ func _hide_indicator():
 	# Clear current nest reference
 	current_nest = null
 	
-	print("🏠 Hiding off-screen nest indicator")
 
 func _update_indicator_position():
 	"""Update the indicator position based on nest world Y and camera"""

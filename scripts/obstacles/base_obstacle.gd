@@ -10,6 +10,8 @@ extends StaticBody2D
 # Screen cleanup properties
 var screen_width: float
 var sprite_node: Sprite2D
+var _cached_actual_sprite_width: float = -1.0
+var _cached_actual_sprite_height: float = -1.0
 
 func _ready():
 	# Add to obstacles group for collision detection
@@ -19,6 +21,15 @@ func _ready():
 	sprite_node = get_node("Sprite2D")
 	if not sprite_node:
 		push_error("BaseObstacle requires a Sprite2D child node!")
+	else:
+		# Precompute cached sprite dimensions to avoid per-frame texture queries
+		if sprite_node.texture:
+			var full_width = sprite_node.texture.get_width()
+			var full_height = sprite_node.texture.get_height()
+			var total_scale_x = sprite_node.scale.x * self.scale.x
+			var total_scale_y = sprite_node.scale.y * self.scale.y
+			_cached_actual_sprite_width = full_width * total_scale_x
+			_cached_actual_sprite_height = full_height * total_scale_y
 
 func _process(delta):
 	"""Handle automatic movement and cleanup"""
@@ -124,11 +135,16 @@ func get_actual_sprite_height() -> float:
 		push_error("get_actual_sprite_height(): No sprite or texture available!")
 		return 0.0
 	
+	# Use cached value if available
+	if _cached_actual_sprite_height > 0.0:
+		return _cached_actual_sprite_height
+	
 	var full_height = sprite_node.texture.get_height()
 	# Account for both sprite scaling and root node scaling
 	var total_scale_y = sprite_node.scale.y * self.scale.y
 	var scaled_height = full_height * total_scale_y
-	return scaled_height
+	_cached_actual_sprite_height = scaled_height
+	return _cached_actual_sprite_height
 
 func get_actual_sprite_width() -> float:
 	"""Get the actual sprite width accounting for scaling applied in the scene"""
@@ -136,8 +152,13 @@ func get_actual_sprite_width() -> float:
 		push_error("get_actual_sprite_width(): No sprite or texture available!")
 		return 0.0
 	
+	# Use cached value if available
+	if _cached_actual_sprite_width > 0.0:
+		return _cached_actual_sprite_width
+	
 	var full_width = sprite_node.texture.get_width()
 	# Account for both sprite scaling and root node scaling
 	var total_scale_x = sprite_node.scale.x * self.scale.x
 	var scaled_width = full_width * total_scale_x
-	return scaled_width
+	_cached_actual_sprite_width = scaled_width
+	return _cached_actual_sprite_width

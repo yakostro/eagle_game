@@ -59,6 +59,10 @@ var gradient_scroll_position: float = 0.0
 var mountain_scroll_position: float = 0.0
 var middle_scroll_position: float = 0.0
 
+# Cached widths to avoid per-frame texture queries/computations
+var _mountain_texture_scaled_width: float = 0.0
+var _middle_texture_scaled_width: float = 0.0
+
 func _ready():
 	# Get screen dimensions
 	screen_width = get_viewport().get_visible_rect().size.x
@@ -144,6 +148,7 @@ func create_mountain_sprites():
 	var scale_factor = mountain_scale  # Use the inspector-controllable scale
 	var scaled_width = texture_width * scale_factor
 	var scaled_height = texture_height * scale_factor
+	_mountain_texture_scaled_width = scaled_width
 	
 	# Create enough sprites to cover screen width + extra for scrolling
 	var sprites_needed = int(ceil((screen_width * 3) / scaled_width)) + 1
@@ -174,6 +179,7 @@ func create_middle_sprites():
 	var texture_height = texture.get_height()
 	var scale_factor = (screen_height * 0.8) / texture_height
 	var scaled_width = texture_width * scale_factor
+	_middle_texture_scaled_width = scaled_width
 	
 	# Create enough sprites to cover screen width + extra for scrolling
 	var sprites_needed = int(ceil((screen_width * 3) / scaled_width)) + 1
@@ -240,15 +246,15 @@ func _process(delta):
 		
 		# Handle wrapping for seamless scrolling
 		if not mountain_sprites.is_empty():
-			var texture = mountain_textures[0] if not mountain_textures.is_empty() else null
-			if texture:
-				var texture_width = texture.get_width()
-				var scale_factor = mountain_scale  # Use the inspector-controllable scale
-				var scaled_width = texture_width * scale_factor
-				
-				# Reset position when we've scrolled one full texture width
-				if mountain_scroll_position <= -scaled_width:
-					mountain_scroll_position += scaled_width
+			# Reset position when we've scrolled one full texture width
+			var width = _mountain_texture_scaled_width
+			if width <= 0.0 and not mountain_textures.is_empty():
+				# Fallback compute once if cache not ready yet
+				var texture = mountain_textures[0]
+				width = texture.get_width() * mountain_scale
+				_mountain_texture_scaled_width = width
+			if width > 0.0 and mountain_scroll_position <= -width:
+				mountain_scroll_position += width
 	
 	# Move middle layer
 	if middle_layer and enable_middle_layer:
@@ -256,15 +262,15 @@ func _process(delta):
 		
 		# Handle wrapping for seamless scrolling
 		if not middle_sprites.is_empty():
-			var texture = middle_textures[0] if not middle_textures.is_empty() else null
-			if texture:
-				var texture_width = texture.get_width()
-				var scale_factor = (screen_height * 0.8) / texture.get_height()
-				var scaled_width = texture_width * scale_factor
-				
-				# Reset position when we've scrolled one full texture width
-				if middle_scroll_position <= -scaled_width:
-					middle_scroll_position += scaled_width
+			# Reset position when we've scrolled one full texture width
+			var width2 = _middle_texture_scaled_width
+			if width2 <= 0.0 and not middle_textures.is_empty():
+				var texture2 = middle_textures[0]
+				var scale2 = (screen_height * 0.8) / texture2.get_height()
+				width2 = texture2.get_width() * scale2
+				_middle_texture_scaled_width = width2
+			if width2 > 0.0 and middle_scroll_position <= -width2:
+				middle_scroll_position += width2
 
 func set_world_movement_speed(new_speed: float):
 	"""Update world movement speed (called from game when speed changes)"""
@@ -373,6 +379,7 @@ func set_mountain_scale(new_scale: float):
 			sprite.scale = Vector2(mountain_scale, mountain_scale)
 			var scaled_height = sprite.texture.get_height() * mountain_scale
 			sprite.position.y = screen_height - (scaled_height / 2) + mountain_vertical_offset
+			_mountain_texture_scaled_width = sprite.texture.get_width() * mountain_scale
 
 
 func fade_mountain_layer(target_transparency: float, duration: float):

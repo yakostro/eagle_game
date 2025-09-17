@@ -113,7 +113,6 @@ func _detect_mode():
 	"""Detect if we're running in flexible mode or legacy mode"""
 	message_container = get_node_or_null("MessageContainer")
 	is_flexible_mode = message_container != null
-	print("🎯 UIMessage: Mode detected - ", "FLEXIBLE" if is_flexible_mode else "LEGACY")
 
 func _setup_flexible_mode():
 	"""Setup for flexible text message mode"""
@@ -145,22 +144,18 @@ func _setup_base_functionality():
 	if nest_spawner and nest_spawner.has_signal("nest_incoming"):
 		if not nest_spawner.nest_incoming.is_connected(_on_nest_incoming):
 			nest_spawner.nest_incoming.connect(_on_nest_incoming)
-			print("🔗 UIMessage: Connected to nest_spawner.nest_incoming signal")
 	
 	# Connect to nest_spawned signal to connect to individual nest_missed signals
 	if nest_spawner and nest_spawner.has_signal("nest_spawned"):
 		if not nest_spawner.nest_spawned.is_connected(_on_nest_spawned):
 			nest_spawner.nest_spawned.connect(_on_nest_spawned)
-			print("🔗 UIMessage: Connected to nest_spawner.nest_spawned signal")
 
 	if eagle:
 		# Cache current energy capacity if the eagle has the method
 		if eagle.has_method("get_energy_capacity_percentage"):
 			_previous_morale = eagle.get_energy_capacity_percentage()
-			print("🔗 UIMessage: Cached initial energy capacity: ", _previous_morale)
 		if eagle.has_signal("energy_capacity_changed") and not eagle.energy_capacity_changed.is_connected(_on_energy_capacity_changed):
 			eagle.energy_capacity_changed.connect(_on_energy_capacity_changed)
-			print("🔗 UIMessage: Connected to eagle.energy_capacity_changed signal")
 
 	if nest_notice_label:
 		nest_notice_label.visible = false
@@ -370,16 +365,13 @@ func _unhandled_input(event):
 
 func _on_nest_incoming(_remaining: int):
 	"""Queue nest incoming message instead of showing directly"""
-	print("📢 UIMessage: Nest incoming signal received! Remaining obstacles: ", _remaining)
 	if is_flexible_mode:
-		print("📢 UIMessage: Showing flexible nest incoming message")
 		show_flexible_message(FlexibleMessageType.NEST_INCOMING, {
 			"primary_text": "Nest ahead!",
 			"primary_color": (palette.White if palette else Color.CYAN),
 			"display_duration": nest_notice_duration
 		})
 	else:
-		print("📢 UIMessage: Adding nest incoming to legacy queue")
 		if not nest_notice_label:
 			return
 		_add_message_to_queue(MessageType.NEST_INCOMING)
@@ -404,9 +396,7 @@ func _on_nest_spawned(nest: Node):
 
 func _on_nest_missed(_points: int = 0):
 	"""Queue morale negative message instead of showing directly"""
-	print("📢 UIMessage: Nest missed signal received! Points: ", _points)
 	if is_flexible_mode:
-		print("📢 UIMessage: Showing flexible nest missed message")
 		show_flexible_message(FlexibleMessageType.NEST_MISSED, {
 			"primary_text": "Nest missed",
 			"secondary_text": "-MORALE",
@@ -415,7 +405,6 @@ func _on_nest_missed(_points: int = 0):
 			"display_duration": morale_pop_duration
 		})
 	else:
-		print("📢 UIMessage: Adding nest missed to legacy queue")
 		if not morale_pop_container:
 			return
 		_add_message_to_queue(MessageType.NEST_MISSED)
