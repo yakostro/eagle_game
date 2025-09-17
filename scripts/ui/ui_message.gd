@@ -36,6 +36,7 @@ enum FlexibleMessageType {
 @export_group("Connections")
 @export var nest_spawner_path: NodePath
 @export var eagle_path: NodePath
+@export var camera_path: NodePath
 
 # Message timing configuration
 @export var nest_notice_duration: float = 1.5
@@ -440,33 +441,28 @@ func _hide_morale_pop():
 			morale_pop_container.visible = false
 
 func _resolve_nodes():
-	if nest_spawner_path != NodePath(""):
+	# Gameplay references - NodePath only, no fallbacks
+	if nest_spawner_path == NodePath(""):
+		push_error("UIMessage: Missing nest_spawner_path. Please set it in the Inspector.")
+	else:
 		nest_spawner = get_node_or_null(nest_spawner_path)
-	if not nest_spawner:
-		nest_spawner = get_tree().current_scene.find_child("NestSpawner", true, false)
+		if not nest_spawner:
+			push_error("UIMessage: Invalid nest_spawner_path: " + str(nest_spawner_path))
 
-	if eagle_path != NodePath(""):
+	if eagle_path == NodePath(""):
+		push_error("UIMessage: Missing eagle_path. Please set it in the Inspector.")
+	else:
 		eagle = get_node_or_null(eagle_path)
-	if not eagle:
-		eagle = get_tree().current_scene.find_child("Eagle", true, false)
+		if not eagle:
+			push_error("UIMessage: Invalid eagle_path: " + str(eagle_path))
 
-	# Legacy nodes resolved only by scene search (no exported paths)
-	nest_notice_label = get_tree().current_scene.find_child("NestNotice", true, false) as Label
-	morale_pop_container = get_tree().current_scene.find_child("MoralePopContainer", true, false)
-	
-	# Find child labels within the container
-	if morale_pop_container:
-		# Look for common label names - adjust these names as needed
-		chicks_label = morale_pop_container.find_child("ChicksLabel", true, false) as Label
-		if not chicks_label:
-			chicks_label = morale_pop_container.find_child("ChicksDieLabel", true, false) as Label
-		
-		morale_label = morale_pop_container.find_child("MoraleLabel", true, false) as Label
-		if not morale_label:
-			morale_label = morale_pop_container.find_child("MoralePop", true, false) as Label
-	
-	# Resolve camera reference for world-to-screen coordinate conversion
-	camera = get_tree().current_scene.find_child("Camera2D", true, false) as Camera2D
+	# Camera is required for coordinate conversion in some flows
+	if camera_path == NodePath(""):
+		push_error("UIMessage: Missing camera_path. Please set it in the Inspector.")
+	else:
+		camera = get_node_or_null(camera_path) as Camera2D
+		if not camera:
+			push_error("UIMessage: Invalid camera_path: " + str(camera_path))
 
 ## Message Queue System Methods (for legacy mode)
 

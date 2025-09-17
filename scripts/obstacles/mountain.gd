@@ -29,10 +29,7 @@ func get_spawn_y_position(screen_height: float) -> float:
 		max_y = temp
 
 	var spawn_y = randf_range(min_y, max_y)
-
-	print("Mountain Y positioning: screen_height=", screen_height, " actual_sprite_height=", actual_sprite_height)
-	print("   Height params: min_offset=", min_mountain_offset, " max_offset=", max_mountain_offset)
-	print("   Y range: ", min_y, " to ", max_y, " chosen=", spawn_y)
+	
 	return spawn_y
 
 func get_obstacle_type() -> String:

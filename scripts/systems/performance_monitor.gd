@@ -14,6 +14,7 @@ class_name PerformanceMonitor
 @export var enable_warnings: bool = true
 @export var fps_warning_threshold: int = 30
 @export var memory_warning_threshold_mb: int = 500
+@export var enable_console_output: bool = true
 
 # Performance tracking variables
 var fps_timer: float = 0.0
@@ -35,10 +36,11 @@ var object_history: Array[int] = []
 var monitor_timer: Timer
 
 func _ready():
-	print("📊 Performance Monitor initialized")
-	print("   - Monitor interval: %.1fs" % monitor_interval)
-	print("   - FPS warnings: %s" % ("ON" if enable_warnings else "OFF"))
-	print("   - Memory warnings: %s" % ("ON" if enable_warnings else "OFF"))
+	if enable_console_output:
+		print("📊 Performance Monitor initialized")
+		print("   - Monitor interval: %.1fs" % monitor_interval)
+		print("   - FPS warnings: %s" % ("ON" if enable_warnings else "OFF"))
+		print("   - Memory warnings: %s" % ("ON" if enable_warnings else "OFF"))
 
 	# Create and start monitoring timer
 	monitor_timer = Timer.new()
@@ -48,7 +50,8 @@ func _ready():
 	monitor_timer.start()
 
 	# Initial stats
-	_print_performance_stats()
+	if enable_console_output:
+		_print_performance_stats()
 
 func _process(delta: float):
 	fps_timer += delta
@@ -62,7 +65,8 @@ func _process(delta: float):
 		max_fps = int(current_fps)
 
 func _on_monitor_timeout():
-	_print_performance_stats()
+	if enable_console_output:
+		_print_performance_stats()
 
 func _print_performance_stats():
 	var stats_text = "\n📊 PERFORMANCE STATS (%.1fs interval)" % monitor_interval
@@ -82,7 +86,8 @@ func _print_performance_stats():
 		# FPS warning
 		if enable_warnings and fps < fps_warning_threshold:
 			stats_text += " ⚠️ LOW FPS!"
-			print(stats_text)
+			if enable_console_output:
+				print(stats_text)
 			push_warning("Low FPS detected: %.0f (below %d threshold)" % [fps, fps_warning_threshold])
 
 	if show_memory:

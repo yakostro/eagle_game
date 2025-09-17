@@ -168,3 +168,84 @@ var last_update_time: float = 0.0
 - Predictions maintain accuracy within 0.2 seconds of actual spawns
 - System handles stage transitions and difficulty changes gracefully
 - Performance impact minimal (< 1ms per prediction update)
+
+---
+
+## Performance Optimization Addendum (Anti‑Burst, Low-GC, Stable Frame Time)
+
+This addendum strengthens the design to avoid distance-based spawn bursts and cleanup spikes.
+
+### Goals
+- Keep predictor+spawner CPU < 1.0 ms/frame average, ~0.3 ms typical
+- Prevent multiple spawn/cleanup operations landing on the same frame
+- Minimize GC churn with pooling and per-frame budgets
+
+### 1) Time-based Scheduling and Anti‑Burst Rules
+- Convert predictions to time-based schedule: `spawn_time = now + predicted_distance / world_speed`
+- On world speed change, rescale remaining `spawn_time` values
+- Enforce throttles when executing the timeline:
+  - `min_spawn_spacing_ms` (default 100 ms)
+  - `spawn_events_per_frame_max` (default 1)
+  - `cleanup_events_per_frame_max` (default 3–4)
+- Clamp big `delta`: if `delta > 0.1`, execute at most one spawn this frame
+
+### 2) Frame Work Budget with Queues
+Maintain queues and stop when budget is spent:
+```gdscript
+@export var frame_budget_ms: float = 0.6
+
+func _physics_process(_delta: float) -> void:
+    var start_us := Time.get_ticks_usec()
+    var spawns := 0
+    while spawn_queue.size() > 0:
+        _execute_one_spawn(spawn_queue.pop_front())
+        spawns += 1
+        if spawns >= spawn_events_per_frame_max:
+            break
+        var elapsed_ms := (Time.get_ticks_usec() - start_us) / 1000.0
+        if elapsed_ms > frame_budget_ms:
+            break
+
+    var cleans := 0
+    while recycle_queue.size() > 0 and cleans < cleanup_events_per_frame_max:
+        _recycle_one(recycle_queue.pop_front())
+        cleans += 1
+```
+
+### 3) Object Pooling (Per Type) with Prewarm
+- Pool per obstacle type; prewarm to expected concurrency
+- Checkout from pool on spawn; return on cleanup
+- When pooled: `visible = false`, `process_mode = Node.PROCESS_MODE_DISABLED`, remove from `"obstacles"` group
+- If pool empty: instantiate; if over capacity: free gradually obeying cleanup budget
+
+### 4) Cleanup Delegation
+- Replace direct `queue_free()` in obstacle with signal `offscreen_exited(obstacle)` to recycler; budget the recycle work
+
+### 5) Predictor ↔ Spawner Sync
+- Predictor owns ordered timeline with `spawn_time`
+- Spawner consumes due items only if within per-frame budget
+- Use deterministic RNG so prediction and execution match
+
+### 6) Telemetry without Console Spam
+- Expose counters: `timeline_size`, `spawn_queue_len`, `recycle_queue_len`, `pool_free[type]`
+- `PerformanceMonitor` can read and print these only when `enable_console_output` is ON
+
+### 7) Exported Tuning Knobs
+- `prediction_lookahead_time: float = 4.0`
+- `prediction_refresh_interval: float = 0.5`
+- `min_spawn_spacing_ms: int = 100`
+- `spawn_events_per_frame_max: int = 1`
+- `cleanup_events_per_frame_max: int = 4`
+- `frame_budget_ms: float = 0.6`
+- `pool_enabled: bool = true`
+- `pool_prewarm_per_type: int = 6`
+
+### 8) Edge Cases
+- Stage transition: rebuild predictions, keep pools
+- Tab-out big delta: execute at most one spawn; repopulate timeline next frame
+- Speed spikes: rescale remaining `spawn_time` values and keep spacing
+
+### 9) Acceptance Checks
+- No periodic 2–4s spikes with logging off; physics time < 2 ms typical
+- Horizon keeps 3+ upcoming spawns populated at 300 px/s, 4 s window
+- Queue lengths remain bounded (spawn ≤ 3, recycle ≤ 8) during play

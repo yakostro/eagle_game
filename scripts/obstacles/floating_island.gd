@@ -31,7 +31,6 @@ func get_spawn_y_position(screen_height: float) -> float:
 	
 	var spawn_y = randf_range(min_y, max_y)
 	
-	print("FloatingIsland Y positioning: scaled_height=", actual_sprite_height, " range=", min_y, " to ", max_y, " chosen=", spawn_y)
 	return spawn_y
 
 func get_obstacle_type() -> String:

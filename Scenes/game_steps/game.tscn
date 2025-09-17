@@ -1,4 +1,4 @@
-[gd_scene load_steps=31 format=3 uid="uid://bvfc1tl8ttpuo"]
+[gd_scene load_steps=33 format=3 uid="uid://bvfc1tl8ttpuo"]
 
 [ext_resource type="Script" path="res://scripts/game_manager.gd" id="1_amiw1"]
 [ext_resource type="PackedScene" uid="uid://bfhkdj8w2yaqr" path="res://scenes/parallax_background.tscn" id="2_pabcw"]
@@ -27,6 +27,8 @@
 [ext_resource type="Texture2D" uid="uid://bc8mpkr5psodf" path="res://sprites/ui/keys_movement_2.png" id="24_keys_move"]
 [ext_resource type="Texture2D" uid="uid://bf5y3dl66rclc" path="res://sprites/ui/keys_fish_2.png" id="25_keys_fish"]
 [ext_resource type="PackedScene" uid="uid://dr3nks8eycs8m" path="res://scenes/ui/ui_offscreen_nest_indicator.tscn" id="26_nest_indicator"]
+[ext_resource type="Script" path="res://scripts/systems/performance_monitor.gd" id="27_perfmon"]
+[ext_resource type="Script" path="res://scripts/systems/performance_profiler.gd" id="28_perfprof"]
 
 [sub_resource type="Resource" id="Resource_2vmig"]
 script = ExtResource("12_3ekbw")
@@ -167,6 +169,7 @@ grow_horizontal = 2
 grow_vertical = 2
 nest_spawner_path = NodePath("../../Spawners/NestSpawner")
 eagle_path = NodePath("../../Eagle")
+camera_path = NodePath("../../Camera2D")
 palette = SubResource("Resource_edrd6")
 
 [node name="UITutorialOverlay" parent="CanvasLayer" instance=ExtResource("23_tutor")]
@@ -209,5 +212,15 @@ volume_db = -30.0
 [node name="BalanceProvider" type="Node" parent="."]
 script = ExtResource("20_bal")
 energy_config = ExtResource("22_ecfg")
+
+[node name="PerformanceMonitor" type="Node" parent="."]
+script = ExtResource("27_perfmon")
+enable_console_output = false
+
+[node name="PerformanceProfiler" type="Node" parent="."]
+script = ExtResource("28_perfprof")
+enable_console_output = false
+obstacle_spawner_path = NodePath("../Spawners/ObstacleSpawner")
+game_manager_path = NodePath("..")
 
 [editable path="Spawners"]

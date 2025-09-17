@@ -58,15 +58,9 @@ func _ready():
 	# Connect to nest spawner if available
 	if nest_spawner:
 		obstacle_spawned.connect(nest_spawner.on_obstacle_spawned)
-		print("🔗 Connected to NestSpawner")
 	else:
 		print("⚠️  No NestSpawner connected - nests will not spawn")
 
-	print("🏔️  Obstacle spawner initialized. Screen size: ", screen_size)
-	print("   Available obstacle types: ", obstacle_types.size())
-	for obstacle_type in obstacle_types:
-		print("   - ", obstacle_type["name"], " (weight: ", obstacle_type["weight"], ")")
-	print("   Distance range: ", min_obstacle_distance, "-", max_obstacle_distance)
 
 	# Connect to StageManager for stage-based configuration
 	_connect_to_stage_manager()
@@ -155,9 +149,6 @@ func spawn_random_obstacle():
 	# Emit signal for nest spawner to handle
 	obstacle_spawned.emit(obstacle)
 
-	print("🏔️  Spawned ", selected_type["name"], " | Total obstacles: ", obstacle_count)
-
-
 
 func _get_weighted_random_obstacle_type() -> Dictionary:
 	"""Select a random obstacle type based on weights"""
@@ -208,7 +199,6 @@ func _connect_to_stage_manager():
 
 func _on_stage_changed(new_stage: int, config: StageConfiguration):
 	"""Handle stage changes from StageManager"""
-	print("🏔️  ObstacleSpawner: Updating to Stage ", new_stage)
 	apply_stage_config(config)
 
 func apply_stage_config(config: StageConfiguration):
@@ -235,12 +225,6 @@ func apply_stage_config(config: StageConfiguration):
 	# Refresh obstacle types with new weights
 	_setup_obstacle_types()
 
-	print("🏔️  Stage config applied:")
-	print("   - World speed: ", obstacle_movement_speed)
-	print("   - Mountain weight: ", mountain_weight)
-	print("   - Stalactite weight: ", stalactite_weight)
-	print("   - Island weight: ", floating_island_weight)
-	print("   - Distance range: ", min_obstacle_distance, "-", max_obstacle_distance)
 
 func _apply_stage_height_params_to_obstacle(obstacle: Node, obstacle_type_name: String):
 	"""Apply stage-specific height/offset parameters to an obstacle"""
@@ -256,7 +240,6 @@ func _apply_stage_height_params_to_obstacle(obstacle: Node, obstacle_type_name: 
 			# Map stage height values to mountain offset values
 			obstacle.min_mountain_offset = current_stage_config.mountain_min_height
 			obstacle.max_mountain_offset = current_stage_config.mountain_max_height
-			print("🏔️  Applied mountain heights: ", current_stage_config.mountain_min_height, "-", current_stage_config.mountain_max_height)
 	
 	elif obstacle_type_name == "Stalactite":
 		# Apply stalactite height parameters
@@ -265,14 +248,12 @@ func _apply_stage_height_params_to_obstacle(obstacle: Node, obstacle_type_name: 
 		elif "min_stalactite_height" in obstacle and "max_stalactite_height" in obstacle:
 			obstacle.min_stalactite_height = current_stage_config.stalactite_min_height
 			obstacle.max_stalactite_height = current_stage_config.stalactite_max_height
-			print("🗻 Applied stalactite heights: ", current_stage_config.stalactite_min_height, "-", current_stage_config.stalactite_max_height)
 	
 	elif obstacle_type_name == "FloatingIsland" or obstacle_type_name.find("Island") != -1:
 		# Apply floating island offset parameters
 		if "minimum_top_offset" in obstacle and "minimum_bottom_offset" in obstacle:
 			obstacle.minimum_top_offset = current_stage_config.floating_island_minimum_top_offset
 			obstacle.minimum_bottom_offset = current_stage_config.floating_island_minimum_bottom_offset
-			print("🏝️  Applied island offsets: ", current_stage_config.floating_island_minimum_top_offset, "-", current_stage_config.floating_island_minimum_bottom_offset)
 
 # NOTE: Difficulty level now managed by StageManager
 

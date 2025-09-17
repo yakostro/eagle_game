@@ -40,8 +40,6 @@ func setup_obstacle(screen_w: float, screen_height: float):
 
 	global_position = Vector2(spawn_x, spawn_y)
 
-	print(get_obstacle_type(), " setup at position: ", global_position)
-
 
 
 func get_spawn_y_position(_screen_height: float) -> float:
@@ -63,7 +61,6 @@ func cleanup_when_offscreen():
 	
 	# Remove when the rightmost edge is off the left side of the screen
 	if global_position.x + actual_sprite_width < 0:
-		print(get_obstacle_type(), " ", name, " removed (off-screen)")
 		queue_free()
 
 func move_left(speed: float, delta: float):
