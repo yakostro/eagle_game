@@ -10,10 +10,10 @@ config_version=5
 
 [application]
 
-config/name="Eagle"
+config/name="The Last Eagle"
 run/main_scene="res://scenes/game_steps/start_scene.tscn"
 config/features=PackedStringArray("4.2", "Forward Plus")
-config/icon="res://icon.svg"
+config/icon="res://The_Last_Eagle.png"
 
 [autoload]
 
