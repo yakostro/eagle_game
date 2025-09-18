@@ -504,7 +504,6 @@ func _on_eagle_died():
 		StageManager.deactivate_stage_system()
 	
 	if enable_game_state_logging:
-		print("💀 Eagle died! Triggering game over sequence...")
 		if GameStats:
 			print("📊 Final Statistics:")
 			print("   - Fed Nests: ", GameStats.get_fed_nests_count())
@@ -520,7 +519,6 @@ func _on_eagle_died():
 	# Emergency fallback: if we're still in this scene after 10 seconds, force transition
 	await get_tree().create_timer(10.0).timeout
 	if get_tree().current_scene.scene_file_path != "res://scenes/game_steps/game_over_scene.tscn":
-		print("🚨 EMERGENCY: Game over scene transition failed! Forcing direct transition...")
 		get_tree().change_scene_to_file("res://scenes/game_steps/game_over_scene.tscn")
 
 func _stop_all_spawning():
@@ -528,25 +526,18 @@ func _stop_all_spawning():
 	# Stop obstacle spawner by disabling its processing
 	if obstacle_spawner:
 		obstacle_spawner.set_process(false)
-		if enable_game_state_logging:
-			print("🛑 Obstacle spawner stopped")
 	
 	# Stop fish spawner by stopping its timer
 	if fish_spawner and fish_spawner.spawn_timer:
 		fish_spawner.spawn_timer.stop()
-		if enable_game_state_logging:
-			print("🛑 Fish spawner stopped")
 	
 	# Stop any boost timer in fish spawner
 	if fish_spawner and fish_spawner.boost_timer:
 		fish_spawner.boost_timer.stop()
-		if enable_game_state_logging:
-			print("🛑 Fish boost timer stopped")
 
 func _trigger_game_over_scene():
 	"""Transition to the game over scene"""
-	if enable_game_state_logging:
-		print("🎬 Transitioning to game over scene...")
+
 	
 	# Use SceneManager for smooth transition
 	if SceneManager:
@@ -554,7 +545,6 @@ func _trigger_game_over_scene():
 		if SceneManager.is_transitioning:
 			await SceneManager.scene_changed
 		
-		print("🎬 Starting scene transition via SceneManager...")
 		SceneManager.change_scene("res://scenes/game_steps/game_over_scene.tscn")
 		
 		# Wait for the transition to complete or timeout after 5 seconds
@@ -570,14 +560,11 @@ func _trigger_game_over_scene():
 		await timeout_timer.timeout
 		
 		if not transition_completed:
-			print("❌ SceneManager transition timed out! Using direct scene change as fallback.")
 			SceneManager.scene_changed.disconnect(scene_change_handler)
 			get_tree().change_scene_to_file("res://scenes/game_steps/game_over_scene.tscn")
-		else:
-			print("✅ Scene transition completed successfully")
+
 	else:
 		# Fallback if SceneManager not available
-		print("⚠️  SceneManager not available, using direct scene change")
 		get_tree().change_scene_to_file("res://scenes/game_steps/game_over_scene.tscn")
 
 func _physics_process(delta):
@@ -597,13 +584,10 @@ func _physics_process(delta):
 				return  # Not enough time has passed
 			
 			# Eagle fell below screen - trigger game over
-			if enable_game_state_logging:
-				print("💀 Eagle fell below screen - triggering game over")
 			_on_eagle_died()
+
 		elif eagle_death_timer >= eagle_fall_timeout:
 			# Timeout reached - force game over even if eagle hasn't fallen below screen
-			if enable_game_state_logging:
-				print("⏰ Eagle fall timeout (", eagle_fall_timeout, "s) reached - forcing game over")
 			_on_eagle_died()
 	else:
 		# Reset timer when eagle is not dying

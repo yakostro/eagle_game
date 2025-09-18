@@ -14,5 +14,5 @@ alwaysApply: true
 - Always create variables for things that need to be tweaked during the balancing game mechanics.
 - If possible do not use direct links like '@onready var base_wind: AudioStreamPlayer2D = $BaseWind'. Use '@export var nest_notice_label_path: NodePath' instead.
 - call node names with a camelcase and gd-script files with a snake case
-- do not add console messages in every function that only purpose is to say 'instantiate item' or 'resource loaded' etc. It's spaming console.
+- NEVER add print/console messages that just announce what the code is doing (like 'instantiate item', 'resource loaded', 'displaying indicator', 'initializing component', etc.). Only use print() for actual errors, warnings, or critical debug information that helps solve problems. Avoid emoji-decorated status messages completely.
 - for ui components always use colors from the palette configs\ui\ui_palette_default.tres

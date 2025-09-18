@@ -7,6 +7,8 @@ extends Control
 # UI Component references using NodePath for flexibility
 @export var game_over_label_path: NodePath = NodePath("UILayer/UIContainer/GameOverLabel")
 @export var amount_label_path: NodePath = NodePath("UILayer/UIContainer/SavedNests/Amount")
+@export var record_amount_label_path: NodePath = NodePath("UILayer/UIContainer/Record/Amount")
+@export var new_record_label_path: NodePath = NodePath("UILayer/UIContainer/Amount2")
 @export var restart_button_path: NodePath = NodePath("UILayer/UIContainer/RestartButton")
 @export var background_music_path: NodePath = NodePath("AudioController/BackgroundMusic")
 
@@ -17,10 +19,15 @@ extends Control
 @export var no_nests_text: String = "No Nests Saved"
 @export var single_nest_text: String = "Saved 1 Nest"
 
+# UI Palette for consistent colors
+@export var palette: UiPalette
+
 # Component references
 var game_over_label: Label
 var saved_nests_label: Label
 var amount_label: Label
+var record_amount_label: Label
+var new_record_label: Label
 var restart_button: Button
 var background_music: AudioStreamPlayer
 
@@ -30,6 +37,12 @@ var is_initialized: bool = false
 func _ready():
 	"""Initialize the game over scene with current statistics"""
 	print("🎬 Game Over Scene initializing...")
+	
+	# Ensure palette is available (fallback to default resource if not assigned)
+	if not palette:
+		var default_palette := load("res://configs/ui/ui_palette_default.tres") as UiPalette
+		if default_palette:
+			palette = default_palette
 	
 	# Get references to UI components
 	_get_ui_references()
@@ -53,6 +66,8 @@ func _get_ui_references():
 	"""Get references to UI components using NodePaths"""
 	game_over_label = get_node(game_over_label_path) if game_over_label_path else null
 	amount_label = get_node(amount_label_path) if amount_label_path else null
+	record_amount_label = get_node(record_amount_label_path) if record_amount_label_path else null
+	new_record_label = get_node(new_record_label_path) if new_record_label_path else null
 	restart_button = get_node(restart_button_path) if restart_button_path else null
 	background_music = get_node(background_music_path) if background_music_path else null
 	
@@ -61,6 +76,8 @@ func _get_ui_references():
 		print("❌ Warning: Game Over Label not found at path: ", game_over_label_path)
 	if not amount_label:
 		print("❌ Warning: Amount Label not found at path: ", amount_label_path)
+	if not record_amount_label:
+		print("❌ Warning: Record Amount Label not found at path: ", record_amount_label_path)
 	if not restart_button:
 		print("❌ Warning: Restart Button not found at path: ", restart_button_path)
 
@@ -72,6 +89,7 @@ func _connect_signals():
 	# Connect to GameStats for any real-time updates (future use)
 	if GameStats:
 		GameStats.stats_updated.connect(_on_stats_updated)
+		GameStats.new_record_achieved.connect(_on_new_record_achieved)
 
 func _initialize_statistics_display():
 	"""Load and display current game statistics from GameStats singleton"""
@@ -82,38 +100,19 @@ func _initialize_statistics_display():
 	# Get current statistics
 	var fed_nests_count = GameStats.get_fed_nests_count()
 	
-	# Update the saved nests display
-	_update_saved_nests_display(fed_nests_count)
+	# Check and update record if this session is a new record
+	var is_new_record = GameStats.check_and_update_record()
 	
 	# Update the amount label with the nest count
 	_update_amount_display(fed_nests_count)
 	
-	print("📊 Displayed statistics - Fed Nests: ", fed_nests_count)
-
-func _update_saved_nests_display(nests_count: int):
-	"""Update the saved nests label with proper grammar"""
-	if not saved_nests_label:
-		return
+	# Update the record display
+	_update_record_display(GameStats.get_best_record())
 	
-	var display_text: String
+	# Show new record indicator if applicable
+	if is_new_record:
+		_show_new_record_indicator()
 	
-	# Handle different cases for better user experience
-	if nests_count == 0:
-		display_text = no_nests_text
-		saved_nests_label.modulate = Color.GRAY  # Dimmed for no achievement
-	elif nests_count == 1:
-		display_text = single_nest_text
-		saved_nests_label.modulate = Color.WHITE
-	else:
-		display_text = nest_text_format % nests_count
-		saved_nests_label.modulate = Color.WHITE
-		
-		# Special highlighting for high achievements (future enhancement)
-		if nests_count >= 10:
-			saved_nests_label.modulate = Color.GOLD
-	
-	saved_nests_label.text = display_text
-	print("🏠 Updated nest display: '", display_text, "'")
 
 func _update_amount_display(nests_count: int):
 	"""Update the amount label with the saved nests count"""
@@ -123,13 +122,33 @@ func _update_amount_display(nests_count: int):
 	# Display format: "x [number]"
 	amount_label.text = str(nests_count)
 
+func _update_record_display(record_count: int):
+	"""Update the record label with the best record count"""
+	if not record_amount_label:
+		return
+	
+	# Display the record amount
+	record_amount_label.text = str(record_count)
+
+func _show_new_record_indicator():
+	"""Show the 'New Record!' indicator"""
+	if not new_record_label:
+		return
+	
+	# Make the new record label visible and set text
+	new_record_label.visible = true
+	new_record_label.text = "New record"
+	
+	# Use palette yellow for the achievement highlight
+	new_record_label.modulate = (palette.Yellow3 if palette else Color.GOLD)
+	
+
 
 func _setup_input_handling():
 	"""Set up keyboard shortcuts for accessibility"""
 	if enable_keyboard_shortcuts:
 		# Make sure this scene can receive input
 		set_process_input(true)
-		print("⌨️  Keyboard shortcuts enabled (Space/Enter for restart)")
 
 func _input(event):
 	"""Handle keyboard input for quick actions"""
@@ -183,16 +202,23 @@ func _on_stats_updated(fed_nests: int):
 	"""Handle real-time statistics updates (future use)"""
 	# This would be called if stats change while on game over screen
 	# Currently not needed, but ready for future enhancements
-	_update_saved_nests_display(fed_nests)
 	_update_amount_display(fed_nests)
+
+func _on_new_record_achieved(new_record: int):
+	"""Handle new record achievement signal"""
+	print("🏆 New record achieved signal received: ", new_record)
+	_update_record_display(new_record)
+	_show_new_record_indicator()
 
 # === DEBUG AND DEVELOPMENT HELPERS ===
 
 func debug_set_nest_count(count: int):
 	"""Debug method to test different nest counts"""
-	print("🔧 DEBUG: Setting nest count to ", count)
-	_update_saved_nests_display(count)
 	_update_amount_display(count)
+
+func debug_test_new_record():
+	"""Debug method to test new record display"""
+	_show_new_record_indicator()
 
 func debug_print_scene_info():
 	"""Print debug information about the scene state"""
@@ -203,4 +229,6 @@ func debug_print_scene_info():
 	print("SceneManager Available: ", SceneManager != null)
 	if GameStats:
 		print("Current Fed Nests: ", GameStats.get_fed_nests_count())
+		print("Best Record: ", GameStats.get_best_record())
+		print("Is New Record: ", GameStats.is_current_session_record())
 	print("===================================")

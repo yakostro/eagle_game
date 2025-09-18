@@ -16,6 +16,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("2_script")
+new_record_label_path = NodePath("UILayer/UIContainer/NewRecord")
 
 [node name="BackgroundLayer" type="CanvasLayer" parent="."]
 layer = -10
@@ -58,6 +59,19 @@ text = "Game Over"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="NewRecord" type="Label" parent="UILayer/UIContainer"]
+visible = false
+layout_mode = 2
+offset_left = 1091.0
+offset_top = 526.0
+offset_right = 1242.0
+offset_bottom = 561.0
+rotation = -0.00823468
+size_flags_vertical = 8
+theme_override_fonts/font = ExtResource("4_83n7h")
+theme_override_font_sizes/font_size = 32
+text = "   New record"
+
 [node name="SavedNests" type="HBoxContainer" parent="UILayer/UIContainer"]
 layout_mode = 1
 anchors_preset = 8
@@ -79,12 +93,11 @@ layout_mode = 2
 texture = ExtResource("4_1f5iq")
 expand_mode = 3
 
-[node name="Saved" type="Label" parent="UILayer/UIContainer/SavedNests"]
-visible = false
+[node name="x" type="Label" parent="UILayer/UIContainer/SavedNests"]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("4_83n7h")
 theme_override_font_sizes/font_size = 32
-text = "Saved:"
+text = "x"
 
 [node name="Amount" type="Label" parent="UILayer/UIContainer/SavedNests"]
 layout_mode = 2
@@ -92,20 +105,12 @@ theme_override_fonts/font = ExtResource("4_83n7h")
 theme_override_font_sizes/font_size = 72
 text = "30"
 
-[node name="Amount2" type="Label" parent="UILayer/UIContainer/SavedNests"]
-visible = false
-layout_mode = 2
-size_flags_vertical = 8
-theme_override_fonts/font = ExtResource("4_83n7h")
-theme_override_font_sizes/font_size = 32
-text = "   New record"
-
 [node name="Record" type="HBoxContainer" parent="UILayer/UIContainer"]
 layout_mode = 2
 offset_left = 879.0
-offset_top = 604.0
+offset_top = 606.0
 offset_right = 1042.0
-offset_bottom = 639.0
+offset_bottom = 641.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 10
@@ -122,12 +127,6 @@ layout_mode = 2
 theme_override_fonts/font = ExtResource("4_83n7h")
 theme_override_font_sizes/font_size = 32
 text = "32"
-
-[node name="TextureRect" type="TextureRect" parent="UILayer/UIContainer/Record"]
-visible = false
-layout_mode = 2
-texture = ExtResource("4_1f5iq")
-expand_mode = 3
 
 [node name="RestartButton" type="Button" parent="UILayer/UIContainer"]
 layout_mode = 1
