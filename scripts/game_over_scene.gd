@@ -6,8 +6,7 @@ extends Control
 
 # UI Component references using NodePath for flexibility
 @export var game_over_label_path: NodePath = NodePath("UILayer/UIContainer/GameOverLabel")
-@export var saved_nests_label_path: NodePath = NodePath("UILayer/UIContainer/StatsContainer/SavedNestsLabel")
-@export var amount_label_path: NodePath = NodePath("UILayer/UIContainer/Control/Amount")
+@export var amount_label_path: NodePath = NodePath("UILayer/UIContainer/SavedNests/Amount")
 @export var restart_button_path: NodePath = NodePath("UILayer/UIContainer/RestartButton")
 @export var background_music_path: NodePath = NodePath("AudioController/BackgroundMusic")
 
@@ -53,7 +52,6 @@ func _ready():
 func _get_ui_references():
 	"""Get references to UI components using NodePaths"""
 	game_over_label = get_node(game_over_label_path) if game_over_label_path else null
-	saved_nests_label = get_node(saved_nests_label_path) if saved_nests_label_path else null
 	amount_label = get_node(amount_label_path) if amount_label_path else null
 	restart_button = get_node(restart_button_path) if restart_button_path else null
 	background_music = get_node(background_music_path) if background_music_path else null
@@ -61,8 +59,6 @@ func _get_ui_references():
 	# Validate critical components
 	if not game_over_label:
 		print("❌ Warning: Game Over Label not found at path: ", game_over_label_path)
-	if not saved_nests_label:
-		print("❌ Warning: Saved Nests Label not found at path: ", saved_nests_label_path)
 	if not amount_label:
 		print("❌ Warning: Amount Label not found at path: ", amount_label_path)
 	if not restart_button:

@@ -17,6 +17,7 @@ class_name GameManager
 
 # Tweakable parameters for game over system
 @export var game_over_transition_delay: float = 1.0  # Delay before transitioning to game over scene
+@export var eagle_fall_timeout: float = 2.0  # Maximum time to wait for eagle to fall below screen
 @export var enable_game_state_logging: bool = true
 @export var run_stage_system_tests: bool = false
 
@@ -31,6 +32,7 @@ var is_game_over: bool = false
 
 # Screen boundary monitoring for dying eagle
 var camera: Camera2D
+var eagle_death_timer: float = 0.0  # Timer for eagle fall timeout
 
 func _ready():
 	# Get references to game systems
@@ -492,6 +494,10 @@ func _on_eagle_died():
 		return  # Prevent multiple game over triggers
 	
 	is_game_over = true
+	eagle_death_timer = 0.0  # Reset death timer
+	
+	# Stop all spawning immediately to prevent obstacles from continuing to spawn
+	_stop_all_spawning()
 	
 	# Deactivate stage progression when game ends
 	if StageManager:
@@ -510,6 +516,32 @@ func _on_eagle_died():
 	
 	# Trigger game over scene transition
 	_trigger_game_over_scene()
+	
+	# Emergency fallback: if we're still in this scene after 10 seconds, force transition
+	await get_tree().create_timer(10.0).timeout
+	if get_tree().current_scene.scene_file_path != "res://scenes/game_steps/game_over_scene.tscn":
+		print("🚨 EMERGENCY: Game over scene transition failed! Forcing direct transition...")
+		get_tree().change_scene_to_file("res://scenes/game_steps/game_over_scene.tscn")
+
+func _stop_all_spawning():
+	"""Stop all spawners to prevent continued spawning during game over"""
+	# Stop obstacle spawner by disabling its processing
+	if obstacle_spawner:
+		obstacle_spawner.set_process(false)
+		if enable_game_state_logging:
+			print("🛑 Obstacle spawner stopped")
+	
+	# Stop fish spawner by stopping its timer
+	if fish_spawner and fish_spawner.spawn_timer:
+		fish_spawner.spawn_timer.stop()
+		if enable_game_state_logging:
+			print("🛑 Fish spawner stopped")
+	
+	# Stop any boost timer in fish spawner
+	if fish_spawner and fish_spawner.boost_timer:
+		fish_spawner.boost_timer.stop()
+		if enable_game_state_logging:
+			print("🛑 Fish boost timer stopped")
 
 func _trigger_game_over_scene():
 	"""Transition to the game over scene"""
@@ -518,26 +550,64 @@ func _trigger_game_over_scene():
 	
 	# Use SceneManager for smooth transition
 	if SceneManager:
+		# Check if SceneManager is already transitioning
+		if SceneManager.is_transitioning:
+			await SceneManager.scene_changed
+		
+		print("🎬 Starting scene transition via SceneManager...")
 		SceneManager.change_scene("res://scenes/game_steps/game_over_scene.tscn")
+		
+		# Wait for the transition to complete or timeout after 5 seconds
+		var timeout_timer = get_tree().create_timer(5.0)
+		var transition_completed = false
+		
+		# Connect to scene_changed signal to track completion
+		var scene_change_handler = func(): 
+			transition_completed = true
+		SceneManager.scene_changed.connect(scene_change_handler, CONNECT_ONE_SHOT)
+		
+		# Wait for either timeout or scene change
+		await timeout_timer.timeout
+		
+		if not transition_completed:
+			print("❌ SceneManager transition timed out! Using direct scene change as fallback.")
+			SceneManager.scene_changed.disconnect(scene_change_handler)
+			get_tree().change_scene_to_file("res://scenes/game_steps/game_over_scene.tscn")
+		else:
+			print("✅ Scene transition completed successfully")
 	else:
 		# Fallback if SceneManager not available
 		print("⚠️  SceneManager not available, using direct scene change")
 		get_tree().change_scene_to_file("res://scenes/game_steps/game_over_scene.tscn")
 
-func _physics_process(_delta):
+func _physics_process(delta):
 	"""Monitor eagle position for dying state boundary detection"""
 	# Only monitor if game is not over and eagle is dying
 	if is_game_over or not eagle or not camera:
 		return
 	
-	# Check if eagle is dying and has fallen below screen
-	if eagle.is_dying and _is_eagle_below_screen():
-		# Check minimum fall duration if specified
-		if eagle.min_death_fall_duration > 0.0 and eagle.death_fall_timer < eagle.min_death_fall_duration:
-			return  # Not enough time has passed
+	# Start timing when eagle enters dying state
+	if eagle.is_dying:
+		eagle_death_timer += delta
 		
-		# Trigger game over
-		_on_eagle_died()
+		# Check if eagle has fallen below screen
+		if _is_eagle_below_screen():
+			# Check minimum fall duration if specified
+			if eagle.min_death_fall_duration > 0.0 and eagle.death_fall_timer < eagle.min_death_fall_duration:
+				return  # Not enough time has passed
+			
+			# Eagle fell below screen - trigger game over
+			if enable_game_state_logging:
+				print("💀 Eagle fell below screen - triggering game over")
+			_on_eagle_died()
+		elif eagle_death_timer >= eagle_fall_timeout:
+			# Timeout reached - force game over even if eagle hasn't fallen below screen
+			if enable_game_state_logging:
+				print("⏰ Eagle fall timeout (", eagle_fall_timeout, "s) reached - forcing game over")
+			_on_eagle_died()
+	else:
+		# Reset timer when eagle is not dying
+		eagle_death_timer = 0.0
 
 func _is_eagle_below_screen() -> bool:
 	"""Check if eagle has fallen below the visible screen area"""

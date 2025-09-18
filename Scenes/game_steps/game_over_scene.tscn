@@ -1,10 +1,12 @@
-[gd_scene load_steps=6 format=3 uid="uid://3usm60dc4lwk"]
+[gd_scene load_steps=8 format=3 uid="uid://3usm60dc4lwk"]
 
 [ext_resource type="Texture2D" uid="uid://bom7op54lqb8o" path="res://sprites/background/back_game_over_scene.png" id="2_iej18"]
 [ext_resource type="Script" path="res://scripts/game_over_scene.gd" id="2_script"]
 [ext_resource type="Texture2D" uid="uid://ccafpc87hk0tx" path="res://sprites/ui/nest_icon.png" id="4_1f5iq"]
 [ext_resource type="FontFile" uid="uid://kcdyir8efr7o" path="res://fonts/Bangers-Regular.ttf" id="4_83n7h"]
-[ext_resource type="StyleBox" uid="uid://cgp78fb87d04" path="res://ui_res/new_style_box_flat.tres" id="5_ge1na"]
+[ext_resource type="StyleBox" uid="uid://cgp78fb87d04" path="res://ui_res/ui_button_default.tres" id="5_ge1na"]
+[ext_resource type="StyleBox" uid="uid://cmdqaud8hhe8" path="res://ui_res/ui_button_pressed.tres" id="5_tneni"]
+[ext_resource type="StyleBox" uid="uid://b5sd62y644wne" path="res://ui_res/ui_button_hover.tres" id="6_7dmsl"]
 
 [node name="GameOverScene" type="Control"]
 layout_mode = 3
@@ -14,8 +16,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("2_script")
-saved_nests_label_path = NodePath("")
-amount_label_path = NodePath("UILayer/UIContainer/SavedNests/Amount")
 
 [node name="BackgroundLayer" type="CanvasLayer" parent="."]
 layer = -10
@@ -146,6 +146,8 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("4_83n7h")
 theme_override_font_sizes/font_size = 32
 theme_override_styles/normal = ExtResource("5_ge1na")
+theme_override_styles/hover = ExtResource("6_7dmsl")
+theme_override_styles/pressed = ExtResource("5_tneni")
 text = "Restart"
 
 [node name="AudioController" type="Node" parent="."]

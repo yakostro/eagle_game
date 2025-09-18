@@ -437,7 +437,7 @@ func handle_fish_actions():
 
 func update_energy(delta):
 	"""Update eagle's energy over time"""
-	if is_dead:
+	if is_dead or is_dying:
 		return
 	# Only lose energy passively if not in flappy mode
 	if not disable_passive_energy_loss:

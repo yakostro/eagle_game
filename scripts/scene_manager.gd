@@ -48,7 +48,8 @@ func change_scene(scene_path: String, transition_type: String = "fade") -> void:
 	if is_transitioning:
 		print("SceneManager: Already transitioning, ignoring request")
 		return
-		
+	
+	print("SceneManager: Starting scene change to: ", scene_path)
 	var current_scene_name = get_current_scene_name()
 	scene_changing.emit(current_scene_name, scene_path)
 	
@@ -60,11 +61,13 @@ func change_scene(scene_path: String, transition_type: String = "fade") -> void:
 func _change_scene_with_fade(scene_path: String) -> void:
 	"""Perform scene change with fade transition"""
 	is_transitioning = true
+	print("SceneManager: Starting fade transition...")
 	
 	# Fade out
 	var fade_out_tween = create_tween()
 	fade_out_tween.tween_property(transition_overlay, "modulate:a", 1.0, transition_duration)
 	await fade_out_tween.finished
+	print("SceneManager: Fade out completed, changing scene...")
 	
 	# Change scene while screen is black
 	var error = get_tree().change_scene_to_file(scene_path)
@@ -73,15 +76,18 @@ func _change_scene_with_fade(scene_path: String) -> void:
 		is_transitioning = false
 		return
 	
+	print("SceneManager: Scene change successful, waiting for load...")
 	# Wait one frame for new scene to load
 	await get_tree().process_frame
 	
+	print("SceneManager: Starting fade in...")
 	# Fade in
 	var fade_in_tween = create_tween()
 	fade_in_tween.tween_property(transition_overlay, "modulate:a", 0.0, transition_duration)
 	await fade_in_tween.finished
 	
 	is_transitioning = false
+	print("SceneManager: Transition completed successfully")
 	scene_changed.emit(get_current_scene_name())
 
 func _change_scene_instant(scene_path: String) -> void:
