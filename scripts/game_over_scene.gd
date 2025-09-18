@@ -7,6 +7,7 @@ extends Control
 # UI Component references using NodePath for flexibility
 @export var game_over_label_path: NodePath = NodePath("UILayer/UIContainer/GameOverLabel")
 @export var saved_nests_label_path: NodePath = NodePath("UILayer/UIContainer/StatsContainer/SavedNestsLabel")
+@export var amount_label_path: NodePath = NodePath("UILayer/UIContainer/Control/Amount")
 @export var restart_button_path: NodePath = NodePath("UILayer/UIContainer/RestartButton")
 @export var background_music_path: NodePath = NodePath("AudioController/BackgroundMusic")
 
@@ -20,6 +21,7 @@ extends Control
 # Component references
 var game_over_label: Label
 var saved_nests_label: Label
+var amount_label: Label
 var restart_button: Button
 var background_music: AudioStreamPlayer
 
@@ -52,6 +54,7 @@ func _get_ui_references():
 	"""Get references to UI components using NodePaths"""
 	game_over_label = get_node(game_over_label_path) if game_over_label_path else null
 	saved_nests_label = get_node(saved_nests_label_path) if saved_nests_label_path else null
+	amount_label = get_node(amount_label_path) if amount_label_path else null
 	restart_button = get_node(restart_button_path) if restart_button_path else null
 	background_music = get_node(background_music_path) if background_music_path else null
 	
@@ -60,6 +63,8 @@ func _get_ui_references():
 		print("❌ Warning: Game Over Label not found at path: ", game_over_label_path)
 	if not saved_nests_label:
 		print("❌ Warning: Saved Nests Label not found at path: ", saved_nests_label_path)
+	if not amount_label:
+		print("❌ Warning: Amount Label not found at path: ", amount_label_path)
 	if not restart_button:
 		print("❌ Warning: Restart Button not found at path: ", restart_button_path)
 
@@ -67,12 +72,10 @@ func _connect_signals():
 	"""Connect UI signals for interaction handling"""
 	if restart_button:
 		restart_button.pressed.connect(_on_restart_button_pressed)
-		print("🔗 Connected restart button signal")
 	
 	# Connect to GameStats for any real-time updates (future use)
 	if GameStats:
 		GameStats.stats_updated.connect(_on_stats_updated)
-		print("🔗 Connected to GameStats signals")
 
 func _initialize_statistics_display():
 	"""Load and display current game statistics from GameStats singleton"""
@@ -85,6 +88,9 @@ func _initialize_statistics_display():
 	
 	# Update the saved nests display
 	_update_saved_nests_display(fed_nests_count)
+	
+	# Update the amount label with the nest count
+	_update_amount_display(fed_nests_count)
 	
 	print("📊 Displayed statistics - Fed Nests: ", fed_nests_count)
 
@@ -113,6 +119,15 @@ func _update_saved_nests_display(nests_count: int):
 	saved_nests_label.text = display_text
 	print("🏠 Updated nest display: '", display_text, "'")
 
+func _update_amount_display(nests_count: int):
+	"""Update the amount label with the saved nests count"""
+	if not amount_label:
+		return
+	
+	# Display format: "x [number]"
+	amount_label.text = str(nests_count)
+
+
 func _setup_input_handling():
 	"""Set up keyboard shortcuts for accessibility"""
 	if enable_keyboard_shortcuts:
@@ -140,33 +155,27 @@ func _play_entrance_animation():
 	modulate.a = 0.0
 	var tween = create_tween()
 	tween.tween_property(self, "modulate:a", 1.0, display_animation_duration)
-	print("🎭 Playing entrance fade-in animation")
 
 # === BUTTON INTERACTION HANDLERS ===
 
 func _on_restart_button_pressed():
 	"""Handle restart button press"""
-	print("🔄 Restart button pressed!")
 	_trigger_restart()
 
 func _trigger_restart():
 	"""Execute the restart sequence"""
-	print("🚀 Triggering game restart sequence...")
 	
 	# Reset game statistics for new session
 	if GameStats:
 		GameStats.reset_session()
-		print("📊 Game statistics reset for new session")
 	
-	# Reset stage system to stage 1
+	# Reset stage system to stage 3 (skip tutorial stages)
 	if StageManager:
-		StageManager.reset_to_stage_one()
-		print("🎯 Stage reset to 1 for new run")
+		StageManager.skip_to_stage(3)
 	
 	# Use SceneManager for smooth transition to game scene
 	if SceneManager:
 		SceneManager.change_scene("res://scenes/game_steps/game.tscn")
-		print("🎬 Transitioning to game scene")
 	else:
 		# Fallback if SceneManager not available
 		print("⚠️  SceneManager not available, using direct scene change")
@@ -179,6 +188,7 @@ func _on_stats_updated(fed_nests: int):
 	# This would be called if stats change while on game over screen
 	# Currently not needed, but ready for future enhancements
 	_update_saved_nests_display(fed_nests)
+	_update_amount_display(fed_nests)
 
 # === DEBUG AND DEVELOPMENT HELPERS ===
 
@@ -186,6 +196,7 @@ func debug_set_nest_count(count: int):
 	"""Debug method to test different nest counts"""
 	print("🔧 DEBUG: Setting nest count to ", count)
 	_update_saved_nests_display(count)
+	_update_amount_display(count)
 
 func debug_print_scene_info():
 	"""Print debug information about the scene state"""

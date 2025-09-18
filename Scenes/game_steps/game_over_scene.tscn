@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://3usm60dc4lwk"]
+[gd_scene load_steps=6 format=3 uid="uid://3usm60dc4lwk"]
 
 [ext_resource type="Texture2D" uid="uid://bom7op54lqb8o" path="res://sprites/background/back_game_over_scene.png" id="2_iej18"]
 [ext_resource type="Script" path="res://scripts/game_over_scene.gd" id="2_script"]
 [ext_resource type="Texture2D" uid="uid://ccafpc87hk0tx" path="res://sprites/ui/nest_icon.png" id="4_1f5iq"]
 [ext_resource type="FontFile" uid="uid://kcdyir8efr7o" path="res://fonts/Bangers-Regular.ttf" id="4_83n7h"]
+[ext_resource type="StyleBox" uid="uid://cgp78fb87d04" path="res://ui_res/new_style_box_flat.tres" id="5_ge1na"]
 
 [node name="GameOverScene" type="Control"]
 layout_mode = 3
@@ -13,11 +14,14 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("2_script")
+saved_nests_label_path = NodePath("")
+amount_label_path = NodePath("UILayer/UIContainer/SavedNests/Amount")
 
 [node name="BackgroundLayer" type="CanvasLayer" parent="."]
 layer = -10
 
 [node name="BackgroundImage" type="TextureRect" parent="BackgroundLayer"]
+modulate = Color(0.564962, 0.564962, 0.564962, 1)
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -37,81 +41,93 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Control" type="HBoxContainer" parent="UILayer/UIContainer"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -81.5
-offset_top = -215.0
-offset_right = 81.5
-offset_bottom = -180.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/separation = 10
-
-[node name="Saved" type="Label" parent="UILayer/UIContainer/Control"]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_83n7h")
-theme_override_font_sizes/font_size = 32
-text = "Saved:"
-
-[node name="Amount" type="Label" parent="UILayer/UIContainer/Control"]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_83n7h")
-theme_override_font_sizes/font_size = 32
-text = "x 30"
-
-[node name="TextureRect" type="TextureRect" parent="UILayer/UIContainer/Control"]
-layout_mode = 2
-texture = ExtResource("4_1f5iq")
-expand_mode = 3
-
 [node name="GameOverLabel" type="Label" parent="UILayer/UIContainer"]
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -120.0
-offset_top = 223.0
-offset_right = 120.0
-offset_bottom = 292.0
+offset_left = -187.0
+offset_top = 330.0
+offset_right = 187.0
+offset_bottom = 438.0
 grow_horizontal = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("4_83n7h")
-theme_override_font_sizes/font_size = 64
+theme_override_font_sizes/font_size = 100
 text = "Game Over"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="StatsContainer" type="VBoxContainer" parent="UILayer/UIContainer"]
+[node name="SavedNests" type="HBoxContainer" parent="UILayer/UIContainer"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -250.0
-offset_top = -23.0
-offset_right = 250.0
-offset_bottom = 77.0
+offset_left = -85.0
+offset_top = -36.0
+offset_right = 86.0
+offset_bottom = 42.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/separation = 10
+alignment = 1
 
-[node name="SavedNestsLabel" type="Label" parent="UILayer/UIContainer/StatsContainer"]
+[node name="TextureRect" type="TextureRect" parent="UILayer/UIContainer/SavedNests"]
+layout_mode = 2
+texture = ExtResource("4_1f5iq")
+expand_mode = 3
+
+[node name="Saved" type="Label" parent="UILayer/UIContainer/SavedNests"]
 visible = false
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.8, 0.4, 1)
+theme_override_fonts/font = ExtResource("4_83n7h")
 theme_override_font_sizes/font_size = 32
-text = "Saved 0 Nests"
-horizontal_alignment = 1
-vertical_alignment = 1
+text = "Saved:"
 
-[node name="Spacer" type="Control" parent="UILayer/UIContainer/StatsContainer"]
-custom_minimum_size = Vector2(0, 20)
+[node name="Amount" type="Label" parent="UILayer/UIContainer/SavedNests"]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("4_83n7h")
+theme_override_font_sizes/font_size = 72
+text = "30"
+
+[node name="Amount2" type="Label" parent="UILayer/UIContainer/SavedNests"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_fonts/font = ExtResource("4_83n7h")
+theme_override_font_sizes/font_size = 32
+text = "   New record"
+
+[node name="Record" type="HBoxContainer" parent="UILayer/UIContainer"]
+layout_mode = 2
+offset_left = 879.0
+offset_top = 604.0
+offset_right = 1042.0
+offset_bottom = 639.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="Saved" type="Label" parent="UILayer/UIContainer/Record"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_83n7h")
+theme_override_font_sizes/font_size = 32
+text = "Record:"
+
+[node name="Amount" type="Label" parent="UILayer/UIContainer/Record"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_83n7h")
+theme_override_font_sizes/font_size = 32
+text = "32"
+
+[node name="TextureRect" type="TextureRect" parent="UILayer/UIContainer/Record"]
+visible = false
+layout_mode = 2
+texture = ExtResource("4_1f5iq")
+expand_mode = 3
 
 [node name="RestartButton" type="Button" parent="UILayer/UIContainer"]
 layout_mode = 1
@@ -120,14 +136,16 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -100.0
-offset_top = -96.0
-offset_right = 100.0
-offset_bottom = -36.0
+offset_left = -150.0
+offset_top = 181.0
+offset_right = 150.0
+offset_bottom = 261.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_colors/font_color = Color(0, 0, 0, 1)
-theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("4_83n7h")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/normal = ExtResource("5_ge1na")
 text = "Restart"
 
 [node name="AudioController" type="Node" parent="."]
