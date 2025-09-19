@@ -7,6 +7,8 @@
 layout_mode = 3
 anchors_preset = 0
 script = ExtResource("2_script")
+pulse_speed = 0.5
+pulse_scale = 1.05
 
 [node name="MessageContainer" type="Control" parent="."]
 layout_mode = 1

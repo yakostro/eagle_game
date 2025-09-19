@@ -106,6 +106,7 @@ func handle_screech_request():
 	# Save current state to return to after screech
 	if animation_state != AnimationState.SCREECH:
 		previous_state_before_screech = animation_state
+		print("🦅 Screech requested. Saving previous state: ", AnimationState.keys()[previous_state_before_screech])
 	
 	# Play screech animation
 	play_animation(AnimationState.SCREECH)
@@ -177,10 +178,22 @@ func _on_animation_finished():
 		# GLIDE_FLAP case removed - no more automatic flapping sequences
 		AnimationState.SCREECH:
 			# Screech finished, return to previous state
+			print("🦅 Screech animation finished. Returning to previous state: ", AnimationState.keys()[previous_state_before_screech])
 			if is_carrying_fish:
+				print("🦅 Eagle carrying fish, switching to talons out")
 				play_animation(AnimationState.FLAP_TALONS_OUT)
 			else:
-				play_animation(previous_state_before_screech)
+				print("🦅 Returning to saved state: ", AnimationState.keys()[previous_state_before_screech])
+				# Get current movement state to ensure we're synced
+				var eagle = get_parent() as Eagle
+				if eagle:
+					var current_movement_state = eagle.get_movement_state()
+					print("🦅 Current movement state: ", BaseMovementController.MovementState.keys()[current_movement_state])
+					# Force sync with current movement state instead of saved state
+					handle_movement_state_change(current_movement_state, current_movement_state)
+				else:
+					# Fallback to saved state if eagle not found
+					play_animation(previous_state_before_screech)
 		AnimationState.HIT:
 			# Hit animation finished, tell eagle to end hit state and return to appropriate animation
 			var eagle = get_parent() as Eagle

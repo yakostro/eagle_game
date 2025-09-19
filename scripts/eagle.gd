@@ -43,6 +43,8 @@ var _camera: Camera2D
 @export var min_death_fall_duration: float = 2.0  # Minimum fall time before game over
 @export var death_animation_name: String = "dying"  # Animation to play when dying
 @export var play_screech_on_zero_energy: bool = true  # Play screech once when entering dying
+@export var play_screech_on_nest_missed: bool = true  # Play screech when missing a nest
+@export var nest_missed_screech_volume_db: float = -10.0  # Volume for nest missed screech (separate from death screech)
 @export var failed_flap_feedback_cooldown: float = 0.5  # Seconds between "No [energy icon]" messages
 
 # Components
@@ -272,6 +274,9 @@ func on_nest_missed(points: int = 0):
 	# Use the points from nest if provided, otherwise use eagle's default value
 	var energy_to_lose: float = float(points) if points > 0 else energy_loss_per_nest_miss
 	reduce_energy_capacity(energy_to_lose)
+	
+	# Play screech sound for missing nest
+	play_nest_missed_screech()
 
 # Hit system methods
 func hit_by_obstacle():
@@ -497,6 +502,27 @@ func play_flap_sound():
 	"""Called when eagle flaps to play the flapping sound"""
 	if flap_audio != null:
 		flap_audio.play()
+
+func play_nest_missed_screech():
+	"""Play screech sound and animation when missing a nest with configurable volume"""
+	if not play_screech_on_nest_missed or not screech_audio:
+		return
+	
+	# Store original volume to restore later
+	var original_volume = screech_audio.volume_db
+	
+	# Set the nest missed screech volume
+	screech_audio.volume_db = nest_missed_screech_volume_db
+	
+	# Play the screech sound
+	screech_audio.play()
+	
+	# Trigger screech animation
+	screech_requested.emit()
+	
+	# Restore original volume after sound finishes (using a timer)
+	var restore_timer = get_tree().create_timer(screech_audio.stream.get_length() if screech_audio.stream else 1.0)
+	restore_timer.timeout.connect(func(): screech_audio.volume_db = original_volume)
 
 func show_no_energy_feedback():
 	"""Show 'No [energy icon]' feedback when trying to flap while dying"""

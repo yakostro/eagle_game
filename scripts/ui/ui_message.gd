@@ -40,7 +40,7 @@ enum FlexibleMessageType {
 
 # Message timing configuration
 @export var nest_notice_duration: float = 1.5
-@export var morale_pop_duration: float = 1.2
+@export var nest_missed_duration: float = 2.5  # Longer duration for nest missed messages
 @export var inter_message_delay: float = 0.7  # Delay between messages
 
 # Flexible display configuration
@@ -65,6 +65,8 @@ enum FlexibleMessageType {
 @export var fade_in_time: float = 0.2
 @export var fade_out_time: float = 0.3
 @export var enable_pulse_animation: bool = false
+@export var pulse_speed: float = 0.3  # Time for one pulse cycle (lower = faster blinking)
+@export var pulse_scale: float = 1.1  # Scale factor for blinking animation (1.0 = no scaling, higher = more dramatic)
 
 # Message queue system variables
 var message_queue: Array[Dictionary] = []
@@ -91,6 +93,7 @@ var message_icon_node: TextureRect
 
 # Animation control
 var display_tween: Tween
+var pulse_tween: Tween
 
 # Mode detection
 var is_flexible_mode: bool = false
@@ -277,10 +280,16 @@ func show_flexible_message(msg_type: FlexibleMessageType, config: Dictionary = {
 	match msg_type:
 		FlexibleMessageType.NEST_INCOMING, FlexibleMessageType.STAGE_COMPLETE, FlexibleMessageType.ACHIEVEMENT:
 			message_mode = MessageMode.SINGLE_TEXT
+			enable_pulse_animation = false  # No blinking for these messages
 		FlexibleMessageType.NEST_MISSED:
 			message_mode = MessageMode.DOUBLE_TEXT
+			# Enable pulse animation and longer duration for nest missed messages
+			if not config.has("display_duration"):
+				display_duration = nest_missed_duration
+			enable_pulse_animation = true
 		FlexibleMessageType.ENERGY_GAIN, FlexibleMessageType.ENERGY_LOSS, FlexibleMessageType.FISH_COLLECTED:
 			message_mode = MessageMode.TEXT_WITH_ICON
+			enable_pulse_animation = false  # No blinking for these messages
 	
 	# Reconfigure layout with new settings
 	_configure_flexible_layout()
@@ -293,13 +302,16 @@ func _animate_show_message():
 	if not message_container:
 		return
 	
-	# Stop any existing tween
+	# Stop any existing tweens
 	if display_tween:
 		display_tween.kill()
+	if pulse_tween:
+		pulse_tween.kill()
 	
 	# Make container visible but transparent
 	message_container.visible = true
 	message_container.modulate.a = 0.0
+	message_container.scale = Vector2(1.0, 1.0)  # Reset scale
 	
 	# Create animation sequence
 	display_tween = create_tween()
@@ -307,13 +319,16 @@ func _animate_show_message():
 	# Fade in
 	display_tween.tween_property(message_container, "modulate:a", 1.0, fade_in_time)
 	
-	# Optional pulse animation
+	# Start continuous blinking if pulse animation is enabled
 	if enable_pulse_animation:
-		display_tween.parallel().tween_property(message_container, "scale", Vector2(1.05, 1.05), fade_in_time * 0.5)
-		display_tween.parallel().tween_property(message_container, "scale", Vector2(1.0, 1.0), fade_in_time * 0.5)
+		display_tween.tween_callback(_start_continuous_blinking)
 	
 	# Hold for display duration
 	display_tween.tween_interval(display_duration)
+	
+	# Stop blinking before fade out
+	if enable_pulse_animation:
+		display_tween.tween_callback(_stop_continuous_blinking)
 	
 	# Fade out
 	display_tween.tween_property(message_container, "modulate:a", 0.0, fade_out_time)
@@ -325,6 +340,40 @@ func _hide_flexible_message():
 	"""Hide the flexible message container"""
 	if message_container:
 		message_container.visible = false
+	# Make sure to stop blinking when hiding
+	_stop_continuous_blinking()
+
+func _start_continuous_blinking():
+	"""Start continuous fast blinking animation"""
+	if not message_container or not enable_pulse_animation:
+		return
+	
+	# Stop any existing pulse tween
+	if pulse_tween:
+		pulse_tween.kill()
+	
+	# Set pivot to center for proper scaling
+	var container_size = message_container.size
+	message_container.pivot_offset = container_size * 0.5
+	
+	# Create looping blinking tween
+	pulse_tween = create_tween()
+	pulse_tween.set_loops()  # Loop infinitely
+	
+	# Fast blink cycle: scale up -> scale down
+	pulse_tween.tween_property(message_container, "scale", Vector2(pulse_scale, pulse_scale), pulse_speed * 0.5)
+	pulse_tween.tween_property(message_container, "scale", Vector2(1.0, 1.0), pulse_speed * 0.5)
+
+func _stop_continuous_blinking():
+	"""Stop the continuous blinking animation"""
+	if pulse_tween:
+		pulse_tween.kill()
+		pulse_tween = null
+	
+	# Reset scale and pivot to normal
+	if message_container:
+		message_container.scale = Vector2(1.0, 1.0)
+		message_container.pivot_offset = Vector2.ZERO  # Reset pivot to default
 
 func _unhandled_input(event):
 	"""Handle debug input for testing message queue and flexible display modes"""
@@ -402,7 +451,7 @@ func _on_nest_missed(_points: int = 0):
 			"secondary_text": "-MORALE",
 			"primary_color": (palette.White if palette else Color.WHITE),
 			"secondary_color": (palette.Red3 if palette else Color.RED),
-			"display_duration": morale_pop_duration
+			"display_duration": nest_missed_duration
 		})
 	else:
 		if not morale_pop_container:
@@ -487,7 +536,7 @@ func _show_current_message():
 			_message_timer.start(nest_notice_duration)
 		MessageType.NEST_MISSED:
 			_show_morale_popup()
-			_message_timer.start(morale_pop_duration)
+			_message_timer.start(nest_missed_duration)
 
 func _on_message_timer_timeout():
 	"""Called when current message duration ends"""

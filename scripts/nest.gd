@@ -9,7 +9,11 @@ enum NestState {
 }
 
 @export var balance_provider_path: NodePath
+@export var eagle_reference_path: NodePath
+@export var missed_detection_offset: float = 50.0  # Distance behind eagle when nest is considered "missed"
+
 var balance_provider: BalanceProvider
+var eagle_reference: Node2D
 
 var current_state: NestState = NestState.HUNGRY
 var animation_player: AnimatedSprite2D
@@ -28,6 +32,12 @@ func _ready():
 		balance_provider = get_node_or_null(balance_provider_path)
 	if not balance_provider:
 		balance_provider = get_tree().current_scene.find_child("BalanceProvider", true, false)
+	
+	# Resolve eagle reference if present
+	if eagle_reference_path != NodePath(""):
+		eagle_reference = get_node_or_null(eagle_reference_path)
+	if not eagle_reference:
+		eagle_reference = get_tree().current_scene.find_child("Eagle", true, false)
 
 	# Get references to child nodes
 	animation_player = get_node("Animation")
@@ -52,25 +62,19 @@ func _ready():
 	print("Nest initialized in HUNGRY state")
 
 func _process(_delta):
-	"""Handle missed signal when nest goes off-screen"""
+	"""Handle missed signal when nest passes behind eagle + offset"""
 	# Only emit missed signal if nest is still hungry and hasn't emitted before
-	if current_state == NestState.HUNGRY and not has_emitted_missed:
-		# Check if the nest itself has gone off-screen using the active camera's left edge
-		var left_edge_x = _get_camera_left_edge_x()
-		if global_position.x < left_edge_x:  # Nest has gone off the left side of screen
-			print("Nest missed - going off screen at position: ", global_position.x)
+	if current_state == NestState.HUNGRY and not has_emitted_missed and eagle_reference:
+		# Check if nest has passed behind the eagle by the specified offset
+		var eagle_x = eagle_reference.global_position.x
+		var nest_x = global_position.x
+		var missed_threshold = eagle_x - missed_detection_offset
+		
+		if nest_x < missed_threshold:
+			print("Nest missed - passed behind eagle. Nest X: ", nest_x, " Eagle X: ", eagle_x, " Threshold: ", missed_threshold)
 			nest_missed.emit(0)  # let eagle use EnergyConfig
 			has_emitted_missed = true
 
-func _get_camera_left_edge_x() -> float:
-	"""Compute world X coordinate of the camera's left screen edge"""
-	var cam := get_viewport().get_camera_2d()
-	if cam:
-		var center := cam.get_screen_center_position()
-		var half_width := get_viewport().get_visible_rect().size.x * 0.5
-		return center.x - half_width
-	# Fallback: assume origin is left edge when no camera is active
-	return 0.0
 
 func set_state(new_state: NestState):
 	"""Change nest state and update animation"""

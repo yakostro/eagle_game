@@ -1,4 +1,4 @@
-[gd_scene load_steps=31 format=3 uid="uid://bvfc1tl8ttpuo"]
+[gd_scene load_steps=32 format=3 uid="uid://bvfc1tl8ttpuo"]
 
 [ext_resource type="Script" path="res://scripts/game_manager.gd" id="1_amiw1"]
 [ext_resource type="PackedScene" uid="uid://bfhkdj8w2yaqr" path="res://scenes/parallax_background.tscn" id="2_pabcw"]
@@ -15,6 +15,7 @@
 [ext_resource type="Script" path="res://scripts/ui/ui_palette.gd" id="12_3ekbw"]
 [ext_resource type="PackedScene" uid="uid://gdoloxvu6nf3" path="res://scenes/ui/energy_morale_ui.tscn" id="12_rye0r"]
 [ext_resource type="PackedScene" uid="uid://cmby6d2loyox6" path="res://scenes/ui/ui_instant_text_feedback.tscn" id="13_2vptr"]
+[ext_resource type="PackedScene" uid="uid://cuoe3rd5wo8ds" path="res://scenes/ui/fade_foreground.tscn" id="14_fade"]
 [ext_resource type="FontFile" uid="uid://kcdyir8efr7o" path="res://fonts/Bangers-Regular.ttf" id="14_k8s70"]
 [ext_resource type="Script" path="res://scripts/ui/ui_debug_stages.gd" id="15_l4c53"]
 [ext_resource type="Script" path="res://scripts/sound_wind_mixer.gd" id="17_xaldk"]
@@ -68,6 +69,7 @@ parallax_background_path = NodePath("ParallaxBackground")
 eagle_path = NodePath("Eagle")
 nest_spawner_path = NodePath("Spawners/NestSpawner")
 fish_spawner_path = NodePath("Spawners/FishSpawner")
+fade_foreground_path = NodePath("CanvasLayer/FadeForeground")
 
 [node name="ParallaxBackground" parent="." instance=ExtResource("2_pabcw")]
 enable_middle_layer = false
@@ -92,6 +94,8 @@ position = Vector2(667, 395)
 balance_provider_path = NodePath("../BalanceProvider")
 energy_loss_per_flap = 1.0
 disable_passive_energy_loss = true
+camera_path = NodePath("../Camera2D")
+nest_missed_screech_volume_db = -15.0
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(960, 540)
@@ -146,6 +150,8 @@ offset_bottom = 32.0
 palette = SubResource("Resource_2vmig")
 
 [node name="UIInstantTextFeedback" parent="CanvasLayer" instance=ExtResource("13_2vptr")]
+
+[node name="FadeForeground" parent="CanvasLayer" instance=ExtResource("14_fade")]
 
 [node name="StageHUD" type="Label" parent="CanvasLayer"]
 offset_left = 20.0

@@ -1,0 +1,26 @@
+[gd_scene load_steps=3 format=3 uid="uid://cuoe3rd5wo8ds"]
+
+[ext_resource type="Script" path="res://scripts/ui/fade_foreground.gd" id="1_2v8kn"]
+[ext_resource type="Texture2D" uid="uid://dohmd0tr7dbfe" path="res://sprites/fade_foreground_6.png" id="2_gedrn"]
+
+[node name="FadeForeground" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_2v8kn")
+visible_duration = 0.1
+fade_out_duration = 2.0
+
+[node name="FadeSprite" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_gedrn")
+expand_mode = 2
