@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://cxouy6sqvmqgf"]
 
 [ext_resource type="Script" path="res://scripts/start_scene.gd" id="1_start_scene"]
-[ext_resource type="Texture2D" uid="uid://cdj6srlerwki2" path="res://sprites/background/back_start_scene.png" id="2_vo4sb"]
+[ext_resource type="Texture2D" uid="uid://h363ynmlgd21" path="res://sprites/background/back_start_scene_2.png" id="2_mnxip"]
 [ext_resource type="AudioStream" uid="uid://cifdr8mdurig3" path="res://sounds/music/shadows_over_peaks_short.mp3" id="3_dnvdi"]
 
 [node name="StartScene" type="Control"]
@@ -23,7 +23,7 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
-texture = ExtResource("2_vo4sb")
+texture = ExtResource("2_mnxip")
 expand_mode = 1
 stretch_mode = 5
 
@@ -63,3 +63,4 @@ vertical_alignment = 1
 [node name="BackgroundMusic" type="AudioStreamPlayer" parent="AudioController"]
 stream = ExtResource("3_dnvdi")
 volume_db = -10.0
+autoplay = true

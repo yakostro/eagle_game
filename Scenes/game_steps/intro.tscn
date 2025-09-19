@@ -1,9 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://c16kqiidsry0i"]
+[gd_scene load_steps=4 format=3 uid="uid://c16kqiidsry0i"]
 
 [ext_resource type="Script" path="res://scripts/intro_scene.gd" id="1_n4rm5"]
 [ext_resource type="FontFile" uid="uid://kcdyir8efr7o" path="res://fonts/Bangers-Regular.ttf" id="2_irv1d"]
 [ext_resource type="AudioStream" uid="uid://bqakjlnmlc3x4" path="res://sounds/wind/wind2.ogg" id="3_1il5d"]
-[ext_resource type="AudioStream" uid="uid://c1ntcdn6rhd4t" path="res://sounds/music/shadows_over_peaks.mp3" id="4_shadows_music"]
 
 [node name="Intro" type="Control"]
 layout_mode = 3
@@ -19,7 +18,7 @@ label_fade_duration = 1.2
 total_scene_duration = 8.0
 first_label_path = NodePath("UILayer/UIContainer/FirstLabel")
 second_label_path = NodePath("UILayer/UIContainer/SecondLabel")
-intro_music_path = NodePath("AudioController/BackgroundMusic")
+intro_music_path = NodePath("")
 
 [node name="BackgroundLayer" type="CanvasLayer" parent="."]
 layer = -10
@@ -84,10 +83,6 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="AudioController" type="Node" parent="."]
-
-[node name="BackgroundMusic" type="AudioStreamPlayer" parent="AudioController"]
-stream = ExtResource("4_shadows_music")
-volume_db = -10.0
 
 [node name="IntroWind" type="AudioStreamPlayer" parent="AudioController"]
 stream = ExtResource("3_1il5d")
