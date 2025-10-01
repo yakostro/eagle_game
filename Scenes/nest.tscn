@@ -62,9 +62,8 @@ radius = 35.0
 height = 146.0
 
 [node name="Nest" type="Node2D"]
-scale = Vector2(0.6, 0.6)
+scale = Vector2(0.7, 0.7)
 script = ExtResource("1_u358j")
-eagle_reference_path = NodePath("")
 missed_detection_offset = 200.0
 
 [node name="FishPlaceholder" type="Sprite2D" parent="."]

@@ -2,18 +2,18 @@ extends Control
 
 # Overlay that shows a stage-specific tutorial image briefly at stage start.
 
-@export var tutorial_image_path: NodePath
-@export var stage_to_texture: Dictionary = {}
-@export var show_duration: float = 3.0
-@export var fade_in_duration: float = 0.25
-@export var fade_out_duration: float = 0.25
-@export var stage_to_duration: Dictionary = {}
-@export var default_delay: float = 0.5
-@export var stage_to_delay: Dictionary = {}
+@export var tutorial_image_path: NodePath ## Path to the tutorial image texture rect
+@export var stage_to_texture: Dictionary = {} ## Map stage_id to texture (stage_id: texture)	
+@export var show_duration: float = 3.0 ## Default show duration in seconds
+@export var fade_in_duration: float = 0.25 ## Fade in duration in seconds
+@export var fade_out_duration: float = 0.25 ## Fade out duration in seconds
+@export var stage_to_duration: Dictionary = {} ## Override show duration for specific stages (stage_id: duration_in_seconds)
+@export var default_delay: float = 0.5 ## Default delay in seconds
+@export var stage_to_delay: Dictionary = {} ## Override delay for specific stages (stage_id: delay_in_seconds)
 
 @onready var tutorialImage: TextureRect = get_node_or_null(tutorial_image_path)
 
-var _shown_stages: Dictionary = {}
+var _shown_stages: Dictionary = {} ## Track which stages have been shown	
 var _current_tween: Tween
 
 func _ready():
@@ -21,13 +21,6 @@ func _ready():
 	visible = false
 	modulate.a = 0.0
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	
-	# Debug: Print configured durations
-	print("📋 Tutorial overlay configured:")
-	print("   - Default duration: ", show_duration, "s")
-	print("   - Stage durations: ", stage_to_duration)
-	print("   - Default delay: ", default_delay, "s")
-	print("   - Stage delays: ", stage_to_delay)
 
 	# Show for the current stage on startup, and connect for subsequent stage changes
 	if Engine.has_singleton("StageManager"):

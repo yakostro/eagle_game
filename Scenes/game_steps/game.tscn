@@ -1,4 +1,4 @@
-[gd_scene load_steps=32 format=3 uid="uid://bvfc1tl8ttpuo"]
+[gd_scene load_steps=33 format=3 uid="uid://bvfc1tl8ttpuo"]
 
 [ext_resource type="Script" path="res://scripts/game_manager.gd" id="1_amiw1"]
 [ext_resource type="PackedScene" uid="uid://bfhkdj8w2yaqr" path="res://scenes/parallax_background.tscn" id="2_pabcw"]
@@ -22,6 +22,7 @@
 [ext_resource type="AudioStream" uid="uid://sfagc5liqm30" path="res://sounds/wind/wind_woosh_loop.ogg" id="18_72rxq"]
 [ext_resource type="AudioStream" uid="uid://06s15ka1es4v" path="res://sounds/wind/additional_wind.wav" id="19_pia2j"]
 [ext_resource type="Script" path="res://scripts/systems/balance_provider.gd" id="20_bal"]
+[ext_resource type="Texture2D" uid="uid://hqj5au6jpnvn" path="res://sprites/ui/keys_aim_3.png" id="22_2lufx"]
 [ext_resource type="Resource" uid="uid://b7lnhfb78obud" path="res://configs/energy/energy_config_default.tres" id="22_ecfg"]
 [ext_resource type="PackedScene" uid="uid://byvhfmkh0uj1d" path="res://scenes/ui/ui_tutorial_overlay.tscn" id="23_tutor"]
 [ext_resource type="Texture2D" uid="uid://bc8mpkr5psodf" path="res://sprites/ui/keys_movement_2.png" id="24_keys_move"]
@@ -130,7 +131,6 @@ layer = 10
 visible = false
 
 [node name="PaletteColorRect" type="ColorRect" parent="FinalShader"]
-visible = false
 material = ExtResource("10_7dtjx")
 anchors_preset = 15
 anchor_right = 1.0
@@ -180,7 +180,8 @@ palette = SubResource("Resource_edrd6")
 tutorial_image_path = NodePath("TutorialImage")
 stage_to_texture = {
 1: ExtResource("24_keys_move"),
-2: ExtResource("25_keys_fish")
+2: ExtResource("22_2lufx"),
+3: ExtResource("25_keys_fish")
 }
 stage_to_duration = {
 1: 5.0,
@@ -188,7 +189,7 @@ stage_to_duration = {
 }
 stage_to_delay = {
 1: 3,
-2: 6
+2: 3
 }
 
 [node name="UIOffscreenNestIndicator" parent="CanvasLayer" instance=ExtResource("26_nest_indicator")]
