@@ -32,7 +32,7 @@ func _init(config_resource: AutoDifficultyConfiguration = null):
 		config = config_resource
 	else:
 		# Load default configuration
-		config = load("res://scenes/configs/auto_difficulty_config.tres")
+		config = load("res://configs/auto_difficulty_config.tres")
 	
 	if not config:
 		push_error("AutoDifficultySystem: Could not load configuration!")
