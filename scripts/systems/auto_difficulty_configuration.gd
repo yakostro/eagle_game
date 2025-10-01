@@ -26,7 +26,7 @@ extends Resource
 @export var min_fish_interval_multiplier: float = 0.3  # Never faster than 30% of original
 
 # Nest progression (make nests more frequent)
-@export var nest_interval_decrease: int = 1      # Decrease max skipped obstacles
+@export var nest_interval_decrease: float = 0.2  # Decrease max skipped obstacles per level
 @export var min_nest_interval: int = 2           # Minimum obstacles between nests
 
 # Configuration validation
@@ -67,8 +67,8 @@ func validate() -> bool:
 		push_error("AutoDifficultyConfiguration: min_fish_interval_multiplier should be between 0 and 1")
 		return false
 	
-	if nest_interval_decrease < 0:
-		push_error("AutoDifficultyConfiguration: nest_interval_decrease should be >= 0")
+	if nest_interval_decrease < 0.0:
+		push_error("AutoDifficultyConfiguration: nest_interval_decrease should be >= 0.0")
 		return false
 		
 	if min_nest_interval <= 0:

@@ -15,7 +15,7 @@ nest_amount_label_path = NodePath("HBoxContainer/NestAmountLabel")
 layout_mode = 0
 offset_top = -1.0
 offset_right = 162.0
-offset_bottom = 49.0
+offset_bottom = 69.0
 theme_override_constants/separation = 10
 
 [node name="NestIcon" type="TextureRect" parent="HBoxContainer"]

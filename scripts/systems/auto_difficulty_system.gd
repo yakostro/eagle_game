@@ -137,7 +137,7 @@ func get_modified_config() -> StageConfiguration:
 	
 	# Apply nest frequency scaling
 	stage_config.nests_enabled = true
-	var nest_max_decrease = config.nest_interval_decrease * difficulty_level
+	var nest_max_decrease = int(config.nest_interval_decrease * difficulty_level)
 	var new_nest_max = base_nest_max_skipped - nest_max_decrease
 	new_nest_max = max(new_nest_max, config.min_nest_interval)
 	
@@ -170,7 +170,7 @@ func get_difficulty_stats() -> Dictionary:
 		"distance_multiplier": max(1.0 - (config.spawn_rate_increase * difficulty_level * 0.5), config.min_distance_multiplier),
 		"stalactite_weight": min(base_stalactite_weight + (config.stalactite_weight_increase * difficulty_level), config.max_stalactite_weight),
 		"fish_multiplier": max(1.0 - (config.fish_spawn_rate_increase * difficulty_level * 0.3), config.min_fish_interval_multiplier),
-		"nest_max_skipped": max(base_nest_max_skipped - (config.nest_interval_decrease * difficulty_level), config.min_nest_interval)
+		"nest_max_skipped": max(base_nest_max_skipped - int(config.nest_interval_decrease * difficulty_level), config.min_nest_interval)
 	}
 
 ## Reset auto-difficulty (useful for testing)

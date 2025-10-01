@@ -13,5 +13,5 @@ stalactite_weight_increase = 1
 max_stalactite_weight = 20
 fish_spawn_rate_increase = 0.1
 min_fish_interval_multiplier = 0.3
-nest_interval_decrease = 1
+nest_interval_decrease = 0.2
 min_nest_interval = 2

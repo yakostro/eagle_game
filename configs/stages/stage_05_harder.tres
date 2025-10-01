@@ -24,6 +24,6 @@ fish_min_spawn_interval = 1.0
 fish_max_spawn_interval = 3.5
 nests_enabled = true
 nest_min_skipped_obstacles = 2
-nest_max_skipped_obstacles = 3
+nest_max_skipped_obstacles = 5
 completion_type = 1
 completion_value = 3.0

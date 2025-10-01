@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://dr3nks8eycs8m"]
 
 [ext_resource type="Script" path="res://scripts/ui/ui_offscreen_nest_indicator.gd" id="1_indicator"]
-[ext_resource type="Texture2D" uid="uid://cgan25epn3mlp" path="res://sprites/nest/nest.png" id="2_nest_icon"]
+[ext_resource type="Texture2D" uid="uid://ccafpc87hk0tx" path="res://sprites/ui/nest_icon.png" id="2_wchio"]
 
 [node name="UIOffscreenNestIndicator" type="Control"]
 layout_mode = 3
@@ -12,7 +12,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_indicator")
-icon_texture = ExtResource("2_nest_icon")
+icon_texture = ExtResource("2_wchio")
 icon_size = Vector2(32, 32)
 right_margin = 80.0
 vertical_padding = 30.0
