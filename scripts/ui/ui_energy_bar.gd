@@ -90,6 +90,7 @@ func connect_to_eagle_signals():
 func _on_eagle_energy_capacity_changed(_new_max_energy: float):
 	"""Called when eagle's energy capacity changes"""
 	var capacity_percent = eagle.get_energy_capacity_percentage() * 100.0
+	print("🔧 DEBUG: UI received capacity change signal - new_max_energy: ", _new_max_energy, " capacity_percent: ", capacity_percent)
 	set_capacity_percent_direct(capacity_percent)
 
 func _physics_process(_delta):
@@ -115,7 +116,10 @@ func set_energy_percent_direct(new_energy_percent: float):
 
 func set_capacity_percent_direct(new_capacity_percent: float):
 	"""Update energy capacity level without UI feedback, affects energy capacity"""
+	var old_capacity = current_capacity_percent
 	current_capacity_percent = clamp(new_capacity_percent, 0.0, 100.0)
+	
+	print("🔧 DEBUG: UI capacity update - old: ", old_capacity, "% new: ", current_capacity_percent, "%")
 	
 	# Capacity affects maximum available energy capacity
 	max_available_energy_capacity = current_capacity_percent

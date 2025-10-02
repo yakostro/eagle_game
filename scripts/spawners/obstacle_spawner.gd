@@ -58,8 +58,6 @@ func _ready():
 	# Connect to nest spawner if available
 	if nest_spawner:
 		obstacle_spawned.connect(nest_spawner.on_obstacle_spawned)
-	else:
-		print("⚠️  No NestSpawner connected - nests will not spawn")
 
 
 	# Connect to StageManager for stage-based configuration
@@ -109,18 +107,15 @@ func _reset_spawn_distance():
 func spawn_random_obstacle():
 	"""Spawn a random obstacle based on weights"""
 	if obstacle_types.is_empty():
-		print("Error: No obstacle types available!")
 		return
 		
 	# Safety check: ensure minimum distance is respected
 	if distance_until_next_spawn > 0.0:
-		print("⚠️ Warning: Attempted to spawn obstacle before minimum distance was reached")
 		return
 
 	# Select random obstacle type using weighted selection
 	var selected_type = _get_weighted_random_obstacle_type()
 	if not selected_type:
-		print("Error: Failed to select obstacle type!")
 		return
 
 	# Instantiate the obstacle
@@ -189,13 +184,10 @@ func _connect_to_stage_manager():
 	"""Connect to StageManager for automatic stage-based parameter updates"""
 	if StageManager:
 		StageManager.stage_changed.connect(_on_stage_changed)
-		print("🔗 ObstacleSpawner connected to StageManager")
 		
 		# Apply current stage configuration immediately
 		if StageManager.current_stage_config:
 			apply_stage_config(StageManager.current_stage_config)
-	else:
-		print("⚠️  StageManager not available - using default parameters")
 
 func _on_stage_changed(new_stage: int, config: StageConfiguration):
 	"""Handle stage changes from StageManager"""
@@ -204,7 +196,6 @@ func _on_stage_changed(new_stage: int, config: StageConfiguration):
 func apply_stage_config(config: StageConfiguration):
 	"""Apply stage configuration parameters to obstacle spawning"""
 	if not config:
-		print("⚠️  No stage configuration provided")
 		return
 
 	current_stage_config = config

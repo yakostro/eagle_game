@@ -10,7 +10,7 @@ enum NestState {
 
 @export var balance_provider_path: NodePath
 @export var eagle_reference_path: NodePath
-@export var missed_detection_offset: float = 50.0  # Distance behind eagle when nest is considered "missed"
+@export var missed_detection_offset: float = 100.0  # Distance behind eagle when nest is considered "missed"
 
 var balance_provider: BalanceProvider
 var eagle_reference: Node2D

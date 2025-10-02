@@ -247,10 +247,14 @@ func restore_energy_capacity(amount: float):
 	var old_max_energy = max_energy
 	max_energy = min(max_energy + amount, initial_max_energy)  # Can't exceed initial capacity
 
+	print("🔧 DEBUG: restore_energy_capacity called - amount: ", amount, " old_max: ", old_max_energy, " new_max: ", max_energy)
+
 	if old_max_energy != max_energy:
 		# When max energy increases, current energy stays the same (don't auto-fill)
-
+		print("🔧 DEBUG: Capacity changed, emitting signal with max_energy: ", max_energy)
 		energy_capacity_changed.emit(max_energy)
+	else:
+		print("🔧 DEBUG: Capacity unchanged, no signal emitted")
 
 func get_energy_capacity_percentage() -> float:
 	"""Returns energy capacity as a percentage (0.0 to 1.0) relative to initial capacity"""
@@ -261,9 +265,11 @@ func on_nest_fed(points: int = 0):
 	"""Called when a nest is successfully fed with a fish"""
 	# Can't gain energy while dying
 	if is_dying:
+		print("🔧 DEBUG: on_nest_fed called but eagle is dying - ignoring")
 		return
 	# Use the points from nest if provided, otherwise use eagle's default value
 	var energy_to_gain: float = float(points) if points > 0 else energy_gain_per_nest_fed
+	print("🔧 DEBUG: on_nest_fed called - points: ", points, " energy_to_gain: ", energy_to_gain)
 	restore_energy_capacity(energy_to_gain)
 
 func on_nest_missed(points: int = 0):

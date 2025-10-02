@@ -33,9 +33,6 @@ func _ready():
 	# Initialize nest spawn target (will be updated when stage config is applied)
 	_set_next_nest_spawn_target()
 
-	print("🏠 Nest spawner initialized")
-	print("   Current nest difficulty: min=", min_skipped_obstacles, " max=", max_skipped_obstacles)
-	print("   First nest will spawn after ", next_nest_spawn_target, " obstacles")
 	
 	# Connect to StageManager for stage-based configuration
 	_connect_to_stage_manager()
@@ -44,7 +41,6 @@ func _ready():
 func on_obstacle_spawned(obstacle: BaseObstacle):
 	"""Called when an obstacle is spawned - decide if it should get a nest"""
 	if not obstacle:
-		print("Warning: null obstacle passed to nest spawner")
 		return
 	
 	# Only process nests if enabled in current stage
@@ -67,7 +63,6 @@ func on_obstacle_spawned(obstacle: BaseObstacle):
 		obstacles_since_last_nest = 0
 		_set_next_nest_spawn_target()
 	
-	print("🏠 Nest spawner processed ", obstacle.get_obstacle_type(), " | Since last nest: ", obstacles_since_last_nest, "/", next_nest_spawn_target)
 
 func _should_spawn_nest_on_obstacle(obstacle: BaseObstacle) -> bool:
 	"""Determine if this obstacle should get a nest"""
@@ -77,7 +72,6 @@ func _should_spawn_nest_on_obstacle(obstacle: BaseObstacle) -> bool:
 	
 	# Check if this obstacle type can carry nests
 	if not obstacle.can_carry_nest:
-		print("   ❌ ", obstacle.get_obstacle_type(), " cannot carry nests")
 		return false
 
 	# Get screen dimensions for visibility checking
@@ -85,20 +79,16 @@ func _should_spawn_nest_on_obstacle(obstacle: BaseObstacle) -> bool:
 
 	# Check if obstacle has any visible nest placeholders
 	if not obstacle.has_visible_nest_placeholders(screen_size.y, nest_visibility_offset):
-		print("   ❌ ", obstacle.get_obstacle_type(), " has no visible NestPlaceholder nodes (screen_height=", screen_size.y, ", offset=", nest_visibility_offset, ")")
 		return false
 	
-	print("   ✅ ", obstacle.get_obstacle_type(), " will get a nest!")
 	return true
 
 func spawn_nest_on_obstacle(obstacle: BaseObstacle):
 	"""Spawn a nest on the given obstacle"""
 	if not nest_scene:
-		print("Error: No nest scene assigned to nest spawner!")
 		return
 	
 	if not eagle_reference:
-		print("Error: No eagle reference assigned to nest spawner for signal connections!")
 		return
 	
 	# Instantiate nest
@@ -118,19 +108,13 @@ func spawn_nest_on_obstacle(obstacle: BaseObstacle):
 		# Use the selected placeholder's position
 		nest.position = selected_placeholder.position
 
-		if debug_placeholder_selection:
-			print("   🏠 Selected placeholder: ", selected_placeholder.name, " from ", visible_placeholders.size(), " visible options")
-			print("   🏠 Placeholder local pos: ", selected_placeholder.position, " | Global Y: ", obstacle.global_position.y + selected_placeholder.position.y)
-		print("   🏠 Spawned nest using random placeholder at position: ", nest.position)
 	else:
 		# This shouldn't happen due to visibility check, but just in case
 		nest.position = Vector2(0, 20)
-		print("   🏠 Warning: No visible NestPlaceholder found, using default position")
 	
 	# Connect nest signals to eagle's energy capacity methods
 	nest.nest_fed.connect(eagle_reference.on_nest_fed)
 	nest.nest_missed.connect(eagle_reference.on_nest_missed)
-	print("   🔗 Connected nest signals to eagle energy capacity system")
 
 	# Track total nests spawned for stage progression
 	total_nests_spawned += 1
@@ -141,8 +125,6 @@ func spawn_nest_on_obstacle(obstacle: BaseObstacle):
 	
 	# Notify UI or other systems that a nest has spawned
 	nest_spawned.emit(nest)
-	
-	print("🏠 Nest spawned! Total nests: ", total_nests_spawned)
 
 # STAGE MANAGER INTEGRATION ===============================================
 
@@ -150,23 +132,18 @@ func _connect_to_stage_manager():
 	"""Connect to StageManager for automatic stage-based parameter updates"""
 	if StageManager:
 		StageManager.stage_changed.connect(_on_stage_changed)
-		print("🔗 NestSpawner connected to StageManager")
 		
 		# Apply current stage configuration immediately
 		if StageManager.current_stage_config:
 			apply_stage_config(StageManager.current_stage_config)
-	else:
-		print("⚠️  StageManager not available - nests disabled by default")
 
 func _on_stage_changed(new_stage: int, config: StageConfiguration):
 	"""Handle stage changes from StageManager"""
-	print("🏠 NestSpawner: Updating to Stage ", new_stage)
 	apply_stage_config(config)
 
 func apply_stage_config(config: StageConfiguration):
 	"""Apply stage configuration parameters to nest spawning"""
 	if not config:
-		print("⚠️  No stage configuration provided")
 		return
 		
 	current_stage_config = config
@@ -184,15 +161,6 @@ func apply_stage_config(config: StageConfiguration):
 	# Reset nest spawn target with new parameters
 	if nests_enabled:
 		_set_next_nest_spawn_target()
-	
-	print("🏠 Stage config applied:")
-	print("   - Nests enabled: ", nests_enabled)
-	if nests_enabled:
-		print("   - Min skipped obstacles: ", min_skipped_obstacles)
-		print("   - Max skipped obstacles: ", max_skipped_obstacles)
-		print("   - Next nest target: ", next_nest_spawn_target)
-	else:
-		print("   - Nest spawning disabled")
 
 # TESTING AND DEBUG METHODS ===============================================
 
@@ -200,4 +168,3 @@ func _set_next_nest_spawn_target():
 	"""Set random nest spawn target within current difficulty range"""
 	next_nest_spawn_target = randi_range(min_skipped_obstacles, max_skipped_obstacles)
 	warned_this_cycle = false
-	print("   🎯 Next nest will spawn after skipping ", next_nest_spawn_target, " obstacles")

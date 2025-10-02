@@ -377,7 +377,6 @@ offset = Vector2(4, -37)
 flip_h = true
 
 [node name="CollisionShape" type="CollisionShape2D" parent="."]
-visible = false
 position = Vector2(-310, 103.333)
 rotation = 1.5708
 scale = Vector2(6.52, 9.18)
@@ -388,11 +387,9 @@ visible = false
 stream = ExtResource("72_qb8h7")
 
 [node name="FlapSound" type="AudioStreamPlayer2D" parent="."]
-visible = false
 stream = ExtResource("73_fcyee")
 
 [node name="CarriedFishHolder" type="Node2D" parent="."]
-visible = false
 position = Vector2(-243, 50)
 
 [node name="HitDetectionArea" type="Area2D" parent="."]
@@ -400,7 +397,6 @@ collision_layer = 4
 collision_mask = 2
 
 [node name="HitDetectionShape" type="CollisionShape2D" parent="HitDetectionArea"]
-visible = false
 position = Vector2(-243.333, 13.3333)
 rotation = 1.5708
 scale = Vector2(6.52, 9.18)

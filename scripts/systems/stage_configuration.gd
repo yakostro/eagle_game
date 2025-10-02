@@ -31,8 +31,8 @@ extends Resource
 
 # Fish System
 @export var fish_enabled: bool = false
-@export var fish_min_spawn_interval: float = 3.0
-@export var fish_max_spawn_interval: float = 7.0
+@export var fish_min_spawn_interval: float = 2.0 # Minimum time (in seconds) between fish spawns - controls the fastest rate at which fish can appear
+@export var fish_max_spawn_interval: float = 5.0 # Maximum time (in seconds) between fish spawns - controls the slowest rate at which fish can appear
 
 # Nest System
 @export var nests_enabled: bool = false

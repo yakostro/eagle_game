@@ -27,12 +27,9 @@ func _ready():
 	if not game_area:
 		# If no game_area group found, use the current scene root
 		game_area = get_tree().current_scene
-		print("Warning: No 'game_area' group found, using scene root for enemy spawning")
 	
 	# Set initial spawn time
 	reset_spawn_timer()
-	
-	print("Enemies spawner initialized. First spawn in: ", next_spawn_time, " seconds")
 
 func _process(delta):
 	# Update timers
@@ -52,13 +49,11 @@ func _process(delta):
 func spawn_enemy_bird():
 	"""Spawn an enemy bird on the right side of the screen"""
 	if not enemy_bird_scene:
-		print("Error: No enemy bird scene assigned to spawner!")
 		return
 	
 	# Find the eagle to get its Y position
 	var eagle = get_tree().get_first_node_in_group("eagle")
 	if not eagle:
-		print("Warning: Could not find eagle for bird spawning!")
 		return
 	
 	# Get screen bounds
