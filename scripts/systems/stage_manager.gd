@@ -61,11 +61,10 @@ func get_current_stage_config() -> StageConfiguration:
 ## Activate the stage progression system (called by game scene when it starts)
 func activate_stage_system():
 	if stage_system_active:
-		print("StageManager: Stage system already active")
+		push_error("StageManager: Stage system already active")
 		return
 	
 	stage_system_active = true
-	print("StageManager: Stage system activated - Stage progression started")
 	
 	# Reset timers to ensure clean start
 	stage_timer = 0.0
@@ -81,7 +80,6 @@ func activate_stage_system():
 func deactivate_stage_system():
 	stage_system_active = false
 	set_process(false)
-	print("StageManager: Stage system deactivated")
 
 ## Load a specific stage configuration
 func load_stage(stage_number: int) -> bool:

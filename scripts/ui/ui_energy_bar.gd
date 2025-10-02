@@ -46,16 +46,11 @@ var feedback_tween: Tween
 @onready var eagle: Eagle = get_node(eagle_path)
 
 func _ready():
-	print("🎮 EnergyUI _ready() called")
 	setup_ui_elements()
 	create_lightning_icon()
 	
 	# Connect to eagle signals for real-time updates
 	connect_to_eagle_signals()
-	
-	# Debug: Print initial values
-	print("🎮 Initial energy percent: ", current_energy_percent)
-	print("🎮 Initial capacity percent: ", current_capacity_percent)
 
 func connect_to_eagle_signals():
 	"""Connect UI to eagle's energy and energy capacity systems"""
@@ -79,18 +74,14 @@ func connect_to_eagle_signals():
 		set_energy_percent_direct(initial_energy)
 		set_capacity_percent_direct(initial_capacity)
 		
-		print("✅ EnergyUI connected to eagle signals")
-		print("   Initial Energy: ", initial_energy, "%")
-		print("   Initial Capacity: ", initial_capacity, "%")
 	else:
-		print("❌ Warning: Could not find Eagle to connect UI signals")
+		pass # Removed debug print: "❌ Warning: Could not find Eagle to connect UI signals"
 
 ## Signal handlers for eagle integration
 
 func _on_eagle_energy_capacity_changed(_new_max_energy: float):
 	"""Called when eagle's energy capacity changes"""
 	var capacity_percent = eagle.get_energy_capacity_percentage() * 100.0
-	print("🔧 DEBUG: UI received capacity change signal - new_max_energy: ", _new_max_energy, " capacity_percent: ", capacity_percent)
 	set_capacity_percent_direct(capacity_percent)
 
 func _physics_process(_delta):
@@ -116,10 +107,8 @@ func set_energy_percent_direct(new_energy_percent: float):
 
 func set_capacity_percent_direct(new_capacity_percent: float):
 	"""Update energy capacity level without UI feedback, affects energy capacity"""
-	var old_capacity = current_capacity_percent
+	var _old_capacity = current_capacity_percent
 	current_capacity_percent = clamp(new_capacity_percent, 0.0, 100.0)
-	
-	print("🔧 DEBUG: UI capacity update - old: ", old_capacity, "% new: ", current_capacity_percent, "%")
 	
 	# Capacity affects maximum available energy capacity
 	max_available_energy_capacity = current_capacity_percent
@@ -163,7 +152,6 @@ func setup_ui_elements():
 
 func apply_progress_bar_colors():
 	"""Apply colors to progress bars using theme overrides"""
-	print("🎨 Applying progress bar colors...")
 	
 	var _energy_color: Color = _get_color(energy_token)
 	var _energy_loss_feedback_color: Color = _get_color(energy_loss_feedback_token)
@@ -210,8 +198,6 @@ func apply_progress_bar_colors():
 	feedback_bg_style.border_width_top = 0
 	feedback_bg_style.border_width_bottom = 0
 	energy_loss_feedback.add_theme_stylebox_override("background", feedback_bg_style)
-	
-	print("🎨 Progress bar styling complete!")
 
 func _get_color(token: StringName) -> Color:
 	if palette:

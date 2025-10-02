@@ -34,7 +34,6 @@ var press_any_button_label: Label
 var background_image: TextureRect
 
 func _ready():
-	print("StartScene: Initializing...")
 	
 	# Setup UI references
 	_setup_ui_references()
@@ -52,13 +51,9 @@ func _setup_ui_references():
 	"""Connect to UI elements using NodePath exports"""
 	if press_any_button_label_path:
 		press_any_button_label = get_node(press_any_button_label_path)
-		if press_any_button_label:
-			print("StartScene: Connected to press any button label")
 	
 	if background_image_path:
 		background_image = get_node(background_image_path)
-		if background_image:
-			print("StartScene: Connected to background image")
 
 func _setup_audio():
 	"""Initialize audio system for background music"""
@@ -74,24 +69,20 @@ func _setup_audio():
 	if background_music and enable_background_music:
 		audio_player.stream = background_music
 		audio_player.loop = true
-		print("StartScene: Background music configured")
 
 func _setup_input():
 	"""Setup input detection system"""
 	# Make sure this node can receive input
 	set_process_unhandled_input(true)
 	set_process_input(true)  # Also enable regular input for mouse handling
-	print("StartScene: Input detection enabled")
 
 func _start_scene():
 	"""Initialize the start scene presentation"""
 	# Play background music if enabled
 	if enable_background_music and background_music and audio_player:
 		audio_player.play()
-		print("StartScene: Background music started")
 	
 	# Show welcome message
-	print("StartScene: Ready - Waiting for player input")
 	
 	# Optional: Add fade-in effect for the scene
 	modulate.a = 0.0
@@ -112,12 +103,10 @@ func _unhandled_input(event: InputEvent):
 	# Check for keyboard input (any key press)
 	if event is InputEventKey and event.pressed:
 		should_trigger = true
-		print("StartScene: Keyboard input detected - Key: ", event.keycode)
 	
 	# Check for gamepad input (any gamepad button)
 	elif event is InputEventJoypadButton and event.pressed:
 		should_trigger = true
-		print("StartScene: Gamepad input detected - Button: ", event.button_index)
 	
 	# Trigger scene transition if valid input received
 	if should_trigger:
@@ -129,7 +118,6 @@ func _handle_start_input():
 		return
 		
 	input_detected = true
-	print("StartScene: Start game input received!")
 	
 	# Emit signal for other systems
 	start_game_requested.emit()
@@ -157,7 +145,6 @@ func _show_input_feedback():
 
 func _transition_to_intro():
 	"""Handle transition to the intro scene"""
-	print("StartScene: Transitioning to intro scene: ", intro_scene_path)
 	
 	# Stop background music with fade out
 	if audio_player and audio_player.playing:
@@ -182,7 +169,6 @@ func _input(event):
 	# Handle mouse clicks (they don't reach _unhandled_input due to Control node consuming them)
 	if event is InputEventMouseButton and event.pressed:
 		if not input_detected and not SceneManager.is_transitioning:
-			print("StartScene: Mouse input detected - Button: ", event.button_index)
 			_handle_start_input()
 			return
 
@@ -191,9 +177,7 @@ func _input(event):
 func debug_trigger_start():
 	"""Debug function to manually trigger scene start"""
 	if OS.is_debug_build():
-		print("StartScene Debug: Manual start triggered")
 		_handle_start_input()
 
 func _on_scene_manager_scene_changed(new_scene_name: String):
 	"""Handle scene manager notifications"""
-	print("StartScene: Scene changed to: ", new_scene_name)

@@ -1,10 +1,8 @@
-[gd_resource type="UiPalette" script_class="UiPalette" load_steps=2 format=3 uid="uid://dmyceymjcjktg"]
+[gd_resource type="Resource" script_class="UiPalette" load_steps=2 format=3 uid="uid://dmyceymjcjktg"]
 
 [ext_resource type="Script" path="res://scripts/ui/ui_palette.gd" id="1_script"]
 
 [resource]
-resource_local_to_scene = false
-resource_name = ""
 script = ExtResource("1_script")
 Yellow1 = Color(0.458824, 0.372549, 0.152941, 1)
 Yellow2 = Color(0.772549, 0.615686, 0.223529, 1)

@@ -36,16 +36,14 @@ func _ready():
 	# Find the eagle (you can also drag and drop this in the inspector)
 	eagle_reference = get_tree().current_scene.find_child("Eagle", true, false)
 	if not eagle_reference:
-		print("Warning: No eagle found! Make sure your eagle node is named 'Eagle'")
 		return
 	
 	# Find nest spawner for boost coordination
 	nest_spawner = get_tree().current_scene.find_child("NestSpawner", true, false)
 	if nest_spawner and boost_enabled:
 		nest_spawner.nest_incoming.connect(_on_nest_incoming)
-		print("🐟 FishSpawner: Connected to NestSpawner for pre-nest boost")
 	elif boost_enabled:
-		print("⚠️  FishSpawner: Boost enabled but no NestSpawner found")
+		pass
 	
 	# Get screen size
 	screen_size = get_viewport().get_visible_rect().size
@@ -62,13 +60,6 @@ func _ready():
 	boost_timer.one_shot = true
 	add_child(boost_timer)
 	boost_timer.timeout.connect(_on_boost_timeout)
-	
-	print("🐟 FishSpawner initialized with boost settings:")
-	print("   - Boost enabled: ", boost_enabled)
-	print("   - Trigger obstacles: ", boost_trigger_obstacles)
-	print("   - Boost interval: ", boost_spawn_interval, "s")
-	print("   - Boost duration: ", boost_duration, "s")
-	print("   - Min guaranteed fish: ", min_fish_guaranteed)
 	
 	# Connect to StageManager for stage-based configuration
 	_connect_to_stage_manager()
@@ -109,17 +100,14 @@ func _connect_to_stage_manager():
 	"""Connect to StageManager for automatic stage-based parameter updates"""
 	if StageManager:
 		StageManager.stage_changed.connect(_on_stage_changed)
-		print("🔗 FishSpawner connected to StageManager")
-		
 		# Apply current stage configuration immediately
 		if StageManager.current_stage_config:
 			apply_stage_config(StageManager.current_stage_config)
 	else:
-		print("⚠️  StageManager not available - fish disabled by default")
+		pass
 
 func _on_stage_changed(new_stage: int, config: StageConfiguration):
 	"""Handle stage changes from StageManager"""
-	print("🐟 FishSpawner: Updating to Stage ", new_stage)
 	apply_stage_config(config)
 
 func apply_stage_config(config: StageConfiguration):
@@ -149,14 +137,6 @@ func apply_stage_config(config: StageConfiguration):
 		# Stop spawning if fish are disabled
 		spawn_timer.stop()
 	
-	print("🐟 Stage config applied:")
-	print("   - Fish enabled: ", fish_enabled)
-	if fish_enabled:
-		print("   - Spawn interval: ", spawn_interval, "±", spawn_interval_variance, "s")
-		print("   - Min spawn interval: ", min_spawn_interval, "s")
-	else:
-		print("   - Fish spawning disabled")
-
 # TESTING AND DEBUG METHODS ===============================================
 
 # Method to manually spawn fish (for testing)
@@ -164,14 +144,12 @@ func spawn_fish_now():
 	if fish_enabled:
 		spawn_fish()
 	else:
-		print("🐟 Cannot spawn fish - disabled in current stage")
+		pass
 
 # Method to manually test boost system (for debugging)
 func test_boost_system():
-	print("🧪 Testing fish boost system...")
 	start_fish_boost()
 	await get_tree().create_timer(3.0).timeout  # Wait 3 seconds
-	print("🧪 Force ending boost for test...")
 	end_fish_boost()
 
 # Pre-nest boost system
@@ -190,8 +168,6 @@ func start_fish_boost():
 	
 	is_boosting = true
 	fish_spawned_during_boost = 0
-	
-	print("🐟 FISH BOOST STARTED! Interval: ", boost_spawn_interval, "s for ", boost_duration, "s")
 	
 	# Restart spawn timer with boost interval
 	spawn_timer.stop()
@@ -217,12 +193,9 @@ func end_fish_boost():
 	
 	is_boosting = false
 	
-	print("🐟 Fish boost ended. Spawned ", fish_spawned_during_boost, " fish during boost")
-	
 	# Ensure minimum fish were spawned
 	if fish_spawned_during_boost < min_fish_guaranteed:
 		var missing_fish = min_fish_guaranteed - fish_spawned_during_boost
-		print("🐟 Spawning ", missing_fish, " additional fish to meet minimum guarantee")
 		for i in range(missing_fish):
 			spawn_fish()
 			await get_tree().create_timer(0.5).timeout  # Small delay between guaranteed spawns

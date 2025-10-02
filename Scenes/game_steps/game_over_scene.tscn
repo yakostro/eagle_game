@@ -1,6 +1,7 @@
-[gd_scene load_steps=8 format=3 uid="uid://3usm60dc4lwk"]
+[gd_scene load_steps=9 format=3 uid="uid://3usm60dc4lwk"]
 
 [ext_resource type="Texture2D" uid="uid://bom7op54lqb8o" path="res://sprites/background/back_game_over_scene.png" id="2_iej18"]
+[ext_resource type="Resource" uid="uid://dmyceymjcjktg" path="res://configs/ui/ui_palette_default.tres" id="2_ry5od"]
 [ext_resource type="Script" path="res://scripts/game_over_scene.gd" id="2_script"]
 [ext_resource type="Texture2D" uid="uid://ccafpc87hk0tx" path="res://sprites/ui/nest_icon.png" id="4_1f5iq"]
 [ext_resource type="FontFile" uid="uid://kcdyir8efr7o" path="res://fonts/Bangers-Regular.ttf" id="4_83n7h"]
@@ -17,6 +18,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("2_script")
 new_record_label_path = NodePath("UILayer/UIContainer/NewRecord")
+palette = ExtResource("2_ry5od")
 
 [node name="BackgroundLayer" type="CanvasLayer" parent="."]
 layer = -10

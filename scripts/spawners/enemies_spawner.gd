@@ -72,15 +72,11 @@ func spawn_enemy_bird():
 	
 	# Add to the game area
 	game_area.add_child(enemy_bird)
-	
-	print("Enemy bird spawned at position: ", enemy_bird.global_position, " (eagle Y: ", eagle.global_position.y, ") | Difficulty level: ", current_difficulty_level)
 
 func reset_spawn_timer():
 	"""Reset the spawn timer with a random interval"""
 	spawn_timer = 0.0
 	next_spawn_time = randf_range(spawn_interval_min, spawn_interval_max)
-	
-	print("Next enemy bird spawn in: ", next_spawn_time, " seconds")
 
 func increase_difficulty():
 	"""Increase the difficulty by spawning enemies more frequently"""
@@ -93,9 +89,6 @@ func increase_difficulty():
 	# Don't let intervals go below minimum
 	spawn_interval_min = max(spawn_interval_min, min_spawn_interval)
 	spawn_interval_max = max(spawn_interval_max, min_spawn_interval)
-	
-	print("Difficulty increased! Level: ", current_difficulty_level)
-	print("New spawn intervals: ", spawn_interval_min, " - ", spawn_interval_max, " seconds")
 	
 	# Reset spawn timer with new intervals
 	reset_spawn_timer()

@@ -42,8 +42,6 @@ var input_detected: bool = false
 var is_playing: bool = false
 
 func _ready():
-	print("IntroScene: Initializing...")
-	
 	# Setup UI references
 	_setup_ui_references()
 	
@@ -62,7 +60,6 @@ func _setup_ui_references():
 	if first_label_path:
 		first_label = get_node(first_label_path)
 		if first_label:
-			print("IntroScene: Connected to first label")
 			# Start labels as invisible
 			first_label.modulate.a = 0.0
 		else:
@@ -71,7 +68,6 @@ func _setup_ui_references():
 	if second_label_path:
 		second_label = get_node(second_label_path)
 		if second_label:
-			print("IntroScene: Connected to second label")
 			# Start labels as invisible
 			second_label.modulate.a = 0.0
 		else:
@@ -80,12 +76,12 @@ func _setup_ui_references():
 	if background_path:
 		background_element = get_node(background_path)
 		if background_element:
-			print("IntroScene: Connected to background element")
+			pass # No print here
 	
 	if intro_music_path:
 		intro_music_player = get_node(intro_music_path)
 		if intro_music_player:
-			print("IntroScene: Connected to intro music player")
+			pass # No print here
 		else:
 			print("IntroScene: Warning - Intro music player not found at path: ", intro_music_path)
 
@@ -101,14 +97,11 @@ func _setup_audio():
 	# Set intro music if provided
 	if intro_music and enable_intro_music:
 		intro_music_player.stream = intro_music
-		print("IntroScene: Intro music configured")
-		print("IntroScene: Audio volume set to ", music_volume, " (db: ", intro_music_player.volume_db, ")")
 
 func _setup_input():
 	"""Setup input detection for skipping intro"""
 	set_process_unhandled_input(true)
 	set_process_input(true)  # Also enable regular input for mouse handling
-	print("IntroScene: Input detection enabled for skipping")
 
 func _start_intro_sequence():
 	"""Start the main intro animation sequence"""
@@ -116,12 +109,10 @@ func _start_intro_sequence():
 		return
 		
 	is_playing = true
-	print("IntroScene: Starting intro sequence...")
 	
 	# Start intro music if enabled
 	if enable_intro_music and intro_music and intro_music_player:
 		intro_music_player.play()
-		print("IntroScene: Intro music started")
 	
 	# Create main tween for the entire sequence
 	intro_tween = create_tween()
@@ -154,7 +145,6 @@ func _show_first_label():
 	if not first_label or input_detected:
 		return
 		
-	print("IntroScene: Showing first label")
 	
 	# Fade in the first label
 	var fade_tween = create_tween()
@@ -165,7 +155,6 @@ func _show_second_label():
 	if not second_label or input_detected:
 		return
 		
-	print("IntroScene: Showing second label")
 	
 	# Fade in the second label
 	var fade_tween = create_tween()
@@ -176,7 +165,6 @@ func _complete_intro():
 	if input_detected:
 		return
 		
-	print("IntroScene: Intro sequence completed, transitioning to game")
 	intro_completed.emit()
 	_transition_to_game()
 
@@ -186,7 +174,6 @@ func _skip_intro():
 		return
 		
 	input_detected = true
-	print("IntroScene: Intro skipped by user input")
 	
 	# Stop current tween
 	if intro_tween:
@@ -205,7 +192,6 @@ func _skip_intro():
 
 func _transition_to_game():
 	"""Handle transition to the main game scene"""
-	print("IntroScene: Transitioning to game scene: ", game_scene_path)
 	
 	# Stop intro music with fade out
 	if intro_music_player and intro_music_player.playing:
@@ -213,7 +199,6 @@ func _transition_to_game():
 		fade_out_tween.tween_method(_set_audio_volume, music_volume, 0.0, audio_fade_duration)
 		await fade_out_tween.finished
 		intro_music_player.stop()
-		print("IntroScene: Intro music faded out and stopped")
 	
 	# Use SceneManager for smooth transition
 	SceneManager.change_scene(game_scene_path, "fade")
@@ -228,12 +213,10 @@ func _unhandled_input(event: InputEvent):
 	# Check for keyboard input (any key press)
 	if event is InputEventKey and event.pressed:
 		should_skip = true
-		print("IntroScene: Skip triggered by keyboard - Key: ", event.keycode)
 	
 	# Check for gamepad input (any gamepad button)
 	elif event is InputEventJoypadButton and event.pressed:
 		should_skip = true
-		print("IntroScene: Skip triggered by gamepad - Button: ", event.button_index)
 	
 	if should_skip:
 		_skip_intro()
@@ -245,20 +228,17 @@ func _input(event):
 		
 	# Handle mouse clicks
 	if event is InputEventMouseButton and event.pressed:
-		print("IntroScene: Skip triggered by mouse - Button: ", event.button_index)
 		_skip_intro()
 
 # Debug functions for development
 func debug_skip_intro():
 	"""Debug function to manually skip intro"""
 	if OS.is_debug_build():
-		print("IntroScene Debug: Manual skip triggered")
 		_skip_intro()
 
 func debug_restart_intro():
 	"""Debug function to restart intro sequence"""
 	if OS.is_debug_build():
-		print("IntroScene Debug: Restarting intro sequence")
 		input_detected = false
 		is_playing = false
 		if first_label:

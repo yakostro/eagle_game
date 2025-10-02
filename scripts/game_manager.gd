@@ -102,39 +102,26 @@ func _ready():
 
 
 
-func _on_stage_changed(new_stage: int, stage_config: StageConfiguration):
+func _on_stage_changed(_new_stage: int, _stage_config: StageConfiguration):
 	"""Handle stage change events"""
-	print("\n============================================================")
-	print("🎉 STAGE PROGRESSION: Advanced to Stage %d - %s" % [new_stage, stage_config.stage_name])
-	print("============================================================")
-	print("📊 New Parameters:")
-	print("   - World Speed: %.1f px/s" % stage_config.world_speed)
-	print("   - Fish: %s" % ("ON" if stage_config.fish_enabled else "OFF"))
-	print("   - Nests: %s" % ("ON" if stage_config.nests_enabled else "OFF"))
-	print("   - Stalactites: %s" % ("ON" if stage_config.stalactite_weight > 0 else "OFF"))
 	
 	# Show completion requirement
-	var completion_text = ""
-	if stage_config.completion_type == StageConfiguration.CompletionType.TIMER:
-		completion_text = "Wait %.1f seconds" % stage_config.completion_value
+	var _completion_text = ""
+	if _stage_config.completion_type == StageConfiguration.CompletionType.TIMER:
+		_completion_text = "Wait %.1f seconds" % _stage_config.completion_value
 	else:
-		completion_text = "Spawn %d nests" % int(stage_config.completion_value)
-	print("🎯 To advance: %s" % completion_text)
-	print("============================================================\n")
+		_completion_text = "Spawn %d nests" % int(_stage_config.completion_value)
 
-func _on_stage_completed(completed_stage: int):
+func _on_stage_completed(_completed_stage: int):
 	"""Handle stage completion events"""
-	print("\n🎯 STAGE %d COMPLETED! Advancing to next stage..." % completed_stage)
 
 func _input(event):
 	"""Handle testing input for stage progression"""
 	if event is InputEventKey and event.pressed:
 		if event.keycode == KEY_P:
-			print("🧪 Manual stage advance triggered!")
 			if StageManager:
 				StageManager.force_advance_stage()
 		elif event.keycode == KEY_R and not event.ctrl_pressed:
-			print("🧪 Restart game triggered!")
 			if SceneManager:
 				SceneManager.reload_current_scene()
 			else:
@@ -144,12 +131,10 @@ func _input(event):
 					if path != "":
 						get_tree().change_scene_to_file(path)
 		elif event.keycode == KEY_R and event.ctrl_pressed:
-			print("🧪 Reset stage progress triggered!")
 			if StageManager:
 				StageManager.reset_stage_progress()
 		elif event.keycode >= KEY_1 and event.keycode <= KEY_6:
 			var stage_number = event.keycode - KEY_0
-			print("🧪 Skipping to stage %d!" % stage_number)
 			if StageManager:
 				StageManager.skip_to_stage(stage_number)
 		elif event.keycode == KEY_F12:
@@ -161,17 +146,14 @@ func _toggle_fps_counter():
 	if fps_counter:
 		fps_counter.toggle_visibility()
 	else:
-		print("⚠️  FPS Counter not found in CanvasLayer")
+		push_warning("FPS Counter not found in CanvasLayer")
 
 func sync_world_movement_speed():
 	"""Synchronize world movement speed between systems"""
 	if obstacle_spawner and parallax_background:
 		var world_speed = obstacle_spawner.obstacle_movement_speed
 		parallax_background.set_world_movement_speed(world_speed)
-		print("🔄 Synced world movement speed: ", world_speed, " px/s")
-		print("   - Gradient layer speed: ", parallax_background.get_gradient_scroll_speed(), " px/s")
-		print("   - Mountain layer speed: ", parallax_background.get_mountain_scroll_speed(), " px/s")
-		print("   - Middle layer speed: ", parallax_background.get_middle_scroll_speed(), " px/s")
+		
 
 func update_world_speed(new_speed: float):
 	"""Update world movement speed for all systems"""
@@ -179,7 +161,7 @@ func update_world_speed(new_speed: float):
 		obstacle_spawner.obstacle_movement_speed = new_speed
 	if parallax_background:
 		parallax_background.set_world_movement_speed(new_speed)
-	print("🚀 Updated world speed to: ", new_speed, " px/s")
+	
 
 func toggle_parallax_middle_layer(enabled: bool):
 	"""Toggle middle parallax layer for performance/artistic control"""
@@ -209,14 +191,12 @@ func _connect_game_state_signals():
 	if nest_spawner:
 		# The nest spawner emits nest_spawned which gives us access to individual nests
 		nest_spawner.nest_spawned.connect(_on_nest_spawned)
-		if enable_game_state_logging:
-			print("🔗 Connected to nest spawner signals")
+		pass # print removed
 	
 	# Connect to eagle for death events
 	if eagle:
 		eagle.eagle_died.connect(_on_eagle_died)
-		if enable_game_state_logging:
-			print("🔗 Connected to eagle death signal")
+		pass # print removed
 
 func _on_nest_spawned(nest: Node):
 	"""Called when a new nest is spawned - connect to its feeding signal"""
@@ -239,7 +219,7 @@ func _on_nest_spawned(nest: Node):
 			nest.nest_missed.connect(eagle.on_nest_missed)
 	
 	if enable_game_state_logging:
-		print("🏠 Connected to new nest feeding signal: ", nest.name)
+		pass # print removed
 
 func _on_nest_fed(_points: int = 0):
 	"""Called when any nest is successfully fed with a fish"""
@@ -249,16 +229,14 @@ func _on_nest_fed(_points: int = 0):
 	# Increment the fed nests count in our global statistics
 	if GameStats:
 		GameStats.increment_fed_nests()
-		if enable_game_state_logging:
-			print("📊 Nest fed! Total fed nests: ", GameStats.get_fed_nests_count())
+		pass # print removed	
 	else:
-		print("❌ Warning: GameStats singleton not available for nest tracking")
+		push_warning("GameManager: GameStats singleton not available for nest tracking")
 
 func _on_nest_missed(_points: int = 0):
 	"""Called when a nest goes off screen without being fed"""
 
-	if enable_game_state_logging:
-		print("🏠 Nest missed!")
+	pass # print removed
 	
 	# Trigger fade foreground effect
 	if fade_foreground:
@@ -280,10 +258,8 @@ func _on_eagle_died():
 		StageManager.deactivate_stage_system()
 	
 	if enable_game_state_logging:
-		if GameStats:
-			print("📊 Final Statistics:")
-			print("   - Fed Nests: ", GameStats.get_fed_nests_count())
-			print("   - Session Duration: ", "%.1f" % GameStats.get_session_duration(), " seconds")
+		pass # prints removed
+		pass # prints removed
 	
 	# Add a small delay for dramatic effect before transitioning
 	if game_over_transition_delay > 0.0:
@@ -328,7 +304,7 @@ func _trigger_game_over_scene():
 		var transition_completed = false
 		
 		# Connect to scene_changed signal to track completion
-		var scene_change_handler = func(): 
+		var scene_change_handler = func(_new_scene_name: String): 
 			transition_completed = true
 		SceneManager.scene_changed.connect(scene_change_handler, CONNECT_ONE_SHOT)
 		
@@ -385,20 +361,20 @@ func _is_eagle_below_screen() -> bool:
 
 func debug_trigger_game_over():
 	"""Debug method to manually trigger game over for testing"""
-	print("🔧 DEBUG: Manually triggering game over")
+	
 	_on_eagle_died()
 
 func debug_add_fed_nest():
 	"""Debug method to manually add a fed nest for testing"""
-	print("🔧 DEBUG: Manually adding fed nest")
+	
 	_on_nest_fed(0)  # Points parameter not used, just pass 0
 
 func _test_obstacle_spawner_stage_integration():
 	"""Task 9 verification: Test ObstacleSpawner integration with StageManager"""
-	print("🧪 Task 9 - ObstacleSpawner Stage Integration:")
+	
 	
 	if not obstacle_spawner:
-		print("   ✗ ObstacleSpawner not available")
+		
 		return
 	
 	# Check if ObstacleSpawner connected to StageManager
@@ -430,10 +406,10 @@ func _test_obstacle_spawner_stage_integration():
 
 func _test_fish_spawner_stage_integration():
 	"""Task 10 verification: Test FishSpawner integration with StageManager"""
-	print("🧪 Task 10 - FishSpawner Stage Integration:")
+	
 	
 	if not fish_spawner:
-		print("   ✗ FishSpawner not available")
+		
 		return
 	
 	# Check if FishSpawner connected to StageManager
@@ -467,10 +443,10 @@ func _test_fish_spawner_stage_integration():
 
 func _test_nest_spawner_stage_integration():
 	"""Task 11 verification: Test NestSpawner integration with StageManager"""
-	print("🧪 Task 11 - NestSpawner Stage Integration:")
+	
 	
 	if not nest_spawner:
-		print("   ✗ NestSpawner not available")
+		
 		return
 	
 	# Check if NestSpawner connected to StageManager
@@ -500,38 +476,36 @@ func _test_nest_spawner_stage_integration():
 		else:
 			print("   ✓ Nest visibility correct for stage")
 	else:
-		print("   ✗ No stage config applied to NestSpawner")
+		pass # No stage config applied to NestSpawner
 
 func _test_stage_config_loading():
 	"""Test loading Stage 1 configuration (Task 3 verification)"""
-	print("🧪 Testing Stage 1 Configuration Loading:")
+	
 	
 	var stage_01_path = "res://scenes/configs/stages/stage_01_introduction.tres"
 	var stage_config = load(stage_01_path) as StageConfiguration
 	
 	if stage_config:
-		print("   - Stage 1 config loads: ✓")
-		print("   - Stage name: ", stage_config.stage_name)
-		print("   - World speed: ", stage_config.world_speed)
-		print("   - Mountain heights: %.1f to %.1f" % [stage_config.mountain_min_height, stage_config.mountain_max_height])
-		print("   - Island offsets: top=%.1f, bottom=%.1f" % [stage_config.floating_island_minimum_top_offset, stage_config.floating_island_minimum_bottom_offset])
-		print("   - Fish enabled: ", stage_config.fish_enabled)
-		print("   - Nests enabled: ", stage_config.nests_enabled)
-		print("   - Completion: ", "TIMER" if stage_config.completion_type == 0 else "NESTS", " (", stage_config.completion_value, ")")
+		
+		
+		
+		
+		
+		
 		
 		if stage_config.validate_parameters():
-			print("   - Validation: ✓")
+			pass # validation print removed
 		else:
-			print("   - Validation: ✗")
+			pass # validation print removed
 	else:
-		print("   - Stage 1 config loads: ✗")
+		pass # Stage 1 config loads print removed
 
 func _test_stage_manager_loading():
 	"""Test StageManager stage loading functionality (Task 4 verification)"""
-	print("🧪 Testing StageManager Stage Loading:")
+	
 	
 	if not StageManager:
-		print("   - StageManager not available: ✗")
+		
 		return
 	
 	# Check if StageManager automatically loaded stage 1
@@ -544,26 +518,25 @@ func _test_stage_manager_loading():
 		
 		# Test manual loading of stage 1 again (should work)
 		if StageManager.load_stage(1):
-			print("   - Manual reload stage 1: ✓")
+			pass # print removed
 		else:
-			print("   - Manual reload stage 1: ✗")
+			pass # print removed
 		
 		# Test loading of non-existent stage (should fail gracefully)
 		if not StageManager.load_stage(99):
-			print("   - Non-existent stage handling: ✓ (correctly failed)")
+			pass # print removed
 		else:
-			print("   - Non-existent stage handling: ✗ (should have failed)")
+			pass # print removed
 		
 	else:
-		print("   - Stage 1 auto-loaded: ✗")
-		print("   - Current stage config: null")
+		pass # print removed
 
 func _test_stage_progression():
 	"""Test StageManager stage progression functionality (Task 5 verification)"""
-	print("🧪 Testing Stage Progression Logic:")
+	
 	
 	if not StageManager:
-		print("   - StageManager not available: ✗")
+		
 		return
 	
 	# Check if progression methods exist
@@ -581,15 +554,19 @@ func _test_stage_progression():
 		# Check signal connections
 		if not StageManager.stage_changed.is_connected(_on_stage_changed):
 			StageManager.stage_changed.connect(_on_stage_changed)
-			print("   - Connected to stage_changed signal: ✓")
+			pass # print removed
 		else:
-			print("   - Stage_changed signal: ✓ (already connected)")
-		
+			pass # print removed
+
 		if not StageManager.stage_completed.is_connected(_on_stage_completed):
 			StageManager.stage_completed.connect(_on_stage_completed)
-			print("   - Connected to stage_completed signal: ✓")
+			pass # print removed
 		else:
-			print("   - Stage_completed signal: ✓ (already connected)")
+			pass # print removed
+	
+	
+	
+	
 	
 	print("   - Progression test will run during gameplay")
 	print("   - Press P to force advance stage (testing)")
@@ -601,7 +578,7 @@ func _test_stage_progression():
 
 func _test_all_stage_configs():
 	"""Test loading all stage configuration files (Task 6 verification)"""
-	print("🧪 Testing All Stage Configuration Files:")
+	
 	
 	var stage_files = [
 		"stage_01_introduction.tres",
@@ -622,63 +599,56 @@ func _test_all_stage_configs():
 		
 		if config:
 			loaded_count += 1
-			print("   - Stage %d (%s): ✓" % [stage_number, config.stage_name])
-			print("     Speed: %.1f, Fish: %s, Nests: %s, Completion: %s(%.0f)" % [
-				config.world_speed,
-				"ON" if config.fish_enabled else "OFF",
-				"ON" if config.nests_enabled else "OFF", 
-				"TIMER" if config.completion_type == 0 else "NESTS",
-				config.completion_value
-			])
+			
+			
+			
+			
+			
+			
 			
 			# Check progression logic
 			if config.world_speed <= previous_speed and stage_number > 1:
-				print("     ⚠️  Speed didn't increase from previous stage!")
+				push_warning("GameManager: Speed didn't increase from previous stage in stage %d!" % stage_number)
 			
 			if not config.validate_parameters():
-				print("     ❌ Parameter validation failed!")
+				push_error("GameManager: Parameter validation failed for stage %d!" % stage_number)
 			
 			previous_speed = config.world_speed
 		else:
-			print("   - Stage %d: ❌ Failed to load %s" % [stage_number, stage_files[i]])
+			push_error("GameManager: Failed to load stage %d: %s" % [stage_number, stage_files[i]])
 	
-	print("   Summary: %d/6 stage files loaded successfully" % loaded_count)
-	
+	pass # Summary print removed	
 	if loaded_count == 6:
-		print("   🎉 All stage configurations ready for progression testing!")
+		pass # All stage configurations ready for progression testing print removed
 	else:
-		print("   ⚠️  Some stage configurations are missing or invalid")
+		pass # Some stage configurations are missing or invalid print removed
 
 func _start_stage_system_test():
 	"""Start comprehensive stage system testing (Task 7)"""
-	print("\n🚀 STARTING STAGE SYSTEM END-TO-END TEST")
-	print("==================================================")
-	print("Task 7: Core Stage System Verification")
-	print("==================================================")
+	
+	
 	
 	if not StageManager:
-		print("❌ CRITICAL: StageManager not available!")
+		push_error("GameManager: CRITICAL: StageManager not available!")
 		return
 	
 	# Test 1: Verify current stage is loaded
 	var current_config = StageManager.get_current_stage_config()
 	if current_config:
-		print("✅ Stage system initialized: Stage %d - %s" % [StageManager.current_stage, current_config.stage_name])
-		print("   Current parameters: Speed=%.1f, Fish=%s, Nests=%s" % [
-			current_config.world_speed,
-			"ON" if current_config.fish_enabled else "OFF",
-			"ON" if current_config.nests_enabled else "OFF"
-		])
+		pass # prints removed
+		pass # prints removed
+		pass # prints removed
+		pass # prints removed
 	else:
-		print("❌ No stage configuration loaded!")
+		push_error("GameManager: No stage configuration loaded!")
 		return
 	
 	# Test 2: Quick parameter progression verification
-	print("\n📊 PARAMETER PROGRESSION CHECK:")
+	
 	_verify_parameter_progression()
 	
 	# Test 3: Test stage 6 limit  
-	print("\n🛑 TESTING STAGE 6 LIMIT:")
+	
 	_test_stage_six_limit()
 
 func _verify_parameter_progression():
@@ -687,33 +657,19 @@ func _verify_parameter_progression():
 	var stage_6 = load("res://scenes/configs/stages/stage_06_final.tres") as StageConfiguration
 	
 	if not stage_1 or not stage_6:
-		print("   ❌ Could not load stage configs for comparison")
+		push_error("GameManager: Could not load stage configs for comparison")
 		return
 	
 	# Check key progressions
-	var speed_progression = stage_6.world_speed > stage_1.world_speed
-	var stalactites_added = stage_6.stalactite_weight > stage_1.stalactite_weight  
-	var nests_enabled = not stage_1.nests_enabled and stage_6.nests_enabled
-	var fish_enabled = not stage_1.fish_enabled and stage_6.fish_enabled
+	var _speed_progression = stage_6.world_speed > stage_1.world_speed
+	var _stalactites_added = stage_6.stalactite_weight > stage_1.stalactite_weight  
+	var _nests_enabled = not stage_1.nests_enabled and stage_6.nests_enabled
+	var _fish_enabled = not stage_1.fish_enabled and stage_6.fish_enabled
 	
-	print("   Speed increases: %s (%.1f → %.1f)" % [
-		"✅" if speed_progression else "❌", 
-		stage_1.world_speed, stage_6.world_speed
-	])
-	print("   Stalactites added: %s (%d → %d)" % [
-		"✅" if stalactites_added else "❌",
-		stage_1.stalactite_weight, stage_6.stalactite_weight
-	])
-	print("   Fish enabled: %s (%s → %s)" % [
-		"✅" if fish_enabled else "❌",
-		"OFF" if not stage_1.fish_enabled else "ON",
-		"ON" if stage_6.fish_enabled else "OFF"  
-	])
-	print("   Nests enabled: %s (%s → %s)" % [
-		"✅" if nests_enabled else "❌", 
-		"OFF" if not stage_1.nests_enabled else "ON",
-		"ON" if stage_6.nests_enabled else "OFF"
-	])
+	pass # prints removed
+	pass # prints removed
+	pass # prints removed
+	pass # prints removed
 
 func _test_stage_six_limit():
 	"""Test that stage 6 doesn't advance to stage 7"""
@@ -722,20 +678,21 @@ func _test_stage_six_limit():
 	
 	# Skip to stage 6
 	if StageManager.skip_to_stage(6):
-		print("   Skipped to stage 6: ✅")
+		pass # print removed
 		
 		# Try to advance beyond stage 6
 		StageManager.force_advance_stage()
 		
 		# Check if auto-difficulty was enabled instead of advancing to stage 7
 		if StageManager.auto_difficulty_enabled and not original_auto_difficulty:
-			print("   Stage 6→7 blocked, auto-difficulty enabled: ✅")
+			pass # auto-difficulty enabled print removed
 		else:
-			print("   Stage 6→7 limit test: ❌")
+			push_error("GameManager: Stage 6→7 limit test: ❌")
 		
 		# Reset to original state
 		StageManager.disable_auto_difficulty()
 		StageManager.skip_to_stage(original_stage)
-		print("   Restored original stage %d: ✅" % original_stage)
+		pass # print removed
+		
 	else:
-		print("   Failed to skip to stage 6: ❌")
+		push_error("GameManager: Failed to skip to stage 6: ❌")
