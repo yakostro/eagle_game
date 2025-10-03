@@ -4,14 +4,23 @@
 
 [resource]
 script = ExtResource("1_0kbqm")
-progression_interval = 5.0
-speed_increase_rate = 0.05
-max_speed_multiplier = 2.0
-spawn_rate_increase = 0.1
-min_distance_multiplier = 0.5
-stalactite_weight_increase = 1
-max_stalactite_weight = 20
-fish_spawn_rate_increase = 0.1
-min_fish_interval_multiplier = 0.3
-nest_interval_decrease = 0.2
+progression_interval = 15.0
+speed_increase_rate = 0.03
+max_speed_multiplier = 1.8
+spawn_rate_increase = 0.08
+min_distance_multiplier = 0.6
+stalactite_weight_increase = 0.04
+max_stalactite_weight = 15
+nest_interval_decrease = 0.15
 min_nest_interval = 2
+mountain_height_increase_rate = 0.08
+max_mountain_height_multiplier = 1.6
+stalactite_height_increase_rate = 0.12
+max_stalactite_height_multiplier = 1.8
+fish_availability_decrease_rate = 0.06
+min_fish_availability_multiplier = 0.5
+nest_frequency_increase_rate = 0.12
+max_nest_frequency_multiplier = 2.0
+mountain_weight_increase_rate = 0.04
+island_weight_increase_rate = 0.06
+max_obstacle_weight = 20

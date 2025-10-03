@@ -137,6 +137,10 @@ func _input(event):
 			var stage_number = event.keycode - KEY_0
 			if StageManager:
 				StageManager.skip_to_stage(stage_number)
+		elif event.keycode == KEY_A:
+			# Direct auto-difficulty test key
+			if StageManager:
+				StageManager.force_trigger_auto_difficulty()
 		elif event.keycode == KEY_F12:
 			_toggle_fps_counter()
 

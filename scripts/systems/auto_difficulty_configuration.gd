@@ -21,13 +21,29 @@ extends Resource
 @export var stalactite_weight_increase: int = 1  # Add 1 weight per interval
 @export var max_stalactite_weight: int = 20     # Cap stalactite frequency
 
-# Fish spawn progression
-@export var fish_spawn_rate_increase: float = 0.1  # 10% faster fish spawning
-@export var min_fish_interval_multiplier: float = 0.3  # Never faster than 30% of original
 
 # Nest progression (make nests more frequent)
 @export var nest_interval_decrease: float = 0.2  # Decrease max skipped obstacles per level
 @export var min_nest_interval: int = 2           # Minimum obstacles between nests
+
+# Height progression (make obstacles taller/more dangerous)
+@export var mountain_height_increase_rate: float = 0.1  # 10% taller per level
+@export var max_mountain_height_multiplier: float = 1.8  # Cap at 80% increase
+@export var stalactite_height_increase_rate: float = 0.15  # 15% taller per level  
+@export var max_stalactite_height_multiplier: float = 2.0  # Cap at 100% increase
+
+# Fish scarcity progression (make fish scarcer over time, but preserve boost system)
+@export var fish_availability_decrease_rate: float = 0.08  # 8% fewer fish per level
+@export var min_fish_availability_multiplier: float = 0.4  # Never less than 40% of base
+
+# Enhanced nest frequency (more nests to feed)
+@export var nest_frequency_increase_rate: float = 0.15  # 15% more frequent per level
+@export var max_nest_frequency_multiplier: float = 2.5  # Up to 2.5x more nests
+
+# Obstacle variety progression
+@export var mountain_weight_increase_rate: float = 0.05  # Gradual mountain increase
+@export var island_weight_increase_rate: float = 0.08  # Gradual island increase
+@export var max_obstacle_weight: int = 25  # Cap for any obstacle type
 
 # Configuration validation
 func validate() -> bool:
@@ -59,13 +75,6 @@ func validate() -> bool:
 		push_error("AutoDifficultyConfiguration: max_stalactite_weight should be > 0")
 		return false
 	
-	if fish_spawn_rate_increase < 0 or fish_spawn_rate_increase > 1.0:
-		push_error("AutoDifficultyConfiguration: fish_spawn_rate_increase should be between 0 and 1")
-		return false
-		
-	if min_fish_interval_multiplier <= 0 or min_fish_interval_multiplier > 1.0:
-		push_error("AutoDifficultyConfiguration: min_fish_interval_multiplier should be between 0 and 1")
-		return false
 	
 	if nest_interval_decrease < 0.0:
 		push_error("AutoDifficultyConfiguration: nest_interval_decrease should be >= 0.0")
@@ -73,6 +82,54 @@ func validate() -> bool:
 		
 	if min_nest_interval <= 0:
 		push_error("AutoDifficultyConfiguration: min_nest_interval should be > 0")
+		return false
+	
+	# Validate height progression parameters
+	if mountain_height_increase_rate < 0 or mountain_height_increase_rate > 1.0:
+		push_error("AutoDifficultyConfiguration: mountain_height_increase_rate should be between 0 and 1")
+		return false
+		
+	if max_mountain_height_multiplier <= 1.0:
+		push_error("AutoDifficultyConfiguration: max_mountain_height_multiplier should be > 1.0")
+		return false
+	
+	if stalactite_height_increase_rate < 0 or stalactite_height_increase_rate > 1.0:
+		push_error("AutoDifficultyConfiguration: stalactite_height_increase_rate should be between 0 and 1")
+		return false
+		
+	if max_stalactite_height_multiplier <= 1.0:
+		push_error("AutoDifficultyConfiguration: max_stalactite_height_multiplier should be > 1.0")
+		return false
+	
+	# Validate fish scarcity parameters
+	if fish_availability_decrease_rate < 0 or fish_availability_decrease_rate > 1.0:
+		push_error("AutoDifficultyConfiguration: fish_availability_decrease_rate should be between 0 and 1")
+		return false
+		
+	if min_fish_availability_multiplier <= 0 or min_fish_availability_multiplier > 1.0:
+		push_error("AutoDifficultyConfiguration: min_fish_availability_multiplier should be between 0 and 1")
+		return false
+	
+	# Validate enhanced nest frequency parameters
+	if nest_frequency_increase_rate < 0 or nest_frequency_increase_rate > 1.0:
+		push_error("AutoDifficultyConfiguration: nest_frequency_increase_rate should be between 0 and 1")
+		return false
+		
+	if max_nest_frequency_multiplier <= 1.0:
+		push_error("AutoDifficultyConfiguration: max_nest_frequency_multiplier should be > 1.0")
+		return false
+	
+	# Validate obstacle variety parameters
+	if mountain_weight_increase_rate < 0 or mountain_weight_increase_rate > 1.0:
+		push_error("AutoDifficultyConfiguration: mountain_weight_increase_rate should be between 0 and 1")
+		return false
+		
+	if island_weight_increase_rate < 0 or island_weight_increase_rate > 1.0:
+		push_error("AutoDifficultyConfiguration: island_weight_increase_rate should be between 0 and 1")
+		return false
+		
+	if max_obstacle_weight <= 0:
+		push_error("AutoDifficultyConfiguration: max_obstacle_weight should be > 0")
 		return false
 	
 	return true

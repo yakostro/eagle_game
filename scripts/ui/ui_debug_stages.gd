@@ -75,12 +75,30 @@ func _update_stage_display(stage_number: int, config: StageConfiguration):
 			var auto_level = stage_number - 100
 			display_text += "Auto-Difficulty Level %d" % auto_level
 			
-			# Show time to next level increase if StageManager has auto-difficulty
+			# Show detailed auto-difficulty stats if available
 			if StageManager.auto_difficulty_enabled and StageManager.has_method("get_auto_difficulty_stats"):
 				var stats = StageManager.get_auto_difficulty_stats()
 				if stats.has("time_to_next"):
 					var time_to_next = stats.time_to_next
-					display_text += " (%.1fs)" % time_to_next
+					display_text += " (%.1fs)\n" % time_to_next
+					
+					# Add key difficulty multipliers on separate lines
+					if stats.has("speed_multiplier"):
+						display_text += "Speed: %.1fx" % stats.speed_multiplier
+					if stats.has("mountain_height_multiplier"):
+						display_text += " | Heights: M%.1fx" % stats.mountain_height_multiplier
+					if stats.has("stalactite_height_multiplier"):
+						display_text += "/S%.1fx" % stats.stalactite_height_multiplier
+					display_text += "\n"
+					
+					if stats.has("fish_availability_multiplier"):
+						display_text += "Fish: %.1fx scarcer" % stats.fish_availability_multiplier
+					if stats.has("nest_frequency_multiplier"):
+						display_text += " | Nests: %.1fx frequent" % (1.0 / stats.nest_frequency_multiplier)
+				else:
+					display_text += "\n"
+			else:
+				display_text += "\n"
 		else:
 			# Manual stage display
 			display_text += "Stage %d: %s" % [stage_number, config.stage_name]
