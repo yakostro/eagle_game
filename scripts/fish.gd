@@ -159,8 +159,8 @@ func catch_fish(eagle):
 		# Make fish smaller and attach to eagle
 		scale = Vector2(fish_scale_when_caught, fish_scale_when_caught)
 		
-		# Disable physics (using set_deferred to avoid physics state changes during callbacks)
-		set_deferred("freeze", true)
+		# Immediately freeze to attach to eagle reliably
+		freeze = true
 		
 		# Disable collision detection for caught fish
 		var catch_area = $CatchArea
@@ -172,14 +172,17 @@ func release_fish():
 	"""Called when eagle releases/drops the fish"""
 	is_caught = false
 	is_dropped = true  # Mark as dropped for cleanup tracking
-	freeze = false  # Set immediately instead of deferred
+	# Ensure physics wakes up and fish starts falling immediately
+	freeze = false
+	set_deferred("freeze", false)
+	sleeping = false
 	
 	# Temporarily disable catching to prevent immediate re-catch
 	can_be_caught = false
 	
 	# Re-enable collision detection but fish won't be catchable until cooldown ends
 	var catch_area = $CatchArea
-	catch_area.monitoring = true  # Set immediately instead of deferred
+	catch_area.set_deferred("monitoring", true)  # Enable detection again
 	
 	# Start cooldown timer to re-enable catching
 	var cooldown_timer = Timer.new()
