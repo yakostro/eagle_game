@@ -376,10 +376,15 @@ func hit_by_enemy(enemy_body):
 func update_hit_system(delta):
 	"""Update immunity and blinking timers"""
 	# Update hit state timeout (safety mechanism)
-	if movement_controller.get_movement_state() == MovementState.HIT:
-		hit_state_timer += delta
-		if hit_state_timer >= max_hit_state_duration:
-			end_hit_state()
+	if movement_controller and is_instance_valid(movement_controller) and movement_controller.has_method("get_movement_state"):
+		if movement_controller.get_movement_state() == MovementState.HIT:
+			hit_state_timer += delta
+			if hit_state_timer >= max_hit_state_duration:
+				end_hit_state()
+	elif not movement_controller:
+		# Re-initialize movement controller if it's missing
+		movement_controller = DefaultMovementController.new(self)
+		add_child(movement_controller)
 
 	# Update immunity timer
 	if is_immune:
@@ -421,9 +426,10 @@ func is_eagle_immune() -> bool:
 
 func end_hit_state():
 	"""Called by animation controller when hit animation finishes"""
-	if movement_controller.get_movement_state() == MovementState.HIT:
-		movement_controller.restore_from_hit_state()
-		hit_state_timer = 0.0  # Reset hit state timer
+	if movement_controller and is_instance_valid(movement_controller) and movement_controller.has_method("get_movement_state"):
+		if movement_controller.get_movement_state() == MovementState.HIT:
+			movement_controller.restore_from_hit_state()
+			hit_state_timer = 0.0  # Reset hit state timer
 
 func _on_hit_detection_area_body_entered(body):
 	"""Called when the HitDetectionArea overlaps with a body (obstacle or enemy)"""
@@ -431,7 +437,10 @@ func _on_hit_detection_area_body_entered(body):
 	if is_dying:
 		return
 		
-	var current_movement_state = movement_controller.get_movement_state()
+	var current_movement_state = MovementState.GLIDING
+	if movement_controller and is_instance_valid(movement_controller):
+		current_movement_state = movement_controller.get_movement_state()
+	
 	var is_obstacle = body.is_in_group("obstacles")
 	var is_enemy = body.is_in_group("enemies")
 

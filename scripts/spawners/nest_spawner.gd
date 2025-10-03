@@ -25,6 +25,7 @@ var warned_this_cycle: bool = false
 # Stage configuration tracking
 var current_stage_config: StageConfiguration
 var total_nests_spawned: int = 0  # Track total nests for stage progression
+var is_first_nest_in_stage: bool = true  # Track if this is the first nest in current stage
 
 signal nest_incoming(obstacles_remaining: int)
 signal nest_spawned(nest: Node)
@@ -66,7 +67,22 @@ func on_obstacle_spawned(obstacle: BaseObstacle):
 
 func _should_spawn_nest_on_obstacle(obstacle: BaseObstacle) -> bool:
 	"""Determine if this obstacle should get a nest"""
-	# Check if we've reached the target number of skipped obstacles
+	# Special case: For stage 3 (nest introduction), spawn first nest immediately on first suitable obstacle
+	if is_first_nest_in_stage and current_stage_config and current_stage_config.stage_number == 3:
+		# Check if this obstacle type can carry nests
+		if not obstacle.can_carry_nest:
+			return false
+
+		# Get screen dimensions for visibility checking
+		var viewport_size = get_viewport().get_visible_rect().size
+
+		# Check if obstacle has any visible nest placeholders
+		if not obstacle.has_visible_nest_placeholders(viewport_size.y, nest_visibility_offset):
+			return false
+		
+		return true
+	
+	# Normal behavior: Check if we've reached the target number of skipped obstacles
 	if obstacles_since_last_nest < next_nest_spawn_target:
 		return false
 	
@@ -119,6 +135,9 @@ func spawn_nest_on_obstacle(obstacle: BaseObstacle):
 	# Track total nests spawned for stage progression
 	total_nests_spawned += 1
 	
+	# Mark that first nest has been spawned
+	is_first_nest_in_stage = false
+	
 	# Notify StageManager of nest spawn (for stage progression tracking)
 	if StageManager:
 		StageManager.on_nest_spawned()
@@ -137,7 +156,7 @@ func _connect_to_stage_manager():
 		if StageManager.current_stage_config:
 			apply_stage_config(StageManager.current_stage_config)
 
-func _on_stage_changed(new_stage: int, config: StageConfiguration):
+func _on_stage_changed(_new_stage: int, config: StageConfiguration):
 	"""Handle stage changes from StageManager"""
 	apply_stage_config(config)
 
@@ -157,6 +176,9 @@ func apply_stage_config(config: StageConfiguration):
 
 	# Update visibility offset for multi-placeholder system
 	nest_visibility_offset = config.nest_visibility_offset
+	
+	# Reset first nest flag when stage changes
+	is_first_nest_in_stage = true
 	
 	# Reset nest spawn target with new parameters
 	if nests_enabled:

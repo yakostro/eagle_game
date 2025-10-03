@@ -354,8 +354,8 @@ animations = [{
 }]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_yl77t"]
-radius = 15.8486
-height = 31.6973
+radius = 19.6319
+height = 39.2638
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_hitbox"]
 radius = 8.69121
@@ -377,7 +377,7 @@ offset = Vector2(4, -37)
 flip_h = true
 
 [node name="CollisionShape" type="CollisionShape2D" parent="."]
-position = Vector2(-310, 103.333)
+position = Vector2(-332, 56)
 rotation = 1.5708
 scale = Vector2(6.52, 9.18)
 shape = SubResource("CapsuleShape2D_yl77t")

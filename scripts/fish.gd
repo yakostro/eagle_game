@@ -54,14 +54,18 @@ func _ready():
 	# Store original scale before any modifications
 	original_scale = scale
 	
-	# Collision layers are now set in the scene file
-	# Fish RigidBody2D: collision_layer = 1, collision_mask = 0
-	# Fish CatchArea: collision_layer = 1, collision_mask = 0
+	# Set collision layers for proper detection
+	collision_layer = 1  # Fish are on layer 1 for nest detection
+	collision_mask = 0   # Fish don't need to detect other objects
 	gravity_scale = 1.0
 	
 	# Get the detection area and connect signal
 	var catch_area = $CatchArea
 	catch_area.body_entered.connect(_on_catch_area_entered)
+	
+	# Set up catch area for eagle detection
+	catch_area.collision_layer = 1  # Same layer as fish body for consistent detection
+	catch_area.collision_mask = 1   # CatchArea needs to detect eagle on layer 1
 	
 	# Add to fish group for easy detection
 	add_to_group("fish")
@@ -150,6 +154,7 @@ func catch_fish(eagle):
 	# Only proceed if eagle successfully caught the fish
 	if successfully_caught:
 		is_caught = true
+		is_dropped = false  # Ensure fish is not marked as dropped when caught
 		
 		# Make fish smaller and attach to eagle
 		scale = Vector2(fish_scale_when_caught, fish_scale_when_caught)

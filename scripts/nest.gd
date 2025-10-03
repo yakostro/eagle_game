@@ -107,10 +107,14 @@ func feed_nest(fish):
 	if current_state != NestState.HUNGRY:
 		return
 	
-	# Accept fish that was dropped by the eagle OR fish that is not currently caught
-	# This handles the case where fish goes directly to nest after being dropped
-	if not fish.is_dropped and fish.is_caught:
-		print("Fish rejected - still caught by eagle")
+	# Only accept fish that was explicitly dropped by the eagle
+	# Fish must have is_dropped = true AND not be currently caught
+	if not fish.is_dropped:
+		print("Fish rejected - not dropped by eagle (is_dropped: ", fish.is_dropped, ")")
+		return
+	
+	if fish.is_caught:
+		print("Fish rejected - still caught by eagle (is_caught: ", fish.is_caught, ")")
 		return
 		
 	print("Nest fed with fish!")
