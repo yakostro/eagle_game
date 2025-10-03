@@ -178,6 +178,14 @@ func _unhandled_input(event):
 			current_energy = 0.0
 			die()
 			get_viewport().set_input_as_handled()
+		# DEBUG: F key to add fish to eagle (as if caught)
+		elif event.keycode == KEY_F:
+			debug_add_fish()
+			get_viewport().set_input_as_handled()
+		# DEBUG: N key to spawn nest on next obstacle
+		elif event.keycode == KEY_N:
+			debug_spawn_nest_on_next_obstacle()
+			get_viewport().set_input_as_handled()
 
 # Fish management methods
 func catch_fish(fish: Fish) -> bool:
@@ -611,6 +619,61 @@ func handle_special_inputs():
 		screech_audio.play()
 		# Trigger screech animation
 		screech_requested.emit()
-	
 
-	
+# ===== DEBUG METHODS =====
+
+func debug_add_fish():
+	"""DEBUG: Add a fish to eagle as if caught (F key)"""
+	# Don't add fish if already carrying one or dying
+	if carried_fish != null or is_dying:
+		print("🔧 DEBUG: Cannot add fish - already carrying or dying")
+		return
+
+	# Find the fish scene in the project
+	var fish_scene_path = "res://scenes/fish.tscn"
+	if not ResourceLoader.exists(fish_scene_path):
+		print("🔧 DEBUG: Fish scene not found at: ", fish_scene_path)
+		return
+
+	var fish_scene = load(fish_scene_path)
+	var fish = fish_scene.instantiate()
+
+	# Add fish to scene
+	get_tree().current_scene.add_child(fish)
+
+	# Position fish near eagle
+	fish.global_position = global_position + Vector2(50, 0)
+
+	# Setup fish with eagle reference
+	fish.setup_fish(self, get_viewport().get_visible_rect().size.y)
+
+	# Directly catch the fish
+	fish.is_caught = true
+	carried_fish = fish
+	fish_caught_changed.emit(true)
+
+	# Make fish smaller and attach to eagle
+	fish.scale = Vector2(fish.fish_scale_when_caught, fish.fish_scale_when_caught)
+	fish.freeze = true
+
+	# Disable collision detection
+	var catch_area = fish.get_node_or_null("CatchArea")
+	if catch_area:
+		catch_area.monitoring = false
+
+	print("🔧 DEBUG: Fish added to eagle")
+
+func debug_spawn_nest_on_next_obstacle():
+	"""DEBUG: Flag next obstacle to receive a nest (N key)"""
+	# Find the nest spawner
+	var nest_spawner = get_tree().current_scene.find_child("NestSpawner", true, false)
+	if not nest_spawner:
+		print("🔧 DEBUG: NestSpawner not found in scene")
+		return
+
+	# Set the nest spawner to spawn on the very next obstacle
+	nest_spawner.obstacles_since_last_nest = nest_spawner.next_nest_spawn_target
+	nest_spawner.warned_this_cycle = false
+
+	print("🔧 DEBUG: Next obstacle will have a nest")
+

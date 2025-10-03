@@ -33,6 +33,11 @@ var audio_player: AudioStreamPlayer
 var press_any_button_label: Label
 var background_image: TextureRect
 
+# Tween references for proper cleanup
+var fade_tween: Tween
+var feedback_tween: Tween
+var fade_out_tween: Tween
+
 func _ready():
 	
 	# Setup UI references
@@ -86,7 +91,7 @@ func _start_scene():
 	
 	# Optional: Add fade-in effect for the scene
 	modulate.a = 0.0
-	var fade_tween = create_tween()
+	fade_tween = create_tween()
 	fade_tween.tween_property(self, "modulate:a", 1.0, 0.5)
 
 func _unhandled_input(event: InputEvent):
@@ -139,16 +144,19 @@ func _show_input_feedback():
 		
 	# Flash the label to show input was registered
 	var original_modulate = press_any_button_label.modulate
-	var feedback_tween = create_tween()
+	feedback_tween = create_tween()
 	feedback_tween.tween_property(press_any_button_label, "modulate", Color.WHITE * 1.5, 0.1)
 	feedback_tween.tween_property(press_any_button_label, "modulate", original_modulate, 0.1)
 
 func _transition_to_intro():
 	"""Handle transition to the intro scene"""
 	
+	# Clean up any running tweens to prevent errors
+	_cleanup_tweens()
+	
 	# Stop background music with fade out
 	if audio_player and audio_player.playing:
-		var fade_out_tween = create_tween()
+		fade_out_tween = create_tween()
 		fade_out_tween.tween_method(_set_audio_volume, music_volume, 0.0, 0.3)
 		await fade_out_tween.finished
 		audio_player.stop()
@@ -179,5 +187,15 @@ func debug_trigger_start():
 	if OS.is_debug_build():
 		_handle_start_input()
 
-func _on_scene_manager_scene_changed(new_scene_name: String):
+func _cleanup_tweens():
+	"""Clean up any running tweens to prevent errors when scene changes"""
+	if fade_tween and fade_tween.is_valid():
+		fade_tween.kill()
+	if feedback_tween and feedback_tween.is_valid():
+		feedback_tween.kill()
+	if fade_out_tween and fade_out_tween.is_valid():
+		fade_out_tween.kill()
+
+func _on_scene_manager_scene_changed(_new_scene_name: String):
 	"""Handle scene manager notifications"""
+	pass

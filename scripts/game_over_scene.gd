@@ -36,8 +36,6 @@ var is_initialized: bool = false
 
 func _ready():
 	"""Initialize the game over scene with current statistics"""
-	print("🎬 Game Over Scene initializing...")
-	
 	# Ensure palette is available (fallback to default resource if not assigned)
 	if not palette:
 		var default_palette := load("res://configs/ui/ui_palette_default.tres") as UiPalette
@@ -58,9 +56,8 @@ func _ready():
 	
 	# Optional: Play initialization animation
 	_play_entrance_animation()
-	
+
 	is_initialized = true
-	print("✅ Game Over Scene fully initialized")
 
 func _get_ui_references():
 	"""Get references to UI components using NodePaths"""
@@ -71,15 +68,7 @@ func _get_ui_references():
 	restart_button = get_node(restart_button_path) if restart_button_path else null
 	background_music = get_node(background_music_path) if background_music_path else null
 	
-	# Validate critical components
-	if not game_over_label:
-		print("❌ Warning: Game Over Label not found at path: ", game_over_label_path)
-	if not amount_label:
-		print("❌ Warning: Amount Label not found at path: ", amount_label_path)
-	if not record_amount_label:
-		print("❌ Warning: Record Amount Label not found at path: ", record_amount_label_path)
-	if not restart_button:
-		print("❌ Warning: Restart Button not found at path: ", restart_button_path)
+	# Validate critical components (no print warnings for missing optional UI elements)
 
 func _connect_signals():
 	"""Connect UI signals for interaction handling"""
@@ -94,7 +83,6 @@ func _connect_signals():
 func _initialize_statistics_display():
 	"""Load and display current game statistics from GameStats singleton"""
 	if not GameStats:
-		print("❌ Error: GameStats singleton not available!")
 		return
 	
 	# Get current statistics
@@ -193,7 +181,6 @@ func _trigger_restart():
 		SceneManager.change_scene("res://scenes/game_steps/game.tscn")
 	else:
 		# Fallback if SceneManager not available
-		print("⚠️  SceneManager not available, using direct scene change")
 		get_tree().change_scene_to_file("res://scenes/game_steps/game.tscn")
 
 # === SIGNAL HANDLERS ===
@@ -206,7 +193,6 @@ func _on_stats_updated(fed_nests: int):
 
 func _on_new_record_achieved(new_record: int):
 	"""Handle new record achievement signal"""
-	print("🏆 New record achieved signal received: ", new_record)
 	_update_record_display(new_record)
 	_show_new_record_indicator()
 
@@ -221,14 +207,5 @@ func debug_test_new_record():
 	_show_new_record_indicator()
 
 func debug_print_scene_info():
-	"""Print debug information about the scene state"""
-	print("=== Game Over Scene Debug Info ===")
-	print("Initialized: ", is_initialized)
-	print("Keyboard Shortcuts: ", enable_keyboard_shortcuts)
-	print("GameStats Available: ", GameStats != null)
-	print("SceneManager Available: ", SceneManager != null)
-	if GameStats:
-		print("Current Fed Nests: ", GameStats.get_fed_nests_count())
-		print("Best Record: ", GameStats.get_best_record())
-		print("Is New Record: ", GameStats.is_current_session_record())
-	print("===================================")
+	"""Debug method to get scene state information (no console output)"""
+	pass

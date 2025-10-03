@@ -19,8 +19,8 @@ extends Resource
 # Obstacle Height Ranges (pixels) - specific to each obstacle type
 @export var mountain_min_height: float = 0.0
 @export var mountain_max_height: float = 400.0
-@export var stalactite_min_height: float = -300.0
-@export var stalactite_max_height: float = 0.0
+@export var stalactite_min_height: float = 100.0
+@export var stalactite_max_height: float = 300.0
 @export var floating_island_minimum_top_offset: float = 100.0
 @export var floating_island_minimum_bottom_offset: float = 100.0
 

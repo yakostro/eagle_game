@@ -67,8 +67,6 @@ func show_for_stage(stage_id: int):
 	elif typeof(duration) == TYPE_INT:
 		duration = float(duration)
 	
-	print("🎯 Tutorial overlay for stage ", stage_id, " - Delay: ", delay, "s, Duration: ", duration, "s")
-	
 	# Wait for delay, then show the overlay
 	if delay > 0.0:
 		await get_tree().create_timer(delay).timeout
@@ -82,15 +80,12 @@ func _play_show_then_hide(duration: float):
 	visible = true
 	modulate.a = 0.0
 	
-	print("   ⏱️  Playing tween with duration: ", duration, "s")
-
 	_current_tween = get_tree().create_tween()
 	_current_tween.tween_property(self, "modulate:a", 1.0, fade_in_duration).from(0.0)
 	_current_tween.tween_interval(duration)
 	_current_tween.tween_property(self, "modulate:a", 0.0, fade_out_duration)
 	_current_tween.tween_callback(func(): 
 		visible = false
-		print("   ✅ Tutorial overlay hidden")
 	)
 
 
