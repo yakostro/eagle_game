@@ -91,7 +91,7 @@ func _on_body_entered(body):
 	# Check if it's a fish using multiple methods for reliability
 	if body is Fish or (body.has_method("get_class") and body.get_class() == "Fish"):
 		if current_state == NestState.HUNGRY:
-			print("Fish detected by nest: ", body.name)
+			print("Fish body detected by nest: ", body.name, " | is_dropped: ", body.is_dropped, " | is_caught: ", body.is_caught)
 			feed_nest(body)
 
 func _on_area_entered(area):
@@ -99,7 +99,7 @@ func _on_area_entered(area):
 	var body = area.get_parent()
 	if body and (body is Fish or (body.has_method("get_class") and body.get_class() == "Fish")):
 		if current_state == NestState.HUNGRY:
-			print("Fish CatchArea detected by nest: ", body.name)
+			print("Fish CatchArea detected by nest: ", body.name, " | is_dropped: ", body.is_dropped, " | is_caught: ", body.is_caught)
 			feed_nest(body)
 
 func feed_nest(fish):
@@ -107,9 +107,10 @@ func feed_nest(fish):
 	if current_state != NestState.HUNGRY:
 		return
 	
-	# Only accept fish that was dropped by the eagle
-	if not fish.is_dropped:
-		print("Fish rejected - not dropped by eagle")
+	# Accept fish that was dropped by the eagle OR fish that is not currently caught
+	# This handles the case where fish goes directly to nest after being dropped
+	if not fish.is_dropped and fish.is_caught:
+		print("Fish rejected - still caught by eagle")
 		return
 		
 	print("Nest fed with fish!")

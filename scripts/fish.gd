@@ -54,18 +54,14 @@ func _ready():
 	# Store original scale before any modifications
 	original_scale = scale
 	
-	# Set collision layers for proper detection
-	collision_layer = 1  # Fish are on layer 1 for nest detection
-	collision_mask = 0   # Fish don't need to detect other objects
+	# Collision layers are now set in the scene file
+	# Fish RigidBody2D: collision_layer = 1, collision_mask = 0
+	# Fish CatchArea: collision_layer = 1, collision_mask = 0
 	gravity_scale = 1.0
 	
 	# Get the detection area and connect signal
 	var catch_area = $CatchArea
 	catch_area.body_entered.connect(_on_catch_area_entered)
-	
-	# Set up catch area for nest detection
-	catch_area.collision_layer = 1  # Same layer as fish body for consistent detection
-	catch_area.collision_mask = 1   # CatchArea doesn't need to detect anything
 	
 	# Add to fish group for easy detection
 	add_to_group("fish")
@@ -171,14 +167,14 @@ func release_fish():
 	"""Called when eagle releases/drops the fish"""
 	is_caught = false
 	is_dropped = true  # Mark as dropped for cleanup tracking
-	set_deferred("freeze", false)
+	freeze = false  # Set immediately instead of deferred
 	
 	# Temporarily disable catching to prevent immediate re-catch
 	can_be_caught = false
 	
 	# Re-enable collision detection but fish won't be catchable until cooldown ends
 	var catch_area = $CatchArea
-	catch_area.set_deferred("monitoring", true)
+	catch_area.monitoring = true  # Set immediately instead of deferred
 	
 	# Start cooldown timer to re-enable catching
 	var cooldown_timer = Timer.new()
