@@ -84,3 +84,46 @@ These debug controls are implemented in the **Eagle** script (`scripts/eagle.gd`
 
 These controls are handled by the **GameManager** and allow testing of the stage progression system:
 
+---
+
+## 🔧 DEBUG CONTROLS STATUS: COMMENTED OUT
+
+**All debug controls have been commented out for production builds.**
+
+### How to Re-enable Debug Controls
+
+To re-enable debug controls for testing and development:
+
+#### 1. Eagle Debug Controls (`scripts/eagle.gd`)
+- **Location**: Lines 168-188 and 632-687
+- **Action**: Uncomment the `_unhandled_input(event)` function and the debug methods section
+- **Controls**: F, N, M, K keys for fish, nest, energy, and death testing
+
+#### 2. Game Manager Debug Controls (`scripts/game_manager.gd`)
+- **Location**: Lines 123-150
+- **Action**: Uncomment the `_input(event)` function
+- **Controls**: P, R, 1-6, A, F12 keys for stage navigation and FPS counter
+
+#### 3. UI Message Debug Controls (`scripts/ui/ui_message.gd`)
+- **Location**: Lines 378-413
+- **Action**: Uncomment the `_unhandled_input(event)` function
+- **Controls**: I, U, O keys for testing different UI message modes
+
+### Quick Re-enable Instructions
+
+1. **Search for**: `# DEBUG CONTROLS COMMENTED OUT`
+2. **Replace with**: `func _unhandled_input(event):` (or `func _input(event):` for game_manager.gd)
+3. **Remove the `#` comment markers** from the debug function implementations
+4. **Test the controls** to ensure they work properly
+
+### Debug Control Locations Summary
+
+| Script | Function | Lines | Controls |
+|--------|----------|-------|----------|
+| `scripts/eagle.gd` | `_unhandled_input()` | 168-188 | F, N, M, K |
+| `scripts/eagle.gd` | Debug methods | 632-687 | debug_add_fish(), debug_spawn_nest_on_next_obstacle() |
+| `scripts/game_manager.gd` | `_input()` | 123-150 | P, R, 1-6, A, F12 |
+| `scripts/ui/ui_message.gd` | `_unhandled_input()` | 378-413 | I, U, O |
+
+**Note**: The Enter key debug control mentioned in the documentation appears to not be implemented yet.
+

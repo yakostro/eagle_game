@@ -375,42 +375,43 @@ func _stop_continuous_blinking():
 		message_container.scale = Vector2(1.0, 1.0)
 		message_container.pivot_offset = Vector2.ZERO  # Reset pivot to default
 
-func _unhandled_input(event):
-	"""Handle debug input for testing message queue and flexible display modes"""
-	if not is_flexible_mode:
-		return
-		
-	if event is InputEventKey and event.pressed:
-		# DEBUG: U key to test morale UI message (double text mode)
-		if event.keycode == KEY_U:
-			print("DEBUG: Testing DOUBLE_TEXT mode - Morale message!")
-			show_flexible_message(FlexibleMessageType.NEST_MISSED, {
-				"primary_text": "Nest missed",
-				"secondary_text": "-MORALE",
-				"primary_color": (palette.White if palette else Color.WHITE),
-				"secondary_color": (palette.Red3 if palette else Color.RED)
-			})
-			get_viewport().set_input_as_handled()
-		# DEBUG: I key to test nest UI message (single text mode)
-		elif event.keycode == KEY_I:
-			print("DEBUG: Testing SINGLE_TEXT mode - Nest ahead!")
-			show_flexible_message(FlexibleMessageType.NEST_INCOMING, {
-				"primary_text": "Nest ahead!",
-				"primary_color": (palette.White if palette else Color.CYAN)
-			})
-			get_viewport().set_input_as_handled()
-		# DEBUG: O key to test energy message (text + icon mode)
-		elif event.keycode == KEY_O:
-			print("DEBUG: Testing TEXT_WITH_ICON mode - Energy gain!")
-			# Load energy icon for testing
-			var energy_icon = load("res://sprites/ui/energy_icon_yellow3.png") as Texture2D
-			show_flexible_message(FlexibleMessageType.ENERGY_GAIN, {
-				"primary_text": "+20",
-				"icon_texture": energy_icon,
-				"primary_color": Color.GREEN,
-				"icon_position": IconPosition.RIGHT
-			})
-			get_viewport().set_input_as_handled()
+# DEBUG CONTROLS COMMENTED OUT - See debug_keyboard_actions.md for re-enable instructions
+# func _unhandled_input(event):
+# 	"""Handle debug input for testing message queue and flexible display modes"""
+# 	if not is_flexible_mode:
+# 		return
+# 		
+# 	if event is InputEventKey and event.pressed:
+# 		# DEBUG: U key to test morale UI message (double text mode)
+# 		if event.keycode == KEY_U:
+# 			print("DEBUG: Testing DOUBLE_TEXT mode - Morale message!")
+# 			show_flexible_message(FlexibleMessageType.NEST_MISSED, {
+# 				"primary_text": "Nest missed",
+# 				"secondary_text": "-MORALE",
+# 				"primary_color": (palette.White if palette else Color.WHITE),
+# 				"secondary_color": (palette.Red3 if palette else Color.RED)
+# 			})
+# 			get_viewport().set_input_as_handled()
+# 		# DEBUG: I key to test nest UI message (single text mode)
+# 		elif event.keycode == KEY_I:
+# 			print("DEBUG: Testing SINGLE_TEXT mode - Nest ahead!")
+# 			show_flexible_message(FlexibleMessageType.NEST_INCOMING, {
+# 				"primary_text": "Nest ahead!",
+# 				"primary_color": (palette.White if palette else Color.CYAN)
+# 			})
+# 			get_viewport().set_input_as_handled()
+# 		# DEBUG: O key to test energy message (text + icon mode)
+# 		elif event.keycode == KEY_O:
+# 			print("DEBUG: Testing TEXT_WITH_ICON mode - Energy gain!")
+# 			# Load energy icon for testing
+# 			var energy_icon = load("res://sprites/ui/energy_icon_yellow3.png") as Texture2D
+# 			show_flexible_message(FlexibleMessageType.ENERGY_GAIN, {
+# 				"primary_text": "+20",
+# 				"icon_texture": energy_icon,
+# 				"primary_color": Color.GREEN,
+# 				"icon_position": IconPosition.RIGHT
+# 			})
+# 			get_viewport().set_input_as_handled()
 
 func _on_nest_incoming(_remaining: int):
 	"""Queue nest incoming message instead of showing directly"""
