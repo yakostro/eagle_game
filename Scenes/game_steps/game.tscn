@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3 uid="uid://bvfc1tl8ttpuo"]
+[gd_scene load_steps=34 format=3 uid="uid://bvfc1tl8ttpuo"]
 
 [ext_resource type="Script" path="res://scripts/game_manager.gd" id="1_amiw1"]
 [ext_resource type="PackedScene" uid="uid://bfhkdj8w2yaqr" path="res://scenes/parallax_background.tscn" id="2_pabcw"]
@@ -29,6 +29,7 @@
 [ext_resource type="Texture2D" uid="uid://bf5y3dl66rclc" path="res://sprites/ui/keys_fish_2.png" id="25_keys_fish"]
 [ext_resource type="AudioStream" uid="uid://b534hgmgqka4o" path="res://sounds/music/shattered_pixels.mp3" id="25_w17wi"]
 [ext_resource type="PackedScene" uid="uid://dr3nks8eycs8m" path="res://scenes/ui/ui_offscreen_nest_indicator.tscn" id="26_nest_indicator"]
+[ext_resource type="PackedScene" uid="uid://d1o1x6twifre5" path="res://scenes/ui/ui_esc_menu.tscn" id="27_esc_menu"]
 
 [sub_resource type="Resource" id="Resource_2vmig"]
 script = ExtResource("12_3ekbw")
@@ -71,6 +72,7 @@ eagle_path = NodePath("Eagle")
 nest_spawner_path = NodePath("Spawners/NestSpawner")
 fish_spawner_path = NodePath("Spawners/FishSpawner")
 fade_foreground_path = NodePath("CanvasLayer/FadeForeground")
+esc_menu_path = NodePath("CanvasLayer/UiEscMenu")
 
 [node name="ParallaxBackground" parent="." instance=ExtResource("2_pabcw")]
 enable_middle_layer = false
@@ -196,6 +198,9 @@ stage_to_delay = {
 camera_path = NodePath("../../Camera2D")
 nest_spawner_path = NodePath("../../Spawners/NestSpawner")
 palette_resource = SubResource("Resource_edrd6")
+
+[node name="UiEscMenu" parent="CanvasLayer" instance=ExtResource("27_esc_menu")]
+overlay_color = Color(0, 0, 0, 0.823529)
 
 [node name="EmbientSound" type="Node2D" parent="."]
 script = ExtResource("17_xaldk")

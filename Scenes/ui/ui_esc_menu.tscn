@@ -1,0 +1,79 @@
+[gd_scene load_steps=6 format=3 uid="uid://d1o1x6twifre5"]
+
+[ext_resource type="Script" path="res://scripts/ui/ui_esc_menu.gd" id="1_script"]
+[ext_resource type="FontFile" uid="uid://kcdyir8efr7o" path="res://fonts/Bangers-Regular.ttf" id="2_xphy1"]
+[ext_resource type="StyleBox" uid="uid://cgp78fb87d04" path="res://ui_res/ui_button_default.tres" id="3_towhi"]
+[ext_resource type="StyleBox" uid="uid://b5sd62y644wne" path="res://ui_res/ui_button_hover.tres" id="4_66d5e"]
+[ext_resource type="StyleBox" uid="uid://cmdqaud8hhe8" path="res://ui_res/ui_button_pressed.tres" id="5_dhpei"]
+
+[node name="UiEscMenu" type="Node2D"]
+script = ExtResource("1_script")
+
+[node name="UILayer" type="CanvasLayer" parent="."]
+layer = 10
+
+[node name="UIContainer" type="Control" parent="UILayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="FadeOverlay" type="ColorRect" parent="UILayer/UIContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0627451, 0, 0.0745098, 0.313726)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UILayer/UIContainer"]
+layout_mode = 1
+anchors_preset = 13
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -150.0
+offset_right = 150.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="Resume" type="Button" parent="UILayer/UIContainer/VBoxContainer"]
+custom_minimum_size = Vector2(300, 80)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("2_xphy1")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/normal = ExtResource("3_towhi")
+theme_override_styles/hover = ExtResource("4_66d5e")
+theme_override_styles/pressed = ExtResource("5_dhpei")
+text = "Resume"
+
+[node name="Restart" type="Button" parent="UILayer/UIContainer/VBoxContainer"]
+custom_minimum_size = Vector2(300, 80)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("2_xphy1")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/normal = ExtResource("3_towhi")
+theme_override_styles/hover = ExtResource("4_66d5e")
+theme_override_styles/pressed = ExtResource("5_dhpei")
+text = "Restart
+"
+
+[node name="Quit" type="Button" parent="UILayer/UIContainer/VBoxContainer"]
+custom_minimum_size = Vector2(300, 80)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("2_xphy1")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/normal = ExtResource("3_towhi")
+theme_override_styles/hover = ExtResource("4_66d5e")
+theme_override_styles/pressed = ExtResource("5_dhpei")
+text = "Quit
+"

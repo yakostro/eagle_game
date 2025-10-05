@@ -15,6 +15,7 @@ class_name GameManager
 @export var nest_spawner_path: NodePath
 @export var fish_spawner_path: NodePath
 @export var fade_foreground_path: NodePath
+@export var esc_menu_path: NodePath
 
 # Tweakable parameters for game over system
 @export var game_over_transition_delay: float = 1.0  # Delay before transitioning to game over scene
@@ -28,6 +29,7 @@ var eagle: Eagle
 var nest_spawner: NestSpawner
 var fish_spawner: FishSpawner
 var fade_foreground: FadeForeground
+var esc_menu: UiEscMenu
 
 # Game state tracking
 var is_game_over: bool = false
@@ -45,6 +47,7 @@ func _ready():
 	nest_spawner = get_node(nest_spawner_path) if nest_spawner_path else null
 	fish_spawner = get_node(fish_spawner_path) if fish_spawner_path else null
 	fade_foreground = get_node(fade_foreground_path) if fade_foreground_path else null
+	esc_menu = get_node(esc_menu_path) if esc_menu_path else null
 	
 	# Auto-find systems if paths not set
 	if not obstacle_spawner:
@@ -59,6 +62,8 @@ func _ready():
 		fish_spawner = find_child("FishSpawner", true, false)
 	if not fade_foreground:
 		fade_foreground = find_child("FadeForeground", true, false)
+	if not esc_menu:
+		esc_menu = find_child("UiEscMenu", true, false)
 	
 	# Sync movement speeds
 	sync_world_movement_speed()
@@ -360,6 +365,35 @@ func _is_eagle_below_screen() -> bool:
 	var death_boundary = screen_bottom + eagle.death_boundary_margin
 	
 	return eagle.global_position.y > death_boundary
+
+# === GAME RESTART ===
+
+func restart_game():
+	"""Restart the game from the beginning - can be called from pause menu or other systems"""
+	# Step 1: Unpause the game (important if called from pause menu)
+	get_tree().paused = false
+	
+	# Step 2: Reset game state flags
+	is_game_over = false
+	
+	# Step 3: Reset GameStats if available
+	if GameStats:
+		GameStats.reset_stats()
+	
+	# Step 4: Reset StageManager to stage 1 if available
+	if StageManager:
+		StageManager.reset_stage_progress()
+	
+	# Step 5: Reload the current scene
+	if SceneManager:
+		SceneManager.reload_current_scene()
+	else:
+		# Fallback if SceneManager not available
+		var error = get_tree().reload_current_scene()
+		if error != OK:
+			var path = get_tree().current_scene.scene_file_path
+			if path != "":
+				get_tree().change_scene_to_file(path)
 
 # === DEBUG AND DEVELOPMENT HELPERS ===
 
