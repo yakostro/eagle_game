@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://d1o1x6twifre5"]
+[gd_scene load_steps=6 format=3 uid="uid://dwbleo7rsrs1m"]
 
 [ext_resource type="Script" path="res://scripts/ui/ui_esc_menu.gd" id="1_script"]
 [ext_resource type="FontFile" uid="uid://kcdyir8efr7o" path="res://fonts/Bangers-Regular.ttf" id="2_xphy1"]
