@@ -41,6 +41,9 @@ var max_available_energy_capacity: float = 100.0
 # Animation tweener
 var feedback_tween: Tween
 
+# Cached reference for diagonal pattern overlay
+var diagonal_pattern_overlay: TextureRect = null
+
 # Game integration - connected to eagle signals
 @export var eagle_path: NodePath = "../../Eagle"
 @onready var eagle: Eagle = get_node(eagle_path)
@@ -148,7 +151,7 @@ func setup_ui_elements():
 	energy_loss_feedback.visible = false
 	
 	# Create diagonal pattern overlay
-	create_diagonal_pattern_overlay()
+	update_diagonal_pattern_overlay()
 
 func apply_progress_bar_colors():
 	"""Apply colors to progress bars using theme overrides"""
@@ -224,44 +227,47 @@ func _get_color(token: StringName) -> Color:
 		_:
 			return Color(1, 1, 1, 1)
 
-func create_diagonal_pattern_overlay():
-	"""Create a diagonal pattern overlay for the energy capacity lock area"""
+func update_diagonal_pattern_overlay():
+	"""Update the diagonal pattern overlay for the energy capacity lock area"""
 	var container = get_node("Container/ProgressBarContainer") as Control
 	
-	# Remove any existing diagonal overlay
-	var existing_overlay = container.get_node_or_null("DiagonalPatternOverlay")
-	if existing_overlay:
-		existing_overlay.queue_free()
-	
-	# Only create pattern if there's actually locked capacity
+	# Calculate locked capacity percentage
 	var locked_capacity_percent = 100.0 - current_capacity_percent
+	
+	# If no locked capacity, hide the overlay if it exists
 	if locked_capacity_percent <= 0:
+		if diagonal_pattern_overlay:
+			diagonal_pattern_overlay.visible = false
 		return
 	
-	# Create TextureRect for the diagonal pattern
-	var pattern_overlay = TextureRect.new()
-	pattern_overlay.name = "DiagonalPatternOverlay"
-	pattern_overlay.texture = diagonal_pattern_texture
-	pattern_overlay.stretch_mode = TextureRect.STRETCH_TILE
+	# If overlay doesn't exist, create it once and cache the reference
+	if diagonal_pattern_overlay == null:
+		diagonal_pattern_overlay = TextureRect.new()
+		diagonal_pattern_overlay.name = "DiagonalPatternOverlay"
+		diagonal_pattern_overlay.texture = diagonal_pattern_texture
+		diagonal_pattern_overlay.stretch_mode = TextureRect.STRETCH_TILE
+		
+		# Position it exactly like the capacity lock ColorRect
+		diagonal_pattern_overlay.anchor_left = 1.0
+		diagonal_pattern_overlay.anchor_right = 1.0
+		diagonal_pattern_overlay.anchor_top = 0.0
+		diagonal_pattern_overlay.anchor_bottom = 1.0
+		
+		# Make it non-interactive
+		diagonal_pattern_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		
+		# Add as child of the progress bar container
+		container.add_child(diagonal_pattern_overlay)
 	
-	# Position it exactly like the capacity lock ColorRect
-	pattern_overlay.anchor_left = 1.0
-	pattern_overlay.anchor_right = 1.0
-	pattern_overlay.anchor_top = 0.0
-	pattern_overlay.anchor_bottom = 1.0
-	
-	# Calculate the same width as the capacity lock
+	# Update the overlay's position based on current locked capacity
 	var locked_width = bar_width * (locked_capacity_percent / 100.0)
-	pattern_overlay.offset_left = -locked_width
-	pattern_overlay.offset_right = 0.0
-	pattern_overlay.offset_top = 0.0
-	pattern_overlay.offset_bottom = 0.0
+	diagonal_pattern_overlay.offset_left = -locked_width
+	diagonal_pattern_overlay.offset_right = 0.0
+	diagonal_pattern_overlay.offset_top = 0.0
+	diagonal_pattern_overlay.offset_bottom = 0.0
 	
-	# Make it non-interactive
-	pattern_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	
-	# Add as child of the progress bar container
-	container.add_child(pattern_overlay)
+	# Ensure it's visible
+	diagonal_pattern_overlay.visible = true
 
 func create_lightning_icon():
 	"""Create a simple lightning bolt icon programmatically"""
@@ -332,7 +338,7 @@ func update_capacity_display():
 	capacity_lock.offset_left = -locked_width
 	
 	# Update diagonal pattern overlay
-	create_diagonal_pattern_overlay()
+	update_diagonal_pattern_overlay()
 	
 ## Utility methods for external access
 
