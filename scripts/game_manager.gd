@@ -120,35 +120,36 @@ func _on_stage_changed(_new_stage: int, _stage_config: StageConfiguration):
 func _on_stage_completed(_completed_stage: int):
 	"""Handle stage completion events"""
 
+
 # DEBUG CONTROLS COMMENTED OUT - See debug_keyboard_actions.md for re-enable instructions
-# func _input(event):
-# 	"""Handle testing input for stage progression"""
-# 	if event is InputEventKey and event.pressed:
-# 		if event.keycode == KEY_P:
-# 			if StageManager:
-# 				StageManager.force_advance_stage()
-# 		elif event.keycode == KEY_R and not event.ctrl_pressed:
-# 			if SceneManager:
-# 				SceneManager.reload_current_scene()
-# 			else:
-# 				var error = get_tree().reload_current_scene()
-# 				if error != OK:
-# 					var path = get_tree().current_scene.scene_file_path
-# 					if path != "":
-# 						get_tree().change_scene_to_file(path)
-# 		elif event.keycode == KEY_R and event.ctrl_pressed:
-# 			if StageManager:
-# 				StageManager.reset_stage_progress()
-# 		elif event.keycode >= KEY_1 and event.keycode <= KEY_6:
-# 			var stage_number = event.keycode - KEY_0
-# 			if StageManager:
-# 				StageManager.skip_to_stage(stage_number)
-# 		elif event.keycode == KEY_A:
-# 			# Direct auto-difficulty test key
-# 			if StageManager:
-# 				StageManager.force_trigger_auto_difficulty()
-# 		elif event.keycode == KEY_F12:
-# 			_toggle_fps_counter()
+func _input(event):
+	"""Handle testing input for stage progression"""
+	if event is InputEventKey and event.pressed:
+		if event.keycode == KEY_P:
+			if StageManager:
+				StageManager.force_advance_stage()
+		elif event.keycode == KEY_R and not event.ctrl_pressed:
+			if SceneManager:
+				SceneManager.reload_current_scene()
+			else:
+				var error = get_tree().reload_current_scene()
+				if error != OK:
+					var path = get_tree().current_scene.scene_file_path
+					if path != "":
+						get_tree().change_scene_to_file(path)
+		elif event.keycode == KEY_R and event.ctrl_pressed:
+			if StageManager:
+				StageManager.reset_stage_progress()
+		elif event.keycode >= KEY_1 and event.keycode <= KEY_6:
+			var stage_number = event.keycode - KEY_0
+			if StageManager:
+				StageManager.skip_to_stage(stage_number)
+		elif event.keycode == KEY_A:
+			# Direct auto-difficulty test key
+			if StageManager:
+				StageManager.force_trigger_auto_difficulty()
+		elif event.keycode == KEY_F12:
+			_toggle_fps_counter()
 
 func _toggle_fps_counter():
 	"""Toggle FPS counter visibility for debugging"""

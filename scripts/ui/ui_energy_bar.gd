@@ -116,9 +116,9 @@ func set_capacity_percent_direct(new_capacity_percent: float):
 	# If current energy exceeds new capacity, clamp it
 	if current_energy_percent > max_available_energy_capacity:
 		current_energy_percent = max_available_energy_capacity
-	
-	update_energy_display()
+
 	update_capacity_display()
+	update_energy_display()
 
 func setup_ui_elements():
 	"""Configure the UI elements with exported parameters"""

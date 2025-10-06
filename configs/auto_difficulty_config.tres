@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_0kbqm")
-progression_interval = 15.0
+progression_interval = 10.0
 speed_increase_rate = 0.03
 max_speed_multiplier = 1.8
 spawn_rate_increase = 0.08
