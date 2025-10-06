@@ -22,6 +22,7 @@ class_name GameManager
 @export var eagle_fall_timeout: float = 2.0  # Maximum time to wait for eagle to fall below screen
 @export var enable_game_state_logging: bool = true
 @export var run_stage_system_tests: bool = false
+@export var debug_mode_enabled: bool = false
 
 var obstacle_spawner: ObstacleSpawner
 var parallax_background: ParallaxBackgroundSystem
@@ -124,32 +125,33 @@ func _on_stage_completed(_completed_stage: int):
 # DEBUG CONTROLS COMMENTED OUT - See debug_keyboard_actions.md for re-enable instructions
 func _input(event):
 	"""Handle testing input for stage progression"""
-	if event is InputEventKey and event.pressed:
-		if event.keycode == KEY_P:
-			if StageManager:
-				StageManager.force_advance_stage()
-		elif event.keycode == KEY_R and not event.ctrl_pressed:
-			if SceneManager:
-				SceneManager.reload_current_scene()
-			else:
-				var error = get_tree().reload_current_scene()
-				if error != OK:
-					var path = get_tree().current_scene.scene_file_path
-					if path != "":
-						get_tree().change_scene_to_file(path)
-		elif event.keycode == KEY_R and event.ctrl_pressed:
-			if StageManager:
-				StageManager.reset_stage_progress()
-		elif event.keycode >= KEY_1 and event.keycode <= KEY_6:
-			var stage_number = event.keycode - KEY_0
-			if StageManager:
-				StageManager.skip_to_stage(stage_number)
-		elif event.keycode == KEY_A:
-			# Direct auto-difficulty test key
-			if StageManager:
-				StageManager.force_trigger_auto_difficulty()
-		elif event.keycode == KEY_F12:
-			_toggle_fps_counter()
+	if debug_mode_enabled:
+		if event is InputEventKey and event.pressed:
+			if event.keycode == KEY_P:
+				if StageManager:
+					StageManager.force_advance_stage()
+			elif event.keycode == KEY_R and not event.ctrl_pressed:
+				if SceneManager:
+					SceneManager.reload_current_scene()
+				else:
+					var error = get_tree().reload_current_scene()
+					if error != OK:
+						var path = get_tree().current_scene.scene_file_path
+						if path != "":
+							get_tree().change_scene_to_file(path)
+			elif event.keycode == KEY_R and event.ctrl_pressed:
+				if StageManager:
+					StageManager.reset_stage_progress()
+			elif event.keycode >= KEY_1 and event.keycode <= KEY_6:
+				var stage_number = event.keycode - KEY_0
+				if StageManager:
+					StageManager.skip_to_stage(stage_number)
+			elif event.keycode == KEY_A:
+				# Direct auto-difficulty test key
+				if StageManager:
+					StageManager.force_trigger_auto_difficulty()
+			elif event.keycode == KEY_F12:
+				_toggle_fps_counter()
 
 func _toggle_fps_counter():
 	"""Toggle FPS counter visibility for debugging"""

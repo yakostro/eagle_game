@@ -1,6 +1,8 @@
 extends Label
 
 @export var palette: UiPalette
+@export var game_manager_path: NodePath
+var game_manager: GameManager
 
 ## Stage HUD Display
 ## Shows current stage information, game timer, and nest stats in the game UI
@@ -16,13 +18,25 @@ func _ready():
 	# Find nest spawner for nest count info
 	_find_nest_spawner()
 	
+	# Resolve game manager reference
+	if game_manager_path != NodePath(""):
+		game_manager = get_node_or_null(game_manager_path)
+	if not game_manager:
+		game_manager = get_tree().current_scene.find_child("Game", true, false) as GameManager
+		if not game_manager:
+			push_warning("StageHUD: Could not find GameManager for debug mode control.")
+	
 	# Apply palette text color if provided
 	if palette:
 		add_theme_color_override("font_color", palette.White)
+	
+	_update_visibility()
 
 func _process(delta):
 	# Update game timer
 	game_timer += delta
+	
+	_update_visibility()
 	
 	# Update display only when seconds change (optimization)
 	var current_second = int(game_timer)
@@ -123,3 +137,11 @@ func _update_stage_display(stage_number: int, config: StageConfiguration):
 	display_text += "Nests: %d fed / %d spawned" % [fed_nests, total_nests]
 	
 	text = display_text
+
+func _update_visibility():
+	"""Update the visibility of the HUD based on GameManager's debug_mode_enabled"""
+	if game_manager:
+		visible = game_manager.debug_mode_enabled
+	else:
+		# If no game manager, assume debug HUD should be hidden
+		visible = false

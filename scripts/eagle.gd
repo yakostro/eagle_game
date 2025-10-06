@@ -11,6 +11,9 @@ extends CharacterBody2D
 @export var balance_provider_path: NodePath
 var balance_provider: BalanceProvider
 
+@export var game_manager_path: NodePath
+var game_manager: GameManager
+
 # Import movement state enum from base controller
 const MovementState = BaseMovementController.MovementState
 
@@ -131,6 +134,14 @@ func _ready():
 	if _instant_text_feedback == null:
 		_instant_text_feedback = get_tree().current_scene.find_child("UIInstantTextFeedback", true, false)
 	
+	# Resolve game manager reference for debug mode
+	if game_manager_path != NodePath(""):
+		game_manager = get_node_or_null(game_manager_path)
+	if not game_manager:
+		game_manager = get_tree().current_scene as GameManager
+		if not game_manager:
+			push_warning("Eagle: Could not find GameManager for debug mode control.")
+	
 	# Connect signals
 	movement_controller.movement_state_changed.connect(animation_controller.handle_movement_state_change)
 	screech_requested.connect(animation_controller.handle_screech_request)
@@ -165,28 +176,29 @@ func _physics_process(delta):
 	move_and_slide()
 	
 
-# DEBUG CONTROLS COMMENTED OUT - See debug_keyboard_actions.md for re-enable instructions
+# DEBUG CONTROLS - Controlled by debug_mode_enabled in GameManager
 func _unhandled_input(event):
 	"""Handle debug input for testing"""
-	if event is InputEventKey and event.pressed:
-		# DEBUG: M key to decrease energy capacity (for testing diagonal pattern)
-		if event.keycode == KEY_M:
-			reduce_energy_capacity(15.0)
-			get_viewport().set_input_as_handled()
-		# DEBUG: K key to test dying animation
-		elif event.keycode == KEY_K:
-			print("🔧 DEBUG: Manually triggering dying state")
-			current_energy = 0.0
-			die()
-			get_viewport().set_input_as_handled()
-		# DEBUG: F key to add fish to eagle (as if caught)
-		elif event.keycode == KEY_F:
-			debug_add_fish()
-			get_viewport().set_input_as_handled()
-		# DEBUG: N key to spawn nest on next obstacle
-		elif event.keycode == KEY_N:
-			debug_spawn_nest_on_next_obstacle()
-			get_viewport().set_input_as_handled()
+	if game_manager and game_manager.debug_mode_enabled:
+		if event is InputEventKey and event.pressed:
+			# DEBUG: M key to decrease energy capacity (for testing diagonal pattern)
+			if event.keycode == KEY_M:
+				reduce_energy_capacity(15.0)
+				get_viewport().set_input_as_handled()
+			# DEBUG: K key to test dying animation
+			elif event.keycode == KEY_K:
+				print("🔧 DEBUG: Manually triggering dying state")
+				current_energy = 0.0
+				die()
+				get_viewport().set_input_as_handled()
+			# DEBUG: F key to add fish to eagle (as if caught)
+			elif event.keycode == KEY_F:
+				debug_add_fish()
+				get_viewport().set_input_as_handled()
+			# DEBUG: N key to spawn nest on next obstacle
+			elif event.keycode == KEY_N:
+				debug_spawn_nest_on_next_obstacle()
+				get_viewport().set_input_as_handled()
 
 # Fish management methods
 func catch_fish(fish: Fish) -> bool:
@@ -631,7 +643,7 @@ func handle_special_inputs():
 		screech_requested.emit()
 
 # ===== DEBUG METHODS =====
-# DEBUG CONTROLS COMMENTED OUT - See debug_keyboard_actions.md for re-enable instructions
+# DEBUG CONTROLS - Controlled by debug_mode_enabled in GameManager
 
 func debug_add_fish():
 	"""DEBUG: Add a fish to eagle as if caught (F key)"""

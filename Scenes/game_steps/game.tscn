@@ -73,6 +73,7 @@ nest_spawner_path = NodePath("Spawners/NestSpawner")
 fish_spawner_path = NodePath("Spawners/FishSpawner")
 fade_foreground_path = NodePath("CanvasLayer/FadeForeground")
 esc_menu_path = NodePath("CanvasLayer/UiEscMenu")
+debug_mode_enabled = true
 
 [node name="ParallaxBackground" parent="." instance=ExtResource("2_pabcw")]
 enable_middle_layer = false
@@ -95,6 +96,7 @@ eagle_reference = NodePath("../../Eagle")
 [node name="Eagle" parent="." instance=ExtResource("7_w8ddd")]
 position = Vector2(667, 395)
 balance_provider_path = NodePath("../BalanceProvider")
+game_manager_path = NodePath("..")
 energy_loss_per_flap = 1.0
 disable_passive_energy_loss = true
 camera_path = NodePath("../Camera2D")
@@ -166,6 +168,7 @@ theme_override_font_sizes/font_size = 22
 text = "Stage 1: Introduction"
 script = ExtResource("15_l4c53")
 palette = SubResource("Resource_bvd22")
+game_manager_path = NodePath("../../.")
 
 [node name="UIMessage" parent="CanvasLayer" instance=ExtResource("11_w3rko")]
 anchors_preset = 15
