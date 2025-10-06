@@ -10,6 +10,7 @@ extends Control
 @export var record_amount_label_path: NodePath = NodePath("UILayer/UIContainer/Record/Amount")
 @export var new_record_label_path: NodePath = NodePath("UILayer/UIContainer/Amount2")
 @export var restart_button_path: NodePath = NodePath("UILayer/UIContainer/RestartButton")
+@export var quit_button_path: NodePath = NodePath("UILayer/UIContainer/QuitButton")
 @export var background_music_path: NodePath = NodePath("AudioController/BackgroundMusic")
 
 # Tweakable parameters for game balancing
@@ -29,6 +30,7 @@ var amount_label: Label
 var record_amount_label: Label
 var new_record_label: Label
 var restart_button: Button
+var quit_button: Button
 var background_music: AudioStreamPlayer
 
 # Scene state
@@ -66,6 +68,7 @@ func _get_ui_references():
 	record_amount_label = get_node(record_amount_label_path) if record_amount_label_path else null
 	new_record_label = get_node(new_record_label_path) if new_record_label_path else null
 	restart_button = get_node(restart_button_path) if restart_button_path else null
+	quit_button = get_node(quit_button_path) if quit_button_path else null
 	background_music = get_node(background_music_path) if background_music_path else null
 	
 	# Validate critical components (no print warnings for missing optional UI elements)
@@ -74,6 +77,9 @@ func _connect_signals():
 	"""Connect UI signals for interaction handling"""
 	if restart_button:
 		restart_button.pressed.connect(_on_restart_button_pressed)
+	
+	if quit_button:
+		quit_button.pressed.connect(_on_quit_button_pressed)
 	
 	# Connect to GameStats for any real-time updates (future use)
 	if GameStats:
@@ -165,6 +171,10 @@ func _on_restart_button_pressed():
 	"""Handle restart button press"""
 	_trigger_restart()
 
+func _on_quit_button_pressed():
+	"""Handle quit button press"""
+	_trigger_quit()
+
 func _trigger_restart():
 	"""Execute the restart sequence"""
 	
@@ -182,6 +192,11 @@ func _trigger_restart():
 	else:
 		# Fallback if SceneManager not available
 		get_tree().change_scene_to_file("res://scenes/game_steps/game.tscn")
+
+func _trigger_quit():
+	"""Execute the quit sequence"""
+	# Quit the game application
+	get_tree().quit()
 
 # === SIGNAL HANDLERS ===
 
